@@ -6,7 +6,7 @@ import * as process from "process";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const PORT = process.env.PORT_SERVER || 5000;
+  const PORT = process.env.PORT_SERVER || 4000;
 
   const config = new DocumentBuilder()
     .setTitle('GLP')
