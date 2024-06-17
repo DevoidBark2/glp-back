@@ -12,9 +12,11 @@ export class RegisterUserDto{
     @ApiProperty()
     city: string;
     @ApiProperty()
-    univercity: string;
+    university: string;
     @ApiProperty()
-    teacher: string;
+    email: string;
+    @ApiProperty()
+    password: string;
     @ApiProperty()
     birth_day: Date;
 }
