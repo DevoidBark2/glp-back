@@ -10,7 +10,7 @@ class PostEntity {
     image: string;
     @Column({type: "text"})
     content: string;
-    @Column({type: "date"})
+    @Column({type: "timestamp"})
     publish_date : Date
 }
 

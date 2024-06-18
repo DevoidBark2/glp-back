@@ -7,6 +7,9 @@ export class CreatePostDto {
     image: string;
     @ApiProperty()
     content: string;
-    @ApiProperty()
+    @ApiProperty({
+        type: 'date',
+        format: 'YYYY-MM-DD HH:mm'
+    })
     publish_date: Date
 }
