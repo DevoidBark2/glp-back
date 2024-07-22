@@ -7,11 +7,13 @@ import {RegisterUserDto} from "./dto/register.dto";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {Roles} from "../constants/contants";
+import {SettingsEntity} from "../settings/entity/settings.entity";
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         @InjectRepository(User) private readonly userRepository: Repository<User>,
+        @InjectRepository(SettingsEntity) private readonly settingsEntityRepository: Repository<SettingsEntity>,
         private readonly jwtService: JwtService
     ) {}
 
@@ -49,6 +51,13 @@ export class AuthService {
 
     async login(user: { email:string }) {
         const userData = await this.userService.findOne(user.email);
+
+        const userSettings = await this.settingsEntityRepository.findOne({where: {user: userData}})
+
+        if(!userSettings){
+            await this.settingsEntityRepository.save({user:userData});
+        }
+
         return {
             id: userData.id,
             email: userData.email,

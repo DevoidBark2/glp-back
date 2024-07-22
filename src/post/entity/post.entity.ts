@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToMany, PrimaryGeneratedColumn,JoinTable} from "typeorm";
+import {EmojiEntity} from "./emoji.entity";
 
 @Entity('posts')
 class PostEntity {
@@ -12,6 +13,9 @@ class PostEntity {
     content: string;
     @Column({type: "timestamp"})
     publish_date : Date
+    @ManyToMany(() => EmojiEntity,{onDelete: "CASCADE"})
+    @JoinTable()
+    emoji: EmojiEntity[]
 }
 
 export default PostEntity;

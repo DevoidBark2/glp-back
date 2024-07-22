@@ -8,6 +8,10 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
 import {join} from "path"
+import { SettingsModule } from './settings/settings.module';
+import { CourseModule } from './course/course.module';
+import { SectionModule } from './section/section.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -33,7 +37,11 @@ import {join} from "path"
 
     AuthModule,
     UserModule,
-    PostModule
+    PostModule,
+    SettingsModule,
+    CourseModule,
+    SectionModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
