@@ -1,5 +1,6 @@
-import {Column, Entity, ManyToMany, PrimaryGeneratedColumn,JoinTable} from "typeorm";
+import {Column, Entity, ManyToMany, PrimaryGeneratedColumn, JoinTable, ManyToOne} from "typeorm";
 import {EmojiEntity} from "./emoji.entity";
+import {User} from "../../user/entity/user.entity";
 
 @Entity('posts')
 class PostEntity {
@@ -16,6 +17,8 @@ class PostEntity {
     @ManyToMany(() => EmojiEntity,{onDelete: "CASCADE"})
     @JoinTable()
     emoji: EmojiEntity[]
+    @ManyToOne(() => User, (user) => user.posts)
+    user: User
 }
 
 export default PostEntity;

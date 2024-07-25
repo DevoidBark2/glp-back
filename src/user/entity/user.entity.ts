@@ -1,5 +1,6 @@
 import {Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {CourseEntity} from "../../course/entity/course.entity";
+import PostEntity from "../../post/entity/post.entity";
 
 @Entity('users')
 export class User{
@@ -30,4 +31,7 @@ export class User{
     @OneToMany(() => CourseEntity, (course) => course.user)
     @JoinColumn()
     courses: CourseEntity[];
+    @OneToMany(() => PostEntity, (post) => post.user)
+    @JoinColumn()
+    posts: PostEntity[];
 }
