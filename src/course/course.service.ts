@@ -6,6 +6,8 @@ import {CreateCourseDto} from "./dto/create_course.dto";
 import {JwtService} from "@nestjs/jwt";
 import {User} from "../user/entity/user.entity";
 import {CategoryEntity} from "../category/entity/category.entity";
+import {AccessRightEnum} from "./enum/access_right.enum";
+import {LevelCourseEnum} from "./enum/level_course.enum";
 
 @Injectable()
 export class CourseService {
@@ -28,8 +30,10 @@ export class CourseService {
                image: course.image,
                category: course.category,
                access_right: course.access_right,
+               duration: course.duration,
                level: course.level,
-               description: course.description,
+               small_description: course.small_description,
+               content_description: course.content_description,
                teacher: {
                    id: course.user.id,
                    name: `${course.user.first_name} ${course.user.second_name} ${course.user.last_name}`,
@@ -40,26 +44,24 @@ export class CourseService {
     }
 
     async createCourse(createCourse: CreateCourseDto, token: string) {
-
-        console.log(createCourse)
         const decodedToken = await this.jwtService.decode(token);
 
         const user = await this.userRepository.findOne({ where: { id: decodedToken.id } });
 
         const category = await this.categoryEntityRepository.findOne({ where: { id: createCourse.category } });
 
+        console.log(createCourse)
         const newCourse = new CourseEntity();
         newCourse.name = createCourse.name;
-        newCourse.description = createCourse.description;
-        newCourse.category = category; // Pass the actual CategoryEntity object
-        newCourse.access_right = Number(createCourse.access_right);
+        newCourse.small_description = createCourse.small_description;
+        newCourse.content_description = createCourse.content_description
+        newCourse.category = category;
+        newCourse.access_right = AccessRightEnum.PRIVATE;
         newCourse.duration = createCourse.duration;
-        newCourse.level = Number(createCourse.level);
+        newCourse.level = LevelCourseEnum.LIGHT;
         newCourse.publish_date = createCourse.publish_date;
         newCourse.image = createCourse.image;
-        newCourse.user = user; // Pass the actual User entity
-
-        console.log(newCourse)
+        newCourse.user = user;
 
         return await this.courseEntityRepository.save(newCourse);
     }

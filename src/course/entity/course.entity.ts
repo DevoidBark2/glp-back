@@ -24,7 +24,7 @@ export class CourseEntity {
     @Column({type: "text"})
     image: string
     @Column({type:"text"})
-    description: string;
+    small_description: string;
     @ManyToOne(() => CategoryEntity, (category) => category.course)
     category: CategoryEntity
     @Column({type: "enum",enum: AccessRightEnum})
@@ -35,6 +35,8 @@ export class CourseEntity {
     level: number;
     @Column({type: "timestamp"})
     publish_date: Date
+    @Column({type: "text"})
+    content_description: string
     @ManyToOne(() => User)
     user: User;
     @OneToMany(() => SectionEntity, (sections) => sections.course)

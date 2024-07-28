@@ -4,7 +4,7 @@ export class CreateCourseDto{
     @ApiProperty()
     name: string;
     @ApiProperty()
-    description:string;
+    small_description:string;
     @ApiProperty({type: "file"})
     image: string
     @ApiProperty({type: "number"})
@@ -19,5 +19,7 @@ export class CreateCourseDto{
         type: 'date',
         format: 'YYYY-MM-DD HH:mm'
     })
+    @ApiProperty()
+    content_description: string
     publish_date: Date
 }

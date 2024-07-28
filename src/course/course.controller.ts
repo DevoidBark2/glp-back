@@ -44,9 +44,10 @@ export class CourseController {
     description: 'Bearer Token',
     required: true
   })
-  async createCourse(@Body() course : CreateCourseDto,@Req() req: Request,@UploadedFile() image : Express.Multer.File){
+  async createCourse(@Body() course : CreateCourseDto,@Req() req: Request){
     try{
-      course.image = "/uploads/" + image.filename;
+      console.log(course)
+      course.image = "/uploads/test.png";
       const userToken = req.headers["authorization"]
       const newCourse = await this.courseService.createCourse(course,userToken)
 
