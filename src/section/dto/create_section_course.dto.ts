@@ -1,8 +1,8 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSectionCourseDto {
-    @ApiProperty({type: 'string'})
-    title: string;
-    @ApiProperty({type: 'number'})
-    courseId: number
+  @ApiProperty({ type: 'string' })
+  title: string;
+  @ApiProperty({ type: 'number' })
+  courseId: number;
 }

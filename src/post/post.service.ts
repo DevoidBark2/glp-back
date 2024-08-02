@@ -1,66 +1,67 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
-import {CreatePostDto} from "./dto/create.dto";
-import {InjectRepository} from "@nestjs/typeorm";
-import PostEntity from "./entity/post.entity";
-import {Repository} from "typeorm";
-import {JwtService} from "@nestjs/jwt";
-import {User} from "../user/entity/user.entity";
+import { Injectable } from '@nestjs/common';
+import { CreatePostDto } from './dto/create.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import PostEntity from './entity/post.entity';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '../user/entity/user.entity';
 
 @Injectable()
 export class PostService {
-    constructor(
-        @InjectRepository(PostEntity) private readonly postEntityRepository: Repository<PostEntity>,
-        @InjectRepository(User) private readonly userRepository: Repository<User>,
-        private readonly jwtService: JwtService
-    ) {}
+  constructor(
+    @InjectRepository(PostEntity)
+    private readonly postEntityRepository: Repository<PostEntity>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    async createPost(post:CreatePostDto,token: any){
-        console.log(token)
-        const decodedToken = await this.jwtService.decode(token);
+  async getAllPosts() {
+    return this.postEntityRepository.find();
+  }
 
-        console.log("decoded token",decodedToken)
-        const user = await this.userRepository.findOne({where: {id: decodedToken.id}})
+  async createPost(post: CreatePostDto, token: any) {
+    console.log(token);
+    const decodedToken = await this.jwtService.decode(token);
 
-        if(!user){
-            throw `Пользователя с id ${decodedToken.id} не существует!`
-        }
+    console.log('decoded token', decodedToken);
+    const user = await this.userRepository.findOne({
+      where: { id: decodedToken.id },
+    });
 
-        const newPost = this.postEntityRepository.create({
-            name: post.name,
-            content: post.content,
-            image: post.image,
-            publish_date: post.publish_date,
-            user: user
-        })
-
-        return this.postEntityRepository.save(newPost);
+    if (!user) {
+      throw `Пользователя с id ${decodedToken.id} не существует!`;
     }
 
-    async getAllPosts(token: string){
-        const decodedToken = await this.jwtService.decode(token);
+    const newPost = this.postEntityRepository.create({
+      name: post.name,
+      content: post.content,
+      image: post.image,
+      publish_date: post.publish_date,
+      user: user,
+    });
 
-        if(!decodedToken){
-            throw new BadRequestException("Ошибка при получении данных!")
-        }
+    return this.postEntityRepository.save(newPost);
+  }
 
-        return this.postEntityRepository.find();
+  async deletePostById(postId: number) {
+    // const decodedToken = await this.jwtService.decode('asdsad');
+    //
+    // const user = await this.userRepository.findOne({
+    //   where: { id: decodedToken.id },
+    // });
+    //
+    // if (!user) {
+    //   throw `Пользователя с id ${decodedToken.id} не существует!`;
+    // }
+
+    const postDelete = await this.postEntityRepository.findOne({
+      where: { id: postId },
+    });
+
+    if (!postDelete) {
+      throw `Поста с id ${postId} не существует!`;
     }
 
-    async deletePostById(postId: number,token: string) {
-        const decodedToken = await this.jwtService.decode(token);
-
-        const user = await this.userRepository.findOne({where: {id: decodedToken.id}})
-
-        if(!user){
-            throw `Пользователя с id ${decodedToken.id} не существует!`
-        }
-
-        const postDelete = await this.postEntityRepository.findOne({where: {id: postId,user: user}})
-
-        if(!postDelete){
-            throw `Поста с id ${postId} не существует!`
-        }
-
-        await this.postEntityRepository.delete(postDelete);
-    }
+    await this.postEntityRepository.delete(postDelete);
+  }
 }

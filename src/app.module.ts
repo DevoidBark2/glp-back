@@ -6,8 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
-import { ServeStaticModule } from "@nestjs/serve-static";
-import {join} from "path"
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { SettingsModule } from './settings/settings.module';
 import { CourseModule } from './course/course.module';
 import { SectionModule } from './section/section.module';
@@ -17,14 +17,14 @@ import { CategoryModule } from './category/category.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      imports:[ConfigModule],
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('POSTGRES_HOST'),
         port: configService.get('POSTGRES_PORT'),
         username: configService.get('POSTGRES_USERNAME'),
-        password:configService.get('POSTGRES_PASSWORD'),
-        database:configService.get('POSTGRES_DB_NAME'),
+        password: configService.get('POSTGRES_PASSWORD'),
+        database: configService.get('POSTGRES_DB_NAME'),
         synchronize: true,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
       }),
@@ -41,7 +41,7 @@ import { CategoryModule } from './category/category.module';
     SettingsModule,
     CourseModule,
     SectionModule,
-    CategoryModule
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

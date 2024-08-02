@@ -1,9 +1,9 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('emoji')
 export class EmojiEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
-    @Column()
-    image: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
+  image: string;
 }
