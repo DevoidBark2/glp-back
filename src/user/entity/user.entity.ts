@@ -31,7 +31,7 @@ export class User {
   is_active: boolean;
   @Column()
   birth_day: Date;
-  @Column()
+  @Column({ nullable: true })
   otp_code: string;
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;

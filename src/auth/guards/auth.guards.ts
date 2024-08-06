@@ -22,16 +22,21 @@ export class AuthGuards implements CanActivate {
       ROLES_KEY,
       context.getHandler(),
     );
-    console.log('here', roles);
+
+    if (!roles) {
+      return true;
+    }
+    console.log('Roles:', roles);
     const request: Request = context.switchToHttp().getRequest();
     const token = request.headers['authorization'];
-    console.log('TOKEN', token);
+    if (!token) {
+      throw new BadRequestException('Token is missing!');
+    }
     const user = await this.userService.getUserByToken(token);
     if (!user) {
       throw new BadRequestException('User not found!');
     }
 
-    console.log(user);
     if (roles && !roles.includes(user.role)) {
       throw new ForbiddenException('У вас нет прав!');
     }

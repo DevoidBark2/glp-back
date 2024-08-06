@@ -28,6 +28,7 @@ import {
 import { CreatePostDto } from './dto/create.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../config/multerConfig';
+import PostEntity from './entity/post.entity';
 
 @ApiTags('Posts')
 @Controller()
@@ -38,11 +39,13 @@ export class PostController {
   @ApiOperation({ summary: 'Get all posts' })
   @ApiHeader({ name: 'authorization' })
   @ApiOkResponse({
+    description: 'List of posts',
     schema: {
-      allOf: [{ $ref: getSchemaPath(CreatePostDto) }],
+      type: 'array',
+      items: { $ref: getSchemaPath(CreatePostDto) },
     },
   })
-  async getAllPosts() {
+  async getAllPosts(): Promise<PostEntity[]> {
     return this.postService.getAllPosts();
   }
 
@@ -58,7 +61,7 @@ export class PostController {
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      post.image = '/uploads/' + image.filename;
+      post.image = '/uploads/' + '';
       const newPost = await this.postService.createPost(post, token);
       return {
         success: true,
