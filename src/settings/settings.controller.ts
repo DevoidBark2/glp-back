@@ -7,7 +7,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { SettingsService } from './settings.service';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChangeUserSettingsDto } from './dto/change_user_settings.dto';
 
 @ApiTags('Настройки')
@@ -16,7 +16,7 @@ export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get('/user-settings')
-  @ApiQuery({ name: 'token', description: 'Authorization token' })
+  @ApiHeader({ name: 'authorization', description: 'Authorization token' })
   async getUserSettings(@Req() req: Request) {
     try {
       const token = req.headers['authorization'];

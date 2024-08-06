@@ -21,7 +21,7 @@ export class CourseEntity {
   image: string;
   @Column({ type: 'text' })
   small_description: string;
-  @ManyToOne(() => CategoryEntity, (category) => category.course)
+  @ManyToOne(() => CategoryEntity, (category) => category.id)
   category: CategoryEntity;
   @Column({ type: 'enum', enum: AccessRightEnum })
   access_right: number;

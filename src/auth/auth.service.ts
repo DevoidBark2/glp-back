@@ -6,10 +6,10 @@ import { User } from '../user/entity/user.entity';
 import { RegisterUserDto } from './dto/register.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Roles } from '../constants/contants';
 import { SettingsEntity } from '../settings/entity/settings.entity';
 import { BasicResponse } from '../types/BasicResponse';
 import { LoginUserDto } from './dto/login.dto';
+import { UserRole } from '../constants/contants';
 @Injectable()
 export class AuthService {
   constructor(
@@ -38,7 +38,7 @@ export class AuthService {
     await this.userRepository.save({
       ...user,
       otp_code: otpCode,
-      role: Roles.STUDENT,
+      role: UserRole.STUDENT,
     });
 
     return {
@@ -62,7 +62,6 @@ export class AuthService {
   }
 
   async login(user: LoginUserDto) {
-    console.log(user);
     const userData = await this.userService.findOne(user.email);
 
     const userSettings = await this.settingsEntityRepository.findOne({

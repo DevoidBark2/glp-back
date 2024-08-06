@@ -1,54 +1,40 @@
 import {
-  BadRequestException,
+  Injectable,
   CanActivate,
   ExecutionContext,
-  Injectable,
-  UnauthorizedException,
+  BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AuthService } from '../auth.service';
+import { UserRole } from '../../constants/contants';
+import { ROLES_KEY } from '../../decorators/roles.decorator';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  public constructor(
-    private readonly reflector: Reflector,
-    private readonly authService: AuthService,
+export class AuthGuards implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    private readonly userService: UserService,
   ) {}
 
-  public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const token = this.extractToken(context);
-
-    console.log('token', token);
-    const user = await this.validateToken(token);
-
-    console.log('USER', user);
-    if (!user) {
-      console.log('user', user);
-      throw new BadRequestException('Error!');
-    }
-    // const isPublic = this.reflector.get<boolean>(
-    //   'isPublic',
-    //   context.getHandler(),
-    // );
-    //
-    // if (isPublic) {
-    //   return true;
-    // }
-
-    return true;
-  }
-
-  private async validateToken(token: string) {
-    return await this.authService.verifyToken(token);
-  }
-
-  private extractToken(context: ExecutionContext): string {
-    const request = context.switchToHttp().getRequest();
-    console.log(request);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const roles = this.reflector.get<UserRole[]>(
+      ROLES_KEY,
+      context.getHandler(),
+    );
+    console.log('here', roles);
+    const request: Request = context.switchToHttp().getRequest();
     const token = request.headers['authorization'];
-    if (!token) {
-      throw new UnauthorizedException('Token is missing');
+    console.log('TOKEN', token);
+    const user = await this.userService.getUserByToken(token);
+    if (!user) {
+      throw new BadRequestException('User not found!');
     }
-    return token;
+
+    console.log(user);
+    if (roles && !roles.includes(user.role)) {
+      throw new ForbiddenException('У вас нет прав!');
+    }
+    return true;
   }
 }

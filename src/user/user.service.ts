@@ -11,10 +11,18 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
+  async findAll() {
+    return await this.userRepository.find({
+      select: ['id', 'first_name', 'second_name', 'last_name', 'role'],
+      relations: {
+        courses: true,
+        posts: true,
+      },
+    });
+  }
   async findOne(email: string) {
     return this.userRepository.findOne({ where: { email: email } });
   }
-
   async getUserData(token: string) {
     const userFromToken = await this.jwtService.decode(token);
 
@@ -37,6 +45,21 @@ export class UserService {
         'city',
         'university',
       ],
+    });
+  }
+
+  async findOneById(id: number) {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+
+  async getUserByToken(token: string) {
+    const decodedToken = await this.jwtService.decode(token);
+
+    console.log(decodedToken);
+    return await this.userRepository.findOne({
+      where: {
+        id: decodedToken.id,
+      },
     });
   }
 }

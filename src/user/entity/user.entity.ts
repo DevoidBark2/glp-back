@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { CourseEntity } from '../../course/entity/course.entity';
 import PostEntity from '../../post/entity/post.entity';
+import { UserRole } from '../../constants/contants';
 
 @Entity('users')
 export class User {
@@ -32,8 +33,8 @@ export class User {
   birth_day: Date;
   @Column()
   otp_code: string;
-  @Column()
-  role: string;
+  @Column({ type: 'enum', enum: UserRole })
+  role: UserRole;
   @OneToMany(() => CourseEntity, (course) => course.user)
   @JoinColumn()
   courses: CourseEntity[];

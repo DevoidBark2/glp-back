@@ -1,5 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { CourseEntity } from '../../course/entity/course.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('categories')
 export class CategoryEntity {
@@ -7,6 +6,4 @@ export class CategoryEntity {
   id: number;
   @Column()
   name: string;
-  @OneToOne(() => CourseEntity, (course) => course.category)
-  course: CourseEntity;
 }

@@ -12,6 +12,9 @@ import { SettingsModule } from './settings/settings.module';
 import { CourseModule } from './course/course.module';
 import { SectionModule } from './section/section.module';
 import { CategoryModule } from './category/category.module';
+import { TestModule } from './test/test.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuards } from './auth/guards/auth.guards';
 
 @Module({
   imports: [
@@ -42,8 +45,15 @@ import { CategoryModule } from './category/category.module';
     CourseModule,
     SectionModule,
     CategoryModule,
+    TestModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuards,
+    },
+  ],
 })
 export class AppModule {}

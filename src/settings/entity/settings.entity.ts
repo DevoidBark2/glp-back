@@ -20,6 +20,10 @@ export class SettingsEntity {
   type_vertex: string;
   @Column({ type: 'text', default: 'black' })
   border_vertex: string;
+  @Column({ type: 'boolean', default: true })
+  enabled_grid: boolean;
+  @Column({ type: 'text', nullable: true, default: null })
+  background_color: string;
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
