@@ -11,10 +11,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.useGlobalInterceptors(
-    new ResponseInterceptor(),
-    new RequestInterceptor(),
-  );
+  // app.useGlobalInterceptors(
+  //   new ResponseInterceptor(),
+  //   new RequestInterceptor(),
+  // );
 
   // app.use(helmet());
   // app.use(csurf());

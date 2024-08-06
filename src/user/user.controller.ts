@@ -4,10 +4,9 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
-  ParseIntPipe,
   Post,
+  Put,
   Query,
   Req,
 } from '@nestjs/common';
@@ -16,7 +15,6 @@ import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create_user.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
-import { DeleteCategoryDto } from '../category/dto/delete-category.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 
 @ApiTags('Пользователи')
@@ -47,6 +45,7 @@ export class UserController {
     }
   }
 
+  // для профиля ?
   @Get('get-user')
   @ApiOperation({ summary: 'Get info user by ID' })
   @ApiQuery({ name: 'token', description: 'Authorization token' })
@@ -60,5 +59,24 @@ export class UserController {
   @Get('users')
   async findAll() {
     return await this.userService.findAll();
+  }
+
+  @Get('users/:id')
+  @ApiOperation({ summary: 'Get ' })
+  async getUserById(@Param('id') id: number) {
+    try {
+      return await this.userService.findOneById(id);
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
+  }
+
+  @Put('/user')
+  @ApiOperation({ summary: 'Change user info' })
+  async updateUser() {
+    try {
+    } catch (e) {
+      throw new BadRequestException(e);
+    }
   }
 }

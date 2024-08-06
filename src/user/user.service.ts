@@ -15,11 +15,16 @@ export class UserService {
 
   async findAll() {
     return await this.userRepository.find({
-      select: ['id', 'first_name', 'second_name', 'last_name', 'role', 'email'],
-      relations: {
-        courses: true,
-        posts: true,
-      },
+      select: [
+        'id',
+        'first_name',
+        'second_name',
+        'last_name',
+        'role',
+        'email',
+        'is_active',
+        'created_at',
+      ],
     });
   }
   async findOne(email: string) {
@@ -51,7 +56,33 @@ export class UserService {
   }
 
   async findOneById(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'first_name',
+        'second_name',
+        'last_name',
+        'role',
+        'email',
+        'is_active',
+        'city',
+        'university',
+        'birth_day',
+        'updated_at',
+        'created_at',
+      ],
+      relations: {
+        courses: true,
+        posts: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException(`User with ID ${id} not found!`);
+    }
+
+    return user;
   }
 
   async getUserByToken(token: string) {

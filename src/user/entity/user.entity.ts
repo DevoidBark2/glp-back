@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { CourseEntity } from '../../course/entity/course.entity';
 import PostEntity from '../../post/entity/post.entity';
@@ -35,6 +37,18 @@ export class User {
   otp_code: string;
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  public created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  public updated_at: Date;
   @OneToMany(() => CourseEntity, (course) => course.user)
   @JoinColumn()
   courses: CourseEntity[];

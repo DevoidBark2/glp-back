@@ -40,12 +40,12 @@ export class CategoryController {
       $ref: getSchemaPath(CreateCategoryDto),
     },
   })
-  @ApiBadRequestResponse({
-    status: 401,
-    schema: {
-      $ref: getSchemaPath(BadRequestException),
-    },
-  })
+  // @ApiBadRequestResponse({
+  //   status: 401,
+  //   schema: {
+  //     $ref: getSchemaPath(BadRequestException),
+  //   },
+  // })
   async getAll() {
     return this.categoryService.getAll();
   }
