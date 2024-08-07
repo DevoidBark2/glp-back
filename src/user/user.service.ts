@@ -98,7 +98,7 @@ export class UserService {
     });
   }
 
-  async createUser(body: CreateUserDto) {
+  async create(body: CreateUserDto) {
     const existUser = await this.userRepository.findOne({
       where: {
         email: body.email,
@@ -125,5 +125,9 @@ export class UserService {
     }
 
     await this.userRepository.delete(id);
+  }
+
+  async update(id: number, updatedUser: CreateUserDto) {
+    return await this.userRepository.update(id, updatedUser);
   }
 }

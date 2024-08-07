@@ -9,6 +9,8 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { format } from 'date-fns';
+import { Reflector } from '@nestjs/core';
+import { RESPONSE_MESSAGE_METADATA } from '../decorators/response-message.decorator';
 
 export type Response<T> = {
   status: boolean;
@@ -21,6 +23,8 @@ export type Response<T> = {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  constructor(private reflector: Reflector) {}
+
   intercept(
     context: ExecutionContext,
     next: CallHandler,
@@ -58,11 +62,16 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
     const statusCode = response.statusCode;
+    const message =
+      this.reflector.get<string>(
+        RESPONSE_MESSAGE_METADATA,
+        context.getHandler(),
+      ) || 'success';
 
     return {
       status: true,
       path: request.url,
-      message: 'asd',
+      message: message,
       statusCode,
       data: res,
       timestamp: format(new Date().toISOString(), 'yyyy-MM-dd HH:mm:ss'),

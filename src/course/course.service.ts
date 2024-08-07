@@ -20,28 +20,9 @@ export class CourseService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async getAllCourses() {
-    const courses = await this.courseEntityRepository.find({
+  async findAll() {
+    return await this.courseEntityRepository.find({
       relations: ['user', 'category'],
-    });
-
-    return courses.map((course) => {
-      return {
-        id: course.id,
-        name: course.name,
-        image: course.image,
-        category: course.category,
-        access_right: course.access_right,
-        duration: course.duration,
-        level: course.level,
-        small_description: course.small_description,
-        content_description: course.content_description,
-        teacher: {
-          id: course.user.id,
-          name: `${course.user.first_name} ${course.user.second_name} ${course.user.last_name}`,
-          email: course.user.email,
-        },
-      };
     });
   }
 
