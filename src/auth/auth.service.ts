@@ -62,15 +62,16 @@ export class AuthService {
   }
 
   async login(user: LoginUserDto) {
+    console.log(user);
     const userData = await this.userService.findOne(user.email);
 
-    const userSettings = await this.settingsEntityRepository.findOne({
-      where: { user: userData },
-    });
-
-    if (!userSettings) {
-      await this.settingsEntityRepository.save({ user: userData });
-    }
+    // const userSettings = await this.settingsEntityRepository.findOne({
+    //   where: { user: userData },
+    // });
+    //
+    // if (!userSettings) {
+    //   await this.settingsEntityRepository.save({ user: userData });
+    // }
 
     return {
       id: userData.id,

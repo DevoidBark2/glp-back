@@ -13,7 +13,6 @@ import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import {
-  ApiBadRequestResponse,
   ApiBody,
   ApiExtraModels,
   ApiOkResponse,

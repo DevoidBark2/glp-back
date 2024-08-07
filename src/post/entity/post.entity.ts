@@ -15,7 +15,7 @@ class PostEntity {
   id: number;
   @Column({ type: 'varchar' })
   name: string;
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   image: string;
   @Column({ type: 'text' })
   content: string;

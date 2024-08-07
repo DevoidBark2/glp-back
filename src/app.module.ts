@@ -14,6 +14,7 @@ import { SectionModule } from './section/section.module';
 import { CategoryModule } from './category/category.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuards } from './auth/guards/auth.guards';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AuthGuards } from './auth/guards/auth.guards';
     CourseModule,
     SectionModule,
     CategoryModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [
