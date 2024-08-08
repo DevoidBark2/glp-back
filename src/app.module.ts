@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -37,7 +35,6 @@ import { BannersModule } from './banners/banners.module';
       rootPath: join(__dirname, '..', 'src', 'uploads'),
       serveRoot: '/uploads',
     }),
-
     AuthModule,
     UserModule,
     PostModule,
@@ -47,9 +44,7 @@ import { BannersModule } from './banners/banners.module';
     CategoryModule,
     BannersModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_GUARD,
       useClass: AuthGuards,

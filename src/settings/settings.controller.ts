@@ -7,7 +7,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { SettingsService } from './settings.service';
-import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ChangeUserSettingsDto } from './dto/change_user_settings.dto';
 
 @ApiTags('Настройки')
@@ -17,18 +17,15 @@ export class SettingsController {
 
   @Get('/user-settings')
   @ApiHeader({ name: 'authorization', description: 'Authorization token' })
+  @ApiOperation({ summary: 'Get user settings' })
   async getUserSettings(@Req() req: Request) {
-    try {
-      const token = req.headers['authorization'];
+    const token = req.headers['authorization'];
 
-      const userSettings = await this.settingsService.getUserSettings(token);
+    const userSettings = await this.settingsService.getUserSettings(token);
 
-      return {
-        userSettings: userSettings,
-      };
-    } catch (e) {
-      throw new BadRequestException(`Ошибка при получении данных: ${e}`);
-    }
+    return {
+      userSettings: userSettings,
+    };
   }
 
   @Put('/user-settings')

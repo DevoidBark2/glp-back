@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,23 +7,26 @@ import {
   Post,
   Put,
   Query,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create_user.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { DeleteUserDto } from './dto/delete-user.dto';
+import { Serialize } from '../decorators/serialize.decorator';
+import { UserDetailsByIdDto } from './dto/user_details_by_id.dto';
+import { UsersResponseDto } from './dto/users_response_dto';
 
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('users')
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: 'Get all users' })
-  @Get('users')
+  @Serialize(UsersResponseDto)
   async findAll() {
     return await this.userService.findAll();
   }
@@ -40,12 +42,14 @@ export class UserController {
   @Post('user')
   @ApiOperation({ summary: 'Create new user' })
   @ApiBody({ type: CreateUserDto })
+  @Serialize(UsersResponseDto)
   async createUser(@Body() body: CreateUserDto) {
     return await this.userService.create(body);
   }
 
   @Get('users/:id')
   @ApiOperation({ summary: 'Get ' })
+  @Serialize(UserDetailsByIdDto)
   async getUserById(@Param('id') id: number) {
     return await this.userService.findOneById(id);
   }
@@ -54,14 +58,5 @@ export class UserController {
   @ApiOperation({ summary: 'Change user info' })
   async updateUser(@Param('id') id: number, @Body() body: CreateUserDto) {
     return await this.userService.update(id, body);
-  }
-
-  // для профиля ????
-  @Get('get-user')
-  @ApiOperation({ summary: 'Get info user by ID' })
-  @ApiQuery({ name: 'token', description: 'Authorization token' })
-  async getUserData(@Req() req: Request) {
-    const token = req.headers['authorization'];
-    return await this.userService.getUserData(token);
   }
 }

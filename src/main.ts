@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as process from 'process';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { RequestInterceptor } from './interceptors/request.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -13,16 +12,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const reflector = app.get(Reflector);
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(
-    new ResponseInterceptor(reflector),
-    // new RequestInterceptor(),
-  );
-
-  // app.use(helmet());
-  // app.use(csurf());
-  // app.register(helmet, {
-  //   contentSecurityPolicy: false,
-  // });
+  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
   const config = new DocumentBuilder()
     .setTitle('GLP')

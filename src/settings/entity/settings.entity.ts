@@ -12,17 +12,17 @@ import { TYPES_VERTEX } from '../enum/type_vertex.enum';
 export class SettingsEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'text', default: 'green' })
+  @Column({ type: 'text' })
   vertex_color: string;
-  @Column({ type: 'text', default: 'red' })
+  @Column({ type: 'text' })
   edge_color: string;
-  @Column({ type: 'enum', enum: TYPES_VERTEX, default: TYPES_VERTEX.CIRCLE })
+  @Column({ type: 'enum', enum: TYPES_VERTEX })
   type_vertex: string;
-  @Column({ type: 'text', default: 'black' })
+  @Column({ type: 'text' })
   border_vertex: string;
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean' })
   enabled_grid: boolean;
-  @Column({ type: 'text', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true })
   background_color: string;
   @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()

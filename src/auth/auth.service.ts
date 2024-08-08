@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { SettingsEntity } from '../settings/entity/settings.entity';
 import { BasicResponse } from '../types/BasicResponse';
 import { LoginUserDto } from './dto/login.dto';
-import { UserRole } from '../constants/contants';
+import { DEFAULT_SETTINGS_FOR_NEW_USER, UserRole } from '../constants/contants';
 @Injectable()
 export class AuthService {
   constructor(
@@ -35,11 +35,23 @@ export class AuthService {
       .toString()
       .padStart(6, '0');
 
-    await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       ...user,
       otp_code: otpCode,
       role: UserRole.STUDENT,
     });
+
+    const settingForNewUser = this.settingsEntityRepository.create({
+      vertex_color: DEFAULT_SETTINGS_FOR_NEW_USER.VERTEX_COLOR,
+      edge_color: DEFAULT_SETTINGS_FOR_NEW_USER.EDGE_COLOR,
+      type_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.TYPE_VERTEX,
+      border_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.BORDER_VERTEX,
+      enabled_grid: DEFAULT_SETTINGS_FOR_NEW_USER.ENABLED_GRID,
+      background_color: DEFAULT_SETTINGS_FOR_NEW_USER.BACKGROUND_COLOR,
+      user: newUser,
+    });
+
+    await this.settingsEntityRepository.save(settingForNewUser);
 
     return {
       success: true,
@@ -72,6 +84,11 @@ export class AuthService {
     // if (!userSettings) {
     //   await this.settingsEntityRepository.save({ user: userData });
     // }
+    const token = this.jwtService.sign({
+      id: userData.id,
+      email: user.email,
+      role: userData.role,
+    });
 
     return {
       id: userData.id,
@@ -79,11 +96,7 @@ export class AuthService {
       role: userData.role,
       user_name:
         userData.second_name + userData.first_name + userData.last_name,
-      token: this.jwtService.sign({
-        id: userData.id,
-        email: user.email,
-        role: userData.role,
-      }),
+      token: token,
     };
   }
 

@@ -14,64 +14,16 @@ export class UserService {
   ) {}
 
   async findAll() {
-    return await this.userRepository.find({
-      select: [
-        'id',
-        'first_name',
-        'second_name',
-        'last_name',
-        'role',
-        'email',
-        'is_active',
-        'created_at',
-      ],
-    });
+    return await this.userRepository.find();
   }
+
   async findOne(email: string) {
     return this.userRepository.findOne({ where: { email: email } });
-  }
-  async getUserData(token: string) {
-    const userFromToken = await this.jwtService.decode(token);
-
-    const user = await this.findOne(userFromToken.email);
-
-    if (!user) {
-      throw new BadRequestException(
-        'Ошибка при получении данных пользователя!',
-      );
-    }
-
-    return this.userRepository.findOne({
-      where: userFromToken.id,
-      select: [
-        'id',
-        'first_name',
-        'second_name',
-        'last_name',
-        'birth_day',
-        'city',
-        'university',
-      ],
-    });
   }
 
   async findOneById(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
-      select: [
-        'id',
-        'first_name',
-        'second_name',
-        'last_name',
-        'role',
-        'email',
-        'is_active',
-        'city',
-        'university',
-        'birth_day',
-        'updated_at',
-        'created_at',
-      ],
       relations: {
         courses: true,
         posts: true,
@@ -98,22 +50,20 @@ export class UserService {
     });
   }
 
-  async create(body: CreateUserDto) {
+  async create(newUser: CreateUserDto) {
     const existUser = await this.userRepository.findOne({
       where: {
-        email: body.email,
+        email: newUser.email,
       },
     });
 
     if (existUser) {
-      throw `Пользователь с email: ${body.email} уже существует!`;
+      throw `Пользователь с email: ${newUser.email} уже существует!`;
     }
 
-    body.password = await argon2.hash(body.password);
-    const newUser = this.userRepository.create(body);
+    newUser.password = await argon2.hash(newUser.password);
     await this.userRepository.save(newUser);
 
-    delete newUser.password;
     return newUser;
   }
 

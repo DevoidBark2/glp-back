@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,14 +15,11 @@ import {
   ApiBody,
   ApiExtraModels,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { ChangeCategoryDto } from './dto/change-category.dto';
-import { CategoryEntity } from './entity/category.entity';
-import { BasicResponse } from '../types/BasicResponse';
 
 @ApiTags('Categories')
 @Controller()
