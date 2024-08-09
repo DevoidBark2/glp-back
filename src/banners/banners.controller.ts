@@ -13,7 +13,7 @@ import { BannersService } from './banners.service';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
-import { CreateBannerDto } from './entity/dto/create-banner.dto';
+import { CreateBannerDto } from './dto/create-banner.dto';
 import { ResponseMessage } from '../decorators/response-message.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 

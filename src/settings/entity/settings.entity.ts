@@ -24,7 +24,7 @@ export class SettingsEntity {
   enabled_grid: boolean;
   @Column({ type: 'text', nullable: true })
   background_color: string;
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.settings, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 }

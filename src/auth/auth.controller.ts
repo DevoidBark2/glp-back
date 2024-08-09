@@ -1,8 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register.dto';
+import { BadRequestResponseDto } from '../types/BadRequestResponseDto';
+import { RegisterResponseDto } from './dto/register_response.dto';
+import { LoginResponseDto } from './dto/login_response.dto';
 
 @ApiTags('Авторизация')
 @Controller()
@@ -11,14 +20,35 @@ export class AuthController {
 
   @Post('register')
   @ApiBody({ type: RegisterUserDto })
-  async registerUser(@Body() req: RegisterUserDto) {
-    return this.authService.registerUser(req);
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestResponseDto,
+    description: 'Error register',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: RegisterResponseDto,
+    description: 'Register new user',
+  })
+  async registerUser(@Body() userDto: RegisterUserDto) {
+    return this.authService.registerUser(userDto);
   }
 
   @Post('login')
   @ApiBody({ type: LoginUserDto })
   @ApiOperation({ summary: 'Log in in system' })
-  async login(@Body() body: LoginUserDto) {
-    return this.authService.login(body);
+  @ApiBadRequestResponse({
+    status: HttpStatus.BAD_REQUEST,
+    type: BadRequestResponseDto,
+    description: 'Error log in in system',
+  })
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    type: LoginResponseDto,
+    description: '',
+  })
+  async login(@Body() userDto: LoginUserDto) {
+    return this.authService.login(userDto);
   }
 }

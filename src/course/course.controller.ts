@@ -23,6 +23,8 @@ import {
 import { CreateCourseDto } from './dto/create_course.dto';
 import { ResponseCoursesInterceptor } from '../interceptors/response-courses.interceptor';
 import { CourseEntity } from './entity/course.entity';
+import { Roles } from '../decorators/roles.decorator';
+import { UserRole } from '../constants/contants';
 
 @ApiTags('Курсы')
 @Controller()
@@ -73,8 +75,12 @@ export class CourseController {
     }
   }
 
+  @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Delete('/course/:id')
   async deleteCourse(@Param('id') id: number) {
-    console.log(typeof id);
+    await this.courseService.delete(id);
+    return {
+      message: 'Курс успешно удален!',
+    };
   }
 }

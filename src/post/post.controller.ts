@@ -37,7 +37,6 @@ export class PostController {
 
   @Get('/posts')
   @ApiOperation({ summary: 'Get all posts' })
-  @ApiHeader({ name: 'authorization' })
   @ApiOkResponse({
     description: 'List of posts',
     schema: {

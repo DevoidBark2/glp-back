@@ -13,6 +13,7 @@ import { CategoryModule } from './category/category.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuards } from './auth/guards/auth.guards';
 import { BannersModule } from './banners/banners.module';
+import { WebsocketGateway } from './websockets/websocket.gateway';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { BannersModule } from './banners/banners.module';
     BannersModule,
   ],
   providers: [
+    WebsocketGateway,
     {
       provide: APP_GUARD,
       useClass: AuthGuards,

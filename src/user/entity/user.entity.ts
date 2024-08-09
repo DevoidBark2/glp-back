@@ -4,12 +4,14 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CourseEntity } from '../../course/entity/course.entity';
 import PostEntity from '../../post/entity/post.entity';
 import { UserRole } from '../../constants/contants';
+import { SettingsEntity } from '../../settings/entity/settings.entity';
 
 @Entity('users')
 export class User {
@@ -55,4 +57,6 @@ export class User {
   @OneToMany(() => PostEntity, (post) => post.user)
   @JoinColumn()
   posts: PostEntity[];
+  @OneToOne(() => SettingsEntity, (settings) => settings.user)
+  settings: SettingsEntity;
 }

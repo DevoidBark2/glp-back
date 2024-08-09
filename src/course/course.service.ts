@@ -60,10 +60,18 @@ export class CourseService {
       where: { id: decodedToken.id },
     });
 
-    const courses = await this.courseEntityRepository.find({
+    return await this.courseEntityRepository.find({
       where: { user: user },
     });
+  }
 
-    return courses;
+  async delete(courseId: number) {
+    const course = await this.courseEntityRepository.findOne({
+      where: {
+        id: courseId,
+      },
+      relations: ['user', 'category'],
+    });
+    console.log(course);
   }
 }

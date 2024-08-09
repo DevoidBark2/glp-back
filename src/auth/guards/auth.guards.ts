@@ -26,7 +26,6 @@ export class AuthGuards implements CanActivate {
     if (!roles) {
       return true;
     }
-    console.log('Roles:', roles);
     const request: Request = context.switchToHttp().getRequest();
     const token = request.headers['authorization'];
     if (!token) {
@@ -40,6 +39,8 @@ export class AuthGuards implements CanActivate {
     if (roles && !roles.includes(user.role)) {
       throw new ForbiddenException('У вас нет прав!');
     }
+
+    request['user'] = user;
     return true;
   }
 }

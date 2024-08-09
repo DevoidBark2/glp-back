@@ -5,6 +5,7 @@ import { User } from '../user/entity/user.entity';
 import { SettingsEntity } from './entity/settings.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ChangeUserSettingsDto } from './dto/change_user_settings.dto';
+import { DEFAULT_SETTINGS_FOR_NEW_USER } from '../constants/contants';
 
 @Injectable()
 export class SettingsService {
@@ -15,35 +16,46 @@ export class SettingsService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async getUserSettings(token) {
-    const decodedToken = await this.jwtService.decode(token);
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
-    });
-
+  async getUserSettings(req: Request) {
+    const currentUser: User = req['user'];
     return await this.settingsEntityRepository.findOne({
       where: {
-        user: user,
+        user: { id: currentUser.id },
       },
     });
   }
 
-  async changeUserSettings(
-    token: string,
-    changeUserSettings: ChangeUserSettingsDto,
-  ) {
-    const decodedToken = await this.jwtService.decode(token);
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
+  async changeUserSettings(changeUserSettings: ChangeUserSettingsDto) {
+    await this.settingsEntityRepository.update(changeUserSettings.id, {
+      ...changeUserSettings,
     });
 
-    await this.settingsEntityRepository.update(
-      changeUserSettings.id,
-      changeUserSettings,
-    );
+    return await this.settingsEntityRepository.findOne({
+      where: { id: changeUserSettings.id },
+    });
+  }
 
-    return user;
+  async resetUserSettings(req: Request) {
+    const currentUser: User = req['user'];
+    const currentSetting = await this.settingsEntityRepository.findOne({
+      where: {
+        user: { id: currentUser.id },
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    await this.settingsEntityRepository.update(currentSetting.id, {
+      ...currentSetting,
+      ...{
+        vertex_color: DEFAULT_SETTINGS_FOR_NEW_USER.VERTEX_COLOR,
+        edge_color: DEFAULT_SETTINGS_FOR_NEW_USER.EDGE_COLOR,
+        type_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.TYPE_VERTEX,
+        border_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.BORDER_VERTEX,
+        enabled_grid: DEFAULT_SETTINGS_FOR_NEW_USER.ENABLED_GRID,
+        background_color: DEFAULT_SETTINGS_FOR_NEW_USER.BACKGROUND_COLOR,
+      },
+    });
   }
 }

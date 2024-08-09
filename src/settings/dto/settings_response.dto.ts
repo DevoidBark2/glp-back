@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ChangeUserSettingsDto {
+export class UserSettingResponseDataDto {
   @ApiProperty()
   id: number;
   @ApiProperty()
@@ -15,4 +15,19 @@ export class ChangeUserSettingsDto {
   enabled_grid: boolean;
   @ApiProperty()
   background_color: string;
+}
+
+export class SettingsResponseDto {
+  @ApiProperty()
+  status: boolean;
+  @ApiProperty()
+  path: string;
+  @ApiProperty()
+  message: string;
+  @ApiProperty()
+  statusCode: number;
+  @ApiProperty()
+  data: UserSettingResponseDataDto;
+  @ApiProperty()
+  timestamp: Date;
 }

@@ -10,6 +10,7 @@ import { SectionEntity } from '../../section/entity/section.entity';
 import { CategoryEntity } from '../../category/entity/category.entity';
 import { AccessRightEnum } from '../enum/access_right.enum';
 import { LevelCourseEnum } from '../enum/level_course.enum';
+import { StatusCourseEnum } from '../enum/status_course.enum';
 
 @Entity('courses')
 export class CourseEntity {
@@ -33,6 +34,14 @@ export class CourseEntity {
   publish_date: Date;
   @Column({ type: 'text' })
   content_description: string;
+  @Column({ type: 'text', nullable: true })
+  secret_key: string;
+  @Column({
+    type: 'enum',
+    enum: StatusCourseEnum,
+    default: StatusCourseEnum.ACTIVE,
+  })
+  status: StatusCourseEnum;
   @ManyToOne(() => User)
   user: User;
   @OneToMany(() => SectionEntity, (sections) => sections.course)

@@ -41,6 +41,7 @@ export class AuthService {
       role: UserRole.STUDENT,
     });
 
+    // Set setting for new user
     const settingForNewUser = this.settingsEntityRepository.create({
       vertex_color: DEFAULT_SETTINGS_FOR_NEW_USER.VERTEX_COLOR,
       edge_color: DEFAULT_SETTINGS_FOR_NEW_USER.EDGE_COLOR,
@@ -67,10 +68,11 @@ export class AuthService {
     }
     const passwordIsMatch = await argon2.verify(user.password, password);
 
-    if (passwordIsMatch) {
-      return user;
+    if (!passwordIsMatch) {
+      throw new BadRequestException('Email или пароль не верные!');
     }
-    throw new BadRequestException('Email или пароль не верные!');
+
+    return user;
   }
 
   async login(user: LoginUserDto) {
