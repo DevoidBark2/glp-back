@@ -26,12 +26,8 @@ export class CourseService {
     });
   }
 
-  async createCourse(createCourse: CreateCourseDto, token: string) {
-    const decodedToken = await this.jwtService.decode(token);
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
-    });
+  async createCourse(createCourse: CreateCourseDto, req: Request) {
+    const currentUser: User = req['user'];
 
     const category = await this.categoryEntityRepository.findOne({
       where: { id: createCourse.category },
@@ -43,22 +39,18 @@ export class CourseService {
     newCourse.small_description = createCourse.small_description;
     newCourse.content_description = createCourse.content_description;
     newCourse.category = category;
-    newCourse.access_right = AccessRightEnum.PRIVATE;
+    newCourse.access_right = createCourse.access_right;
     newCourse.duration = createCourse.duration;
-    newCourse.level = LevelCourseEnum.LIGHT;
+    newCourse.level = createCourse.level;
     newCourse.publish_date = createCourse.publish_date;
     newCourse.image = createCourse.image;
-    newCourse.user = user;
+    newCourse.user = currentUser;
 
     return await this.courseEntityRepository.save(newCourse);
   }
 
-  async getAllUserCourses(token: string) {
-    const decodedToken = await this.jwtService.decode(token);
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
-    });
+  async getAllUserCourses(req: Request) {
+    const user: User = req['user'];
 
     return await this.courseEntityRepository.find({
       where: { user: user },

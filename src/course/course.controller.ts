@@ -49,10 +49,8 @@ export class CourseController {
     required: true,
   })
   async createCourse(@Body() course: CreateCourseDto, @Req() req: Request) {
-    console.log(course);
     course.image = '/uploads/test.png';
-    const userToken = req.headers['authorization'];
-    const newCourse = await this.courseService.createCourse(course, userToken);
+    const newCourse = await this.courseService.createCourse(course, req);
 
     return {
       course: newCourse,
@@ -61,11 +59,9 @@ export class CourseController {
   }
 
   @Get('/get-user-courses')
-  @ApiQuery({ name: 'token', description: 'Token' })
   async getUserCourses(@Req() req: Request) {
     try {
-      const token = req.headers['authorization'];
-      const courses = await this.courseService.getAllUserCourses(token);
+      const courses = await this.courseService.getAllUserCourses(req);
 
       return {
         courses: courses,

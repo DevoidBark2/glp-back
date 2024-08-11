@@ -14,6 +14,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('GLP')
     .setDescription('Graph Learning Platform')
