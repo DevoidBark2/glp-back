@@ -23,11 +23,14 @@ export class AuthGuards implements CanActivate {
       context.getHandler(),
     );
 
+    console.log(roles);
     if (!roles) {
       return true;
     }
     const request: Request = context.switchToHttp().getRequest();
     const token = request.headers['authorization'];
+    console.log(request);
+    console.log('token', token);
     if (!token) {
       throw new BadRequestException('Token is missing!');
     }

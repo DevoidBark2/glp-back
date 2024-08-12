@@ -17,7 +17,6 @@ import {
   ApiConsumes,
   ApiHeader,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateCourseDto } from './dto/create_course.dto';
@@ -38,6 +37,7 @@ export class CourseController {
     return await this.courseService.findAll();
   }
 
+  @Roles(UserRole.TEACHER)
   @Post('/course')
   @UseInterceptors(FileInterceptor('image', multerOptions))
   @ApiConsumes('multipart/form-data')
@@ -50,6 +50,7 @@ export class CourseController {
   })
   async createCourse(@Body() course: CreateCourseDto, @Req() req: Request) {
     course.image = '/uploads/test.png';
+    console.log('User in controller', req['user']);
     const newCourse = await this.courseService.createCourse(course, req);
 
     return {
@@ -58,6 +59,7 @@ export class CourseController {
     };
   }
 
+  @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Get('/get-user-courses')
   async getUserCourses(@Req() req: Request) {
     try {
@@ -78,5 +80,15 @@ export class CourseController {
     return {
       message: 'Курс успешно удален!',
     };
+  }
+
+  @Post('publish-course')
+  async publishCourse(@Body() body: { courseId: number }, @Req() req: Request) {
+    return await this.courseService.publishCourse(body.courseId, req);
+  }
+
+  @Get('course-details/:id')
+  async getCourseDetail(@Param('id') id: number) {
+    return await this.courseService.getCourseDetails(id);
   }
 }

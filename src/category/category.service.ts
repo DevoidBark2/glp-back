@@ -4,17 +4,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { ChangeCategoryDto } from './dto/change-category.dto';
+import { CourseEntity } from '../course/entity/course.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
+    @InjectRepository(CourseEntity)
+    private readonly courseEntityRepository: Repository<CourseEntity>,
   ) {}
 
   async getAll() {
     try {
-      return this.categoryEntityRepository.find();
+      return this.categoryEntityRepository.find({ order: { id: 'ASC' } });
     } catch (e) {
       throw new BadRequestException(e);
     }
@@ -54,5 +57,20 @@ export class CategoryService {
     }
 
     await this.categoryEntityRepository.update(body.id, body);
+  }
+
+  async isPossibleDeleteCategory(id: number) {
+    const category = await this.categoryEntityRepository.findOne({
+      where: { id: id },
+    });
+
+    return await this.courseEntityRepository.find({
+      where: {
+        category: category,
+      },
+      relations: {
+        category: true,
+      },
+    });
   }
 }

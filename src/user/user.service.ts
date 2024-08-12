@@ -40,6 +40,7 @@ export class UserService {
   async getUserByToken(token: string) {
     const decodedToken = await this.jwtService.decode(token);
 
+    console.log('Decoded Token', decodedToken);
     if (!decodedToken) {
       throw new BadRequestException('Invalid Token!');
     }

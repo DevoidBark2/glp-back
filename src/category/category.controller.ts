@@ -55,12 +55,26 @@ export class CategoryController {
   @Put('/category')
   @ApiBody({ type: ChangeCategoryDto })
   async changeCategory(@Body() body: ChangeCategoryDto) {
-    return await this.categoryService.change(body);
+    await this.categoryService.change(body);
+
+    return {
+      message: 'Категория упешно обновлена!',
+    };
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Delete('/category')
   async deleteCategory(@Query() query: DeleteCategoryDto) {
     return await this.categoryService.delete(query.id);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Post('/possible-delete-category')
+  async possibleDeleteCategory(@Body() query: { id: number }) {
+    const data = await this.categoryService.isPossibleDeleteCategory(query.id);
+
+    return {
+      data: data,
+    };
   }
 }

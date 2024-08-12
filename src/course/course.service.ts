@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CourseEntity } from './entity/course.entity';
 import { Repository } from 'typeorm';
@@ -6,8 +6,7 @@ import { CreateCourseDto } from './dto/create_course.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
 import { CategoryEntity } from '../category/entity/category.entity';
-import { AccessRightEnum } from './enum/access_right.enum';
-import { LevelCourseEnum } from './enum/level_course.enum';
+import { StatusCourseEnum } from './enum/status_course.enum';
 
 @Injectable()
 export class CourseService {
@@ -27,8 +26,10 @@ export class CourseService {
   }
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
+    console.log('Here');
     const currentUser: User = req['user'];
 
+    console.log(currentUser);
     const category = await this.categoryEntityRepository.findOne({
       where: { id: createCourse.category },
     });
@@ -53,7 +54,7 @@ export class CourseService {
     const user: User = req['user'];
 
     return await this.courseEntityRepository.find({
-      where: { user: user },
+      where: { user: { id: user.id } },
     });
   }
 
@@ -65,5 +66,32 @@ export class CourseService {
       relations: ['user', 'category'],
     });
     console.log(course);
+  }
+
+  async publishCourse(courseId: number, req: Request) {
+    const course = await this.courseEntityRepository.findOne({
+      where: { id: courseId },
+      relations: {
+        sections: true,
+      },
+    });
+
+    if (course.sections.length < 1) {
+      throw new BadRequestException(
+        'Данный курс нельзя отправить,так как в нем нет,как минимум 1 раздела',
+      );
+    }
+
+    return {
+      message: 'Все четко!',
+    };
+  }
+
+  async getCourseDetails(id: number) {
+    return this.courseEntityRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
   }
 }
