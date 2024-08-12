@@ -46,6 +46,7 @@ export class CourseService {
     newCourse.publish_date = createCourse.publish_date;
     newCourse.image = createCourse.image;
     newCourse.user = currentUser;
+    newCourse.status = StatusCourseEnum.NEW;
 
     return await this.courseEntityRepository.save(newCourse);
   }
@@ -55,6 +56,9 @@ export class CourseService {
 
     return await this.courseEntityRepository.find({
       where: { user: { id: user.id } },
+      relations: {
+        category: true,
+      },
     });
   }
 
@@ -91,6 +95,12 @@ export class CourseService {
     return this.courseEntityRepository.findOne({
       where: {
         id: id,
+      },
+      relations: {
+        category: true,
+      },
+      select: {
+        category: ['id'],
       },
     });
   }
