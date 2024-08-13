@@ -99,9 +99,6 @@ export class CourseService {
       relations: {
         category: true,
       },
-      select: {
-        category: ['id'],
-      },
     });
   }
 }

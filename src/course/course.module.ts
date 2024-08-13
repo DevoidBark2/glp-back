@@ -6,11 +6,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
 import { CourseEntity } from './entity/course.entity';
 import { CategoryEntity } from '../category/entity/category.entity';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CourseEntity, User, CategoryEntity]),
     JwtModule,
+    EventsModule,
   ],
   controllers: [CourseController],
   providers: [CourseService],

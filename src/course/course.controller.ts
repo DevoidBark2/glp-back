@@ -24,8 +24,12 @@ import { ResponseCoursesInterceptor } from '../interceptors/response-courses.int
 import { CourseEntity } from './entity/course.entity';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
+import { EventLoggingInterceptor } from '../interceptors/event-logging.interceptor';
+import { LogAction } from '../decorators/log-action.decorator';
+import { ActionEvent } from '../events/enum/action-event.enum';
 
 @ApiTags('Курсы')
+@UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
@@ -43,6 +47,7 @@ export class CourseController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Create new post' })
   @ApiBody({ type: CreateCourseDto })
+  @LogAction(ActionEvent.CREATE_COURSE, 'A new course was created')
   @ApiHeader({
     name: 'authorization',
     description: 'Bearer Token',
@@ -61,6 +66,7 @@ export class CourseController {
 
   @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Get('/get-user-courses')
+  @LogAction(ActionEvent.ENROLL_STUDENT, 'view details of course')
   async getUserCourses(@Req() req: Request) {
     try {
       const courses = await this.courseService.getAllUserCourses(req);
