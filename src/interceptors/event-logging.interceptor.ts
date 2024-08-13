@@ -18,8 +18,7 @@ export class EventLoggingInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
-    console.log('req', request);
+    const request: Request = context.switchToHttp().getRequest();
     const user: User = request['user'];
     const logAction = this.reflector.get('logAction', context.getHandler());
 

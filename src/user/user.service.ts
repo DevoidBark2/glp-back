@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create_user.dto';
 import * as argon2 from 'argon2';
+import { UserRole } from '../constants/contants';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,9 @@ export class UserService {
   ) {}
 
   async findAll() {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      where: { role: Not(UserRole.SUPER_ADMIN) },
+    });
   }
 
   async findOne(email: string) {
