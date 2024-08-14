@@ -15,6 +15,7 @@ import { AuthGuards } from './auth/guards/auth.guards';
 import { BannersModule } from './banners/banners.module';
 import { WebsocketGateway } from './websockets/websocket.gateway';
 import { EventsModule } from './events/events.module';
+import { GeneralSettingsModule } from './general-settings/general-settings.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { EventsModule } from './events/events.module';
     CategoryModule,
     BannersModule,
     EventsModule,
+    GeneralSettingsModule,
   ],
   providers: [
     WebsocketGateway,
