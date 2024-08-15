@@ -41,7 +41,7 @@ export class CourseController {
     return await this.courseService.findAll();
   }
 
-  @Roles(UserRole.TEACHER)
+  @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/course')
   @UseInterceptors(FileInterceptor('image', multerOptions))
   @ApiConsumes('multipart/form-data')

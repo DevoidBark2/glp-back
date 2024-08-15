@@ -79,6 +79,8 @@ export class AuthService {
     console.log(user);
     const userData = await this.userService.findOne(user.email);
 
+    await this.validateUser(user.email, user.password);
+
     // const userSettings = await this.settingsEntityRepository.findOne({
     //   where: { user: userData },
     // });
