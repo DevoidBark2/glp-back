@@ -17,6 +17,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { Serialize } from '../decorators/serialize.decorator';
 import { UserDetailsByIdDto } from './dto/user_details_by_id.dto';
 import { UsersResponseDto } from './dto/users_response_dto';
+import { ResponseMessage } from '../decorators/response-message.decorator';
 
 @ApiTags('Пользователи')
 @Controller()
@@ -43,6 +44,7 @@ export class UserController {
   @ApiOperation({ summary: 'Create new user' })
   @ApiBody({ type: CreateUserDto })
   @Serialize(UsersResponseDto)
+  @ResponseMessage('Пользователь успешно создан!')
   async createUser(@Body() body: CreateUserDto) {
     return await this.userService.create(body);
   }
