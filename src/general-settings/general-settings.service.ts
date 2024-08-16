@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ComplexityPasswordEnum } from './enum/complexity-password.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { GeneralSettingsEntity } from './entity/general-settings.entity';
+import { ChangeGeneralSettingsDto } from './dto/change-general-settings.dto';
 
 @Injectable()
 export class GeneralSettingsService {
@@ -46,5 +46,9 @@ export class GeneralSettingsService {
 
   async getAll() {
     return this.generalSettingsEntityRepository.find();
+  }
+
+  async change(settings: ChangeGeneralSettingsDto) {
+    await this.generalSettingsEntityRepository.update(settings.id, settings);
   }
 }

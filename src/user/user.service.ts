@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { Not, Repository } from 'typeorm';
@@ -45,7 +49,7 @@ export class UserService {
 
     console.log('Decoded Token', decodedToken);
     if (!decodedToken) {
-      throw new BadRequestException('Invalid Token!');
+      throw new UnauthorizedException('Invalid Token!');
     }
     return await this.userRepository.findOne({
       where: {

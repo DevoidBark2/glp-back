@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   BadRequestException,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { UserRole } from '../../constants/contants';
@@ -32,7 +33,7 @@ export class AuthGuards implements CanActivate {
     console.log(request);
     console.log('token', token);
     if (!token) {
-      throw new BadRequestException('Token is missing!');
+      throw new UnauthorizedException('Token is missing!');
     }
     const user = await this.userService.getUserByToken(token);
     if (!user) {
