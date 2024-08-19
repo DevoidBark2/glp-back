@@ -16,6 +16,7 @@ import { BannersModule } from './banners/banners.module';
 import { WebsocketGateway } from './websockets/websocket.gateway';
 import { EventsModule } from './events/events.module';
 import { GeneralSettingsModule } from './general-settings/general-settings.module';
+import { ComponentTaskModule } from './component-task/component-task.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { GeneralSettingsModule } from './general-settings/general-settings.modul
     BannersModule,
     EventsModule,
     GeneralSettingsModule,
+    ComponentTaskModule,
   ],
   providers: [
     WebsocketGateway,
