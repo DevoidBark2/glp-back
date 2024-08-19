@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CourseComponentType } from '../enum/course-component-type.enum';
 import { User } from '../../user/entity/user.entity';
+import { StatusComponentTaskEnum } from '../enum/status-component-task.enum';
 
 export type QuestionsType = {
   question: string;
@@ -21,6 +28,16 @@ export class ComponentTask {
   questions: QuestionsType;
   @Column({ type: 'text', nullable: true })
   content_description: string;
+  @CreateDateColumn()
+  created_at: Date;
+  @Column({
+    type: 'enum',
+    enum: StatusComponentTaskEnum,
+    default: StatusComponentTaskEnum.ACTIVATED,
+  })
+  status: StatusComponentTaskEnum;
+  @Column({ type: 'json', nullable: true })
+  tags: string[];
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 }
