@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -29,6 +30,9 @@ import { CreatePostDto } from './dto/create.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../config/multerConfig';
 import PostEntity from './entity/post.entity';
+import { ResponseMessage } from '../decorators/response-message.decorator';
+import { Roles } from '../decorators/roles.decorator';
+import { UserRole } from '../constants/contants';
 
 @ApiTags('Posts')
 @Controller()
@@ -48,25 +52,22 @@ export class PostController {
     return this.postService.getAllPosts();
   }
 
+  @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/posts')
   @UseInterceptors(FileInterceptor('image', multerOptions))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Create new post' })
   @ApiBody({ type: CreatePostDto })
   @ApiHeader({ name: 'authorization' })
+  @ResponseMessage('Пост успешно создан!')
   async createPost(
     @Body() post: CreatePostDto,
-    @Query('token') token: string,
+    @Req() req: Request,
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      post.image = '/uploads/' + image.filename;
-      const newPost = await this.postService.createPost(post, token);
-      return {
-        success: true,
-        post: newPost,
-        message: 'Пост успешно добавлен!',
-      };
+      post.image = '/uploads/' + '';
+      return await this.postService.createPost(post, req['user']);
     } catch (e) {
       throw new BadRequestException(`Ошибка при создании поста: ${e}`);
     }

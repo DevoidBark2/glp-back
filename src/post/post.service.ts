@@ -19,25 +19,14 @@ export class PostService {
     return this.postEntityRepository.find();
   }
 
-  async createPost(post: CreatePostDto, token: any) {
-    const decodedToken = await this.jwtService.decode(token);
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
-    });
-
-    if (!user) {
-      throw `Пользователя с id ${decodedToken.id} не существует!`;
-    }
-
-    const newPost = this.postEntityRepository.create({
+  async createPost(post: CreatePostDto, user: User) {
+    return this.postEntityRepository.save({
       name: post.name,
       content: post.content,
       image: post.image,
+      description: post.description,
       user: user,
     });
-
-    return this.postEntityRepository.save(newPost);
   }
 
   async deletePostById(postId: number) {
@@ -59,6 +48,6 @@ export class PostService {
       throw `Поста с id ${postId} не существует!`;
     }
 
-    await this.postEntityRepository.delete(postDelete);
+    await this.postEntityRepository.delete(postDelete.id);
   }
 }

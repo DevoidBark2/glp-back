@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { EmojiEntity } from './emoji.entity';
 import { User } from '../../user/entity/user.entity';
+import { PostStatusEnum } from '../enum/PostStatus.enum';
 
 @Entity('posts')
 class PostEntity {
@@ -20,8 +21,14 @@ class PostEntity {
   image: string;
   @Column({ type: 'text' })
   content: string;
+  @Column({ type: 'text' })
+  description: string;
+  @Column({ type: 'enum', enum: PostStatusEnum, default: PostStatusEnum.NEW })
+  status: PostStatusEnum;
+  @Column({ type: 'boolean', default: false })
+  is_publish: boolean;
   @CreateDateColumn()
-  publish_date: Date;
+  created_at: Date;
   @ManyToMany(() => EmojiEntity, { onDelete: 'CASCADE' })
   @JoinTable()
   emoji: EmojiEntity[];

@@ -14,4 +14,7 @@ export class CreatePostDto {
 
   @ApiProperty({ description: 'The content of the post' })
   content: string;
+
+  @ApiProperty()
+  description: string;
 }
