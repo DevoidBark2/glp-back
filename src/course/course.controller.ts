@@ -55,7 +55,6 @@ export class CourseController {
   })
   async createCourse(@Body() course: CreateCourseDto, @Req() req: Request) {
     course.image = '/uploads/test.png';
-    console.log('User in controller', req['user']);
     const newCourse = await this.courseService.createCourse(course, req);
 
     return {

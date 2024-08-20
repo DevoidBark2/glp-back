@@ -20,10 +20,8 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, token: any) {
-    console.log(token);
     const decodedToken = await this.jwtService.decode(token);
 
-    console.log('decoded token', decodedToken);
     const user = await this.userRepository.findOne({
       where: { id: decodedToken.id },
     });
@@ -36,7 +34,6 @@ export class PostService {
       name: post.name,
       content: post.content,
       image: post.image,
-      publish_date: post.publish_date,
       user: user,
     });
 

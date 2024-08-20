@@ -76,7 +76,6 @@ export class AuthService {
   }
 
   async login(user: LoginUserDto) {
-    console.log(user);
     const userData = await this.userService.findOne(user.email);
 
     await this.validateUser(user.email, user.password);

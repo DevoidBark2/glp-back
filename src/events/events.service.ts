@@ -21,7 +21,6 @@ export class EventsService {
       action,
       description,
     });
-    console.log(event);
     return this.eventRepository.save(event);
   }
 }

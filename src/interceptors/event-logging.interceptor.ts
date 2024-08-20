@@ -22,8 +22,6 @@ export class EventLoggingInterceptor implements NestInterceptor {
     const user: User = request['user'];
     const logAction = this.reflector.get('logAction', context.getHandler());
 
-    console.log('Action', logAction);
-    console.log(user);
     if (logAction && user) {
       const { action, description } = logAction;
       return next.handle().pipe(

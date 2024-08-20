@@ -26,15 +26,12 @@ export class CourseService {
   }
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
-    console.log('Here');
     const currentUser: User = req['user'];
 
-    console.log(currentUser);
     const category = await this.categoryEntityRepository.findOne({
       where: { id: createCourse.category },
     });
 
-    console.log(createCourse);
     const newCourse = new CourseEntity();
     newCourse.name = createCourse.name;
     newCourse.small_description = createCourse.small_description;
@@ -69,7 +66,6 @@ export class CourseService {
       },
       relations: ['user', 'category'],
     });
-    console.log(course);
   }
 
   async publishCourse(courseId: number, req: Request) {

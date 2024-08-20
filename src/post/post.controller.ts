@@ -60,7 +60,7 @@ export class PostController {
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      post.image = '/uploads/' + '';
+      post.image = '/uploads/' + image.filename;
       const newPost = await this.postService.createPost(post, token);
       return {
         success: true,

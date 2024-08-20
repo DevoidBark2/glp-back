@@ -35,8 +35,6 @@ export class BannersController {
     @Body() createBannerDto: CreateBannerDto,
     @UploadedFile() image: Express.Multer.File,
   ) {
-    console.log(createBannerDto);
-    console.log(image);
     return await this.bannersService.create(createBannerDto);
   }
 

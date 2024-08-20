@@ -2,19 +2,21 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CourseComponentType } from '../enum/course-component-type.enum';
 import { User } from '../../user/entity/user.entity';
 import { StatusComponentTaskEnum } from '../enum/status-component-task.enum';
+import { SectionEntity } from '../../section/entity/section.entity';
 
 export type QuestionsType = {
   question: string;
   options: string[];
   correctOption: number;
 };
-@Entity('component-task')
+@Entity('component_task')
 export class ComponentTask {
   @PrimaryGeneratedColumn()
   id: number;
@@ -40,4 +42,6 @@ export class ComponentTask {
   tags: string[];
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
+  @ManyToMany(() => SectionEntity, (section) => section.components)
+  sections: SectionEntity[];
 }
