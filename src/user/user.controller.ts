@@ -18,6 +18,7 @@ import { Serialize } from '../decorators/serialize.decorator';
 import { UserDetailsByIdDto } from './dto/user_details_by_id.dto';
 import { UsersResponseDto } from './dto/users_response_dto';
 import { ResponseMessage } from '../decorators/response-message.decorator';
+import { GlobalActionDto } from './dto/global-action.dto';
 
 @ApiTags('Пользователи')
 @Controller()
@@ -60,5 +61,17 @@ export class UserController {
   @ApiOperation({ summary: 'Change user info' })
   async updateUser(@Param('id') id: number, @Body() body: CreateUserDto) {
     return await this.userService.update(id, body);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Get('/search-users')
+  async searchUser(@Query() query: { query: string }) {
+    return this.userService.searchUserByNameOrEmail(query.query);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Post('/global-action')
+  async setGlobalAction(@Body() body: GlobalActionDto) {
+    await this.userService.setGlobalAction(body);
   }
 }

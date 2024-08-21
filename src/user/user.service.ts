@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { Not, Repository } from 'typeorm';
+import { Brackets, Not, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create_user.dto';
 import * as argon2 from 'argon2';
 import { UserRole } from '../constants/contants';
+import { GlobalActionDto } from './dto/global-action.dto';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,7 @@ export class UserService {
   async findAll() {
     return await this.userRepository.find({
       where: { role: Not(UserRole.SUPER_ADMIN) },
+      order: { id: 'ASC' },
     });
   }
 
@@ -87,5 +89,35 @@ export class UserService {
 
   async update(id: number, updatedUser: CreateUserDto) {
     return await this.userRepository.update(id, updatedUser);
+  }
+
+  async searchUserByNameOrEmail(query: string) {
+    const queryParts = query.split(' ').filter(Boolean); // Разбиваем строку на части по пробелам и удаляем пустые строки
+
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        new Brackets((qb) => {
+          queryParts.forEach((part) => {
+            qb.andWhere(
+              new Brackets((subQb) => {
+                subQb
+                  .where('user.email ILIKE :part', { part: `%${part}%` })
+                  .orWhere('user.first_name ILIKE :part', { part: `%${part}%` })
+                  .orWhere('user.second_name ILIKE :part', {
+                    part: `%${part}%`,
+                  })
+                  .orWhere('user.last_name ILIKE :part', { part: `%${part}%` });
+              }),
+            );
+          });
+        }),
+      )
+      .andWhere('user.role != :role', { role: UserRole.SUPER_ADMIN })
+      .getMany();
+  }
+
+  async setGlobalAction(body: GlobalActionDto) {
+    await this.userRepository.update(body.usersIds, { status: body.action });
   }
 }

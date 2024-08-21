@@ -77,6 +77,7 @@ export class PostController {
   @ApiOperation({ summary: 'Change post by ID' })
   async changePost() {}
 
+  @ResponseMessage('Пост успешно удален!')
   @Delete('/posts/:id')
   @ApiOperation({ summary: 'Delete post by ID' })
   @ApiParam({ name: 'id', description: 'Post ID' })
@@ -95,5 +96,12 @@ export class PostController {
     } catch (e) {
       throw new BadRequestException(`Ошибка при удалении поста: ${e}`);
     }
+  }
+
+  @ResponseMessage('Пост отправлен на проверку, ожидайте подтверждения!')
+  @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+  @Put('/submit-preview')
+  async submitPreviewPost(@Query() query: { postId: string }) {
+    await this.postService.submitPreviewPost(Number(query.postId));
   }
 }

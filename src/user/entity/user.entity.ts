@@ -12,6 +12,7 @@ import { CourseEntity } from '../../course/entity/course.entity';
 import PostEntity from '../../post/entity/post.entity';
 import { UserRole } from '../../constants/contants';
 import { SettingsEntity } from '../../settings/entity/settings.entity';
+import { StatusUserEnum } from '../enum/user-status.enum';
 
 @Entity('users')
 export class User {
@@ -31,25 +32,21 @@ export class User {
   city: string;
   @Column()
   university: string;
-  @Column({ default: false })
-  is_active: boolean;
+  @Column({
+    type: 'enum',
+    enum: StatusUserEnum,
+    default: StatusUserEnum.ACTIVATED,
+  })
+  status: StatusUserEnum;
   @Column()
   birth_day: Date;
   @Column({ nullable: true })
   otp_code: string;
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
+  @CreateDateColumn()
   created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
+  @UpdateDateColumn()
   updated_at: Date;
   @OneToMany(() => CourseEntity, (course) => course.user)
   @JoinColumn()

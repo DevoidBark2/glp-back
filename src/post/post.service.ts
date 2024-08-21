@@ -5,6 +5,7 @@ import PostEntity from './entity/post.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
+import { PostStatusEnum } from './enum/PostStatus.enum';
 
 @Injectable()
 export class PostService {
@@ -30,16 +31,6 @@ export class PostService {
   }
 
   async deletePostById(postId: number) {
-    // const decodedToken = await this.jwtService.decode('asdsad');
-    //
-    // const user = await this.userRepository.findOne({
-    //   where: { id: decodedToken.id },
-    // });
-    //
-    // if (!user) {
-    //   throw `Пользователя с id ${decodedToken.id} не существует!`;
-    // }
-
     const postDelete = await this.postEntityRepository.findOne({
       where: { id: postId },
     });
@@ -49,5 +40,11 @@ export class PostService {
     }
 
     await this.postEntityRepository.delete(postDelete.id);
+  }
+
+  async submitPreviewPost(postId: number) {
+    await this.postEntityRepository.update(postId, {
+      status: PostStatusEnum.IN_PROCESSING,
+    });
   }
 }

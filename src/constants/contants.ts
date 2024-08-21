@@ -4,6 +4,7 @@ export enum UserRole {
   SUPER_ADMIN = 'superadmin',
   TEACHER = 'teacher',
   STUDENT = 'student',
+  MODERATOR = 'moderator',
 }
 
 export const DEFAULT_SETTINGS_FOR_NEW_USER = {

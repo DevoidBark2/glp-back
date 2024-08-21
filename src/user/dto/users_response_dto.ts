@@ -1,5 +1,6 @@
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { StatusUserEnum } from '../enum/user-status.enum';
 
 export class UsersResponseDto {
   @ApiProperty()
@@ -22,7 +23,7 @@ export class UsersResponseDto {
   email: string;
   @ApiProperty()
   @Expose()
-  is_active: boolean;
+  status: StatusUserEnum;
   @ApiProperty()
   @Expose()
   created_at: Date;
