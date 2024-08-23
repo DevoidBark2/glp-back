@@ -65,6 +65,7 @@ export class UserController {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Get('/search-users')
+  @Serialize(UsersResponseDto)
   async searchUser(@Query() query: { query: string }) {
     return this.userService.searchUserByNameOrEmail(query.query);
   }

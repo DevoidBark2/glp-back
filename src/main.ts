@@ -4,6 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as process from 'process';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +17,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
   app.enableCors();
+  app.use(helmet());
+  app.use(compression());
 
   const config = new DocumentBuilder()
     .setTitle('GLP')
