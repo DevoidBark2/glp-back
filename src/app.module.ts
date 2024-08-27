@@ -17,6 +17,7 @@ import { WebsocketGateway } from './websockets/websocket.gateway';
 import { EventsModule } from './events/events.module';
 import { GeneralSettingsModule } from './general-settings/general-settings.module';
 import { ComponentTaskModule } from './component-task/component-task.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ComponentTaskModule } from './component-task/component-task.module';
     EventsModule,
     GeneralSettingsModule,
     ComponentTaskModule,
+    StatisticsModule,
   ],
   providers: [
     WebsocketGateway,

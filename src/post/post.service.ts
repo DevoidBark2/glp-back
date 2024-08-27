@@ -20,6 +20,16 @@ export class PostService {
     return this.postEntityRepository.find();
   }
 
+  async getUserPosts(user: User) {
+    return await this.postEntityRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
+  }
+
   async createPost(post: CreatePostDto, user: User) {
     return this.postEntityRepository.save({
       name: post.name,

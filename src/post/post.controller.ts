@@ -52,6 +52,20 @@ export class PostController {
     return this.postService.getAllPosts();
   }
 
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Get('/posts-user')
+  @ApiOperation({ summary: 'Get all posts user' })
+  @ApiOkResponse({
+    description: 'List of posts',
+    schema: {
+      type: 'array',
+      items: { $ref: getSchemaPath(CreatePostDto) },
+    },
+  })
+  async getUserPosts(@Req() req: Request): Promise<PostEntity[]> {
+    return this.postService.getUserPosts(req['user']);
+  }
+
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/posts')
   @UseInterceptors(FileInterceptor('image', multerOptions))
