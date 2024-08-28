@@ -88,7 +88,7 @@ export class CourseService {
   }
 
   async getCourseDetails(id: number) {
-    return this.courseEntityRepository.findOne({
+    const course = await this.courseEntityRepository.findOne({
       where: {
         id: id,
       },
@@ -96,5 +96,11 @@ export class CourseService {
         category: true,
       },
     });
+
+    if (course.status === StatusCourseEnum.IN_PROCESSING) {
+      throw 'Курс находится в обработке,получить доступ к нему нельзя';
+    }
+
+    return course;
   }
 }

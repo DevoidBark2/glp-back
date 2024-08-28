@@ -62,12 +62,9 @@ export class ComponentTaskController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/search-components')
   async getSearchComponents(
-    @Query() query: { query: string },
+    @Query('query') query: string,
     @Req() req: Request,
   ) {
-    return await this.componentTaskService.searchComponent(
-      query.query,
-      req['user'],
-    );
+    return await this.componentTaskService.searchComponent(query, req['user']);
   }
 }

@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
 import { PostStatusEnum } from './enum/PostStatus.enum';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PostService {
@@ -32,6 +33,7 @@ export class PostService {
 
   async createPost(post: CreatePostDto, user: User) {
     return this.postEntityRepository.save({
+      id: uuidv4(),
       name: post.name,
       content: post.content,
       image: post.image,
@@ -40,7 +42,7 @@ export class PostService {
     });
   }
 
-  async deletePostById(postId: number) {
+  async deletePostById(postId: string) {
     const postDelete = await this.postEntityRepository.findOne({
       where: { id: postId },
     });

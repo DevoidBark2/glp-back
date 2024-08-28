@@ -103,7 +103,7 @@ export class PostController {
         errorHttpStatusCode: HttpStatus.BAD_REQUEST,
       }),
     )
-    id: number,
+    id: string,
   ) {
     try {
       await this.postService.deletePostById(id);
