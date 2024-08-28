@@ -97,8 +97,7 @@ export class AuthService {
       id: userData.id,
       email: userData.email,
       role: userData.role,
-      user_name:
-        userData.second_name + userData.first_name + userData.last_name,
+      user_name: `${userData.second_name} ${userData.first_name} ${userData.last_name}`,
       token: token,
     };
   }

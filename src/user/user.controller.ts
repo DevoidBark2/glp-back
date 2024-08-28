@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -74,5 +75,16 @@ export class UserController {
   @Post('/global-action')
   async setGlobalAction(@Body() body: GlobalActionDto) {
     await this.userService.setGlobalAction(body);
+  }
+
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.MODERATOR,
+    UserRole.STUDENT,
+  )
+  @Get('/profile-user')
+  async getUserProfileInfo(@Req() req: Request) {
+    return await this.userService.getUserProfileInfo(req['user']);
   }
 }

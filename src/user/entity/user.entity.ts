@@ -28,9 +28,9 @@ export class User {
   email: string;
   @Column()
   password: string;
-  @Column()
+  @Column({nullable: true})
   city: string;
-  @Column()
+  @Column({nullable: true})
   university: string;
   @Column({
     type: 'enum',
@@ -38,7 +38,7 @@ export class User {
     default: StatusUserEnum.ACTIVATED,
   })
   status: StatusUserEnum;
-  @Column()
+  @Column({nullable: true})
   birth_day: Date;
   @Column({ nullable: true })
   otp_code: string;

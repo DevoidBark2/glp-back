@@ -120,4 +120,8 @@ export class UserService {
   async setGlobalAction(body: GlobalActionDto) {
     await this.userRepository.update(body.usersIds, { status: body.action });
   }
+
+  async getUserProfileInfo(user: User) {
+    return user;
+  }
 }
