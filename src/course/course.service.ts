@@ -94,6 +94,9 @@ export class CourseService {
       },
       relations: {
         category: true,
+        sections: {
+          components: true,
+        },
       },
     });
 

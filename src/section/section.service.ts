@@ -3,6 +3,7 @@ import { User } from '../user/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SectionEntity } from './entity/section.entity';
+import { CreateSectionCourseDto } from './dto/create_section_course.dto';
 
 @Injectable()
 export class SectionService {
@@ -18,6 +19,18 @@ export class SectionService {
         course: true,
         components: true,
       },
+    });
+  }
+
+  async createSection(section: CreateSectionCourseDto, user: User) {
+    await this.sectionEntityRepository.save({
+      name: section.name,
+      description: section.description,
+      course: section.course,
+      components: section.components,
+      externalLinks: section.externalLinks,
+      uploadFile: section.uploadFile,
+      user: user,
     });
   }
 }

@@ -4,6 +4,7 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateSectionCourseDto } from './dto/create_section_course.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
+import { ResponseMessage } from '../decorators/response-message.decorator';
 
 @ApiTags('Разделы курсов')
 @Controller()
@@ -16,9 +17,14 @@ export class SectionController {
     return await this.sectionService.findAll(req['user']);
   }
 
-  @Post('/create-section')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Post('/sections')
   @ApiBody({ type: CreateSectionCourseDto })
-  async createSectionCourse(@Body() newSectionCourse: CreateSectionCourseDto) {
-    return newSectionCourse;
+  @ResponseMessage('Раздел успешно создан!')
+  async createSectionCourse(
+    @Body() newSectionCourse: CreateSectionCourseDto,
+    @Req() req: Request,
+  ) {
+    await this.sectionService.createSection(newSectionCourse, req['user']);
   }
 }

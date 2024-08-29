@@ -19,9 +19,9 @@ export class SectionEntity {
   name: string;
   @Column({ type: 'text' })
   description: string;
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   externalLinks: string[];
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   uploadFile: string[];
   @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })
   @JoinTable({
