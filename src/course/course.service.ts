@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
 import { CategoryEntity } from '../category/entity/category.entity';
 import { StatusCourseEnum } from './enum/status_course.enum';
+import { ChangeCourseDto } from './dto/change-course.dto';
 
 @Injectable()
 export class CourseService {
@@ -105,5 +106,28 @@ export class CourseService {
     }
 
     return course;
+  }
+
+  async changeCourse(course: ChangeCourseDto, user: User) {
+    const category = await this.categoryEntityRepository.findOne({
+      where: {
+        id: course.category,
+      },
+    });
+    console.log(course);
+    await this.courseEntityRepository.update(course.id, {
+      name: course.name,
+      image: course.image,
+      small_description: course.small_description,
+      category: category,
+      access_right: course.access_right,
+      duration: course.duration,
+      level: course.level,
+      publish_date: course.publish_date,
+      content_description: course.content_description,
+      secret_key: course.secret_key,
+      status: course.status,
+      user: user,
+    });
   }
 }

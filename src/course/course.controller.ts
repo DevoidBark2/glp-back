@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
@@ -27,6 +28,8 @@ import { UserRole } from '../constants/contants';
 import { EventLoggingInterceptor } from '../interceptors/event-logging.interceptor';
 import { LogAction } from '../decorators/log-action.decorator';
 import { ActionEvent } from '../events/enum/action-event.enum';
+import { ChangeCourseDto } from './dto/change-course.dto';
+import { ResponseMessage } from '../decorators/response-message.decorator';
 
 @ApiTags('Курсы')
 @UseInterceptors(EventLoggingInterceptor)
@@ -95,5 +98,13 @@ export class CourseController {
   @Get('course-details/:id')
   async getCourseDetail(@Param('id') id: number) {
     return await this.courseService.getCourseDetails(id);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Put('/course')
+  @ResponseMessage('Курс успешно обновлен!')
+  async changeCourse(@Body() body: ChangeCourseDto, @Req() req: Request) {
+    console.log(body);
+    return this.courseService.changeCourse(body, req['user']);
   }
 }
