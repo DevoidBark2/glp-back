@@ -10,6 +10,7 @@ import {
 import { CourseEntity } from '../../course/entity/course.entity';
 import { ComponentTask } from '../../component-task/entity/component-task.entity';
 import { User } from '../../user/entity/user.entity';
+import { StatusSectionEnum } from '../enum/status_section.enum';
 
 @Entity('sections')
 export class SectionEntity {
@@ -23,6 +24,12 @@ export class SectionEntity {
   externalLinks: string[];
   @Column({ type: 'json', nullable: true })
   uploadFile: string[];
+  @Column({
+    type: 'enum',
+    enum: StatusSectionEnum,
+    default: StatusSectionEnum.NEW,
+  })
+  status: StatusSectionEnum;
   @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })
   @JoinTable({
     name: 'section_component_task',
@@ -33,7 +40,9 @@ export class SectionEntity {
     },
   })
   components: ComponentTask[];
-  @ManyToOne(() => CourseEntity, (course) => course.sections)
+  @ManyToOne(() => CourseEntity, (course) => course.sections, {
+    onDelete: 'CASCADE',
+  })
   course: CourseEntity;
   @ManyToOne(() => User, (user) => user.id)
   user: User;

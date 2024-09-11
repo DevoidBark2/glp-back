@@ -65,8 +65,21 @@ export class CourseService {
       where: {
         id: courseId,
       },
-      relations: ['user', 'category'],
     });
+
+    if (course.status === StatusCourseEnum.IN_PROCESSING) {
+      throw new BadRequestException(
+        'В данный момент курс в обработке, ожидайте ответа от модератора',
+      );
+    }
+
+    if (course.status === StatusCourseEnum.ACTIVE) {
+      throw new BadRequestException(
+        'Курс сейчас опубликован, его нельзя удалить!',
+      );
+    }
+
+    await this.courseEntityRepository.delete(courseId);
   }
 
   async publishCourse(courseId: number, req: Request) {
@@ -83,9 +96,9 @@ export class CourseService {
       );
     }
 
-    return {
-      message: 'Все четко!',
-    };
+    await this.courseEntityRepository.update(courseId, {
+      status: StatusCourseEnum.IN_PROCESSING,
+    });
   }
 
   async getCourseDetails(id: number) {

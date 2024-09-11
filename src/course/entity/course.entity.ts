@@ -16,13 +16,15 @@ import { StatusCourseEnum } from '../enum/status_course.enum';
 export class CourseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: 255 })
   name: string;
   @Column({ type: 'text' })
   image: string;
   @Column({ type: 'text' })
   small_description: string;
-  @ManyToOne(() => CategoryEntity, (category) => category.id)
+  @ManyToOne(() => CategoryEntity, (category) => category.id, {
+    onDelete: 'SET NULL',
+  })
   category: CategoryEntity;
   @Column({ type: 'enum', enum: AccessRightEnum })
   access_right: number;
@@ -34,7 +36,7 @@ export class CourseEntity {
   publish_date: Date;
   @Column({ type: 'text' })
   content_description: string;
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   secret_key: string;
   @Column({
     type: 'enum',

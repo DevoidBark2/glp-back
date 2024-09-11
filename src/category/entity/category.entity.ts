@@ -4,6 +4,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class CategoryEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   name: string;
 }

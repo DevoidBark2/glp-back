@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SectionEntity } from './entity/section.entity';
 import { CreateSectionCourseDto } from './dto/create_section_course.dto';
+import { StatusSectionEnum } from './enum/status_section.enum';
 
 @Injectable()
 export class SectionService {
@@ -31,6 +32,7 @@ export class SectionService {
       externalLinks: section.externalLinks,
       uploadFile: section.uploadFile,
       user: user,
+      status: StatusSectionEnum.NEW,
     });
   }
 }

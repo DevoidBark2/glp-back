@@ -80,7 +80,8 @@ export class PostController {
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      post.image = '/uploads/' + '';
+      post.image = '/uploads/' + image;
+
       return await this.postService.createPost(post, req['user']);
     } catch (e) {
       throw new BadRequestException(`Ошибка при создании поста: ${e}`);

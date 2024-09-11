@@ -83,14 +83,13 @@ export class CourseController {
 
   @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Delete('/course/:id')
+  @ResponseMessage('Курс успешно удален!')
   async deleteCourse(@Param('id') id: number) {
     await this.courseService.delete(id);
-    return {
-      message: 'Курс успешно удален!',
-    };
   }
 
   @Post('publish-course')
+  @ResponseMessage('Курс отправлен на проверку, ожидайте ответа от модератора')
   async publishCourse(@Body() body: { courseId: number }, @Req() req: Request) {
     return await this.courseService.publishCourse(body.courseId, req);
   }
@@ -104,7 +103,7 @@ export class CourseController {
   @Put('/course')
   @ResponseMessage('Курс успешно обновлен!')
   async changeCourse(@Body() body: ChangeCourseDto, @Req() req: Request) {
-    console.log(body);
+    console.log('body', body);
     return this.courseService.changeCourse(body, req['user']);
   }
 }

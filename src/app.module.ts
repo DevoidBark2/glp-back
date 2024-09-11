@@ -18,6 +18,7 @@ import { EventsModule } from './events/events.module';
 import { GeneralSettingsModule } from './general-settings/general-settings.module';
 import { ComponentTaskModule } from './component-task/component-task.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { AvatarIconsModule } from './avatar-icons/avatar-icons.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { StatisticsModule } from './statistics/statistics.module';
     GeneralSettingsModule,
     ComponentTaskModule,
     StatisticsModule,
+    AvatarIconsModule,
   ],
   providers: [
     WebsocketGateway,
