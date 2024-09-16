@@ -96,12 +96,14 @@ export class StatisticsService {
     return {
       courseCount: courseCount,
       postCount: postCount,
-      postsCountPublish: ((publishPosts / postCount) * 100).toFixed(2),
-      postsCountNew: ((newPosts / postCount) * 100).toFixed(2),
-      postsCountIsProcessing: ((inProcessingPosts / postCount) * 100).toFixed(
-        2,
-      ),
-      postsCountReject: ((rejectPosts / postCount) * 100).toFixed(2),
+      postsCountPublish:
+        postCount !== 0 ?? ((publishPosts / postCount) * 100).toFixed(2),
+      postsCountNew:
+        postCount !== 0 ?? ((newPosts / postCount) * 100).toFixed(2),
+      postsCountIsProcessing:
+        postCount !== 0 ?? ((inProcessingPosts / postCount) * 100).toFixed(2),
+      postsCountReject:
+        postCount !== 0 ?? ((rejectPosts / postCount) * 100).toFixed(2),
     };
   }
 }

@@ -16,7 +16,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:3000',
+  });
   app.use(helmet());
   app.use(compression());
 
