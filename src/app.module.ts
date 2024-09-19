@@ -19,6 +19,7 @@ import { GeneralSettingsModule } from './general-settings/general-settings.modul
 import { ComponentTaskModule } from './component-task/component-task.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { AvatarIconsModule } from './avatar-icons/avatar-icons.module';
+import { FeedbacksModule } from './feedbacks/feedbacks.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AvatarIconsModule } from './avatar-icons/avatar-icons.module';
     ComponentTaskModule,
     StatisticsModule,
     AvatarIconsModule,
+    FeedbacksModule,
   ],
   providers: [
     WebsocketGateway,
