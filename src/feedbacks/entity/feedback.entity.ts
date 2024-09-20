@@ -1,5 +1,6 @@
 import { User } from "src/user/entity/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { FeedbackAttachmentEntity } from "./feedback-attachment.entity";
 
 @Entity('feedbacks')
 export class FeedBackEntity {
@@ -13,4 +14,6 @@ export class FeedBackEntity {
     message: string
     @CreateDateColumn()
     sent_at: Date
+    @OneToMany(() => FeedbackAttachmentEntity, (attachment) => attachment.feedback, { cascade: true })
+    attachments: FeedbackAttachmentEntity[];
 }
