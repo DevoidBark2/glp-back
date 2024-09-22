@@ -16,9 +16,9 @@ export class FeedbacksService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(FeedbackAttachmentEntity)
         private readonly attachmentRepository: Repository<FeedbackAttachmentEntity>
-      ) {}
+    ) { }
 
-    async sendFeedBack(message:string, user: User, attachments: Express.Multer.File[]){
+    async sendFeedBack(message: string, user: User, attachments: Express.Multer.File[]) {
         const superAdminUser = await this.userRepository.findOne({ where: { role: UserRole.SUPER_ADMIN } });
 
         const feedback = this.feedbackRepository.create({
@@ -33,16 +33,14 @@ export class FeedbacksService {
 
         // Если есть вложения, сохраняем их
         if (attachments && attachments.length > 0) {
-        const attachmentEntities = attachments.map((file) => {
-            return this.attachmentRepository.create({
-            filename: file.originalname,
-            filepath: file.path,
-            mimetype: file.mimetype,
-            feedback: savedFeedback,
+            attachments.map((file) => {
+                this.attachmentRepository.save({
+                    filename: file.originalname,
+                    filepath: file.path,
+                    mimetype: file.mimetype,
+                    feedback: savedFeedback,
+                });
             });
-        });
-
-        await this.attachmentRepository.save(attachmentEntities);
         }
 
         return savedFeedback;
@@ -51,34 +49,12 @@ export class FeedbacksService {
     async getFeedBackForUser(user: User) {
         const superAdminUser = await this.userRepository.findOne({ where: { role: UserRole.SUPER_ADMIN } });
 
-        const feedbacks = await this.feedbackRepository.find({
+        return await this.feedbackRepository.find({
             where: [
                 { sender: { id: user.id } },
                 { recipient: { id: superAdminUser.id } },
             ],
             relations: ['attachments', 'sender', 'recipient'],
         });
-
-        console.log(feedbacks)
-
-        return feedbacks.map(feedback => ({
-            id: feedback.id,
-            message: feedback.message,
-            sender: {
-                id: feedback.sender.id,
-                name: feedback.sender.first_name
-            },
-            recipient: {
-                id: feedback.recipient.id,
-                name: feedback.recipient.first_name,
-            },
-            sent_at: feedback.sent_at,
-            attachments: feedback.attachments.map(attachment => ({
-                id: attachment.id,
-                filename: attachment.filename,
-                filepath: attachment.filepath,
-                mimetype: attachment.mimetype,
-            })),
-        }));
     }
 }
