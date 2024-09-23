@@ -10,6 +10,7 @@ import { SettingsEntity } from '../settings/entity/settings.entity';
 import { BasicResponse } from '../types/BasicResponse';
 import { LoginUserDto } from './dto/login.dto';
 import { DEFAULT_SETTINGS_FOR_NEW_USER, UserRole } from '../constants/contants';
+import { GeneralSettingsEntity } from 'src/general-settings/entity/general-settings.entity';
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,6 +18,8 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(SettingsEntity)
     private readonly settingsEntityRepository: Repository<SettingsEntity>,
+    @InjectRepository(GeneralSettingsEntity)
+    private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -35,10 +38,13 @@ export class AuthService {
       .toString()
       .padStart(6, '0');
 
+    
+    const generalSettings = await this.generalSettingsEntityRepository.find();
+
     const newUser = await this.userRepository.save({
       ...user,
       otp_code: otpCode,
-      role: UserRole.STUDENT,
+      role: generalSettings ? generalSettings[0].default_user_role : UserRole.STUDENT,
     });
 
     // Set setting for new user

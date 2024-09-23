@@ -9,12 +9,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entity/user.entity';
 import { SettingsEntity } from '../settings/entity/settings.entity';
+import { GeneralSettingsEntity } from 'src/general-settings/entity/general-settings.entity';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
-    TypeOrmModule.forFeature([User, SettingsEntity]),
+    TypeOrmModule.forFeature([User, SettingsEntity,GeneralSettingsEntity]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

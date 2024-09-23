@@ -51,8 +51,8 @@ export class FeedbacksService {
 
         return await this.feedbackRepository.find({
             where: [
-                { sender: { id: user.id } },
-                { recipient: { id: superAdminUser.id } },
+                { sender: { id: user.id }, recipient: { id: superAdminUser.id } }, // Сообщения от данного пользователя к супер-администратору
+                { sender: { id: superAdminUser.id }, recipient: { id: user.id } }, // Сообщения от супер-администратора к данному пользователю
             ],
             relations: ['attachments', 'sender', 'recipient'],
         });
