@@ -25,10 +25,18 @@ export class AuthService {
 
   async registerUser(user: RegisterUserDto): Promise<BasicResponse> {
     const userExists = await this.userService.findOne(user.email);
+    const generalSettings = await this.generalSettingsEntityRepository.find();
 
     if (userExists) {
       throw new BadRequestException(
         'Пользователь с таким email уже существует!',
+      );
+    }
+
+    const min_password_length = generalSettings[0].min_password_length
+    if (user.password.length < min_password_length) {
+      throw new BadRequestException(
+        `Пароль должен быть не меньше, чем ${min_password_length} символов, попробуйте еще раз!`,
       );
     }
 
@@ -39,7 +47,7 @@ export class AuthService {
       .padStart(6, '0');
 
     
-    const generalSettings = await this.generalSettingsEntityRepository.find();
+    
 
     const newUser = await this.userRepository.save({
       ...user,

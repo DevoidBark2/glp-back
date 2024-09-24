@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ComplexityPasswordEnum } from '../enum/complexity-password.enum';
 import { UserRole } from '../../constants/contants';
+import { ModeratorAccessRightsEnum } from '../enum/moderator-access-rights.enum';
 
 @Entity('general-settings')
 export class GeneralSettingsEntity {
@@ -39,5 +40,8 @@ export class GeneralSettingsEntity {
   @Column({ type: 'boolean', default: false })
   moderation_new_course: boolean;
   @Column({ type: 'boolean', default: false })
-  audit_enabled: boolean;
+  audit_enabled: boolean; 
+  // For moderators settings
+  @Column({ type: "json", default: [] })
+  accessRights: ModeratorAccessRightsEnum[];
 }

@@ -41,7 +41,7 @@ export class AvatarIconsController {
     }
   }
 
-  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT,UserRole.MODERATOR)
   @Get('/avatar-icons')
   async getAllAvatarIcons() {
     return this.avatarIconsService.getAll();
