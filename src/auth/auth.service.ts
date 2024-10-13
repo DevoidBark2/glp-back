@@ -21,7 +21,7 @@ export class AuthService {
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async registerUser(user: RegisterUserDto): Promise<BasicResponse> {
     const userExists = await this.userService.findOne(user.email);
@@ -46,8 +46,8 @@ export class AuthService {
       .toString()
       .padStart(6, '0');
 
-    
-    
+
+
 
     const newUser = await this.userRepository.save({
       ...user,
@@ -78,12 +78,12 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findOne(email);
     if (!user) {
-      throw new BadRequestException('Email или пароль не верные!');
+      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
     }
     const passwordIsMatch = await argon2.verify(user.password, password);
 
     if (!passwordIsMatch) {
-      throw new BadRequestException('Email или пароль не верные!');
+      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
     }
 
     return user;

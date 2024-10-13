@@ -17,7 +17,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: process.env.CLIENT_URL
   });
   app.use(helmet());
   app.use(compression());
@@ -26,6 +26,11 @@ async function bootstrap() {
     .setTitle('GLP')
     .setDescription('Graph Learning Platform')
     .setVersion('1.0')
+    .addBearerAuth({
+      type: "http",
+      scheme: "bearer",
+      bearerFormat: "JWT"
+    }, 'access-token')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

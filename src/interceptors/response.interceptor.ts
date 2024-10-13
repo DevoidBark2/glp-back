@@ -23,7 +23,7 @@ export type Response<T> = {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
 
   intercept(
     context: ExecutionContext,
@@ -49,10 +49,10 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     response.status(status).json({
       status: false,
-      statusCode: status,
       path: request.url,
       message: exception.message,
-      result: exception,
+      statusCode: status,
+      data: exception,
       timestamp: format(new Date().toISOString(), 'yyyy-MM-dd HH:mm:ss'),
     });
   }

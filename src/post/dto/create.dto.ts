@@ -7,14 +7,15 @@ export class CreatePostDto {
   name: string;
 
   @ApiProperty({
-    type: 'string',
+    type: 'file',
     description: 'The image path associated with the post',
+    required: false
   })
   image: string;
 
-  @ApiProperty({ description: 'The content of the post' })
+  @ApiProperty({ description: 'The content of the post', required: true })
   content: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   description: string;
 }

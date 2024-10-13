@@ -17,6 +17,8 @@ import {
 import { PostService } from './post.service';
 
 import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiHeader,
@@ -33,39 +35,41 @@ import PostEntity from './entity/post.entity';
 import { ResponseMessage } from '../decorators/response-message.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
+import { PostsResponseDto } from './dto/posts-response.dto';
 
-@ApiTags('Posts')
+@ApiTags('Посты')
 @Controller()
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   @Get('/posts')
   @ApiOperation({ summary: 'Get all posts' })
   @ApiOkResponse({
     description: 'List of posts',
-    schema: {
-      type: 'array',
-      items: { $ref: getSchemaPath(CreatePostDto) },
-    },
+    type: PostsResponseDto,
+    isArray: true,
   })
-  async getAllPosts(): Promise<PostEntity[]> {
-    return this.postService.getAllPosts();
+  @ApiBadRequestResponse({
+    description: 'List of posts error',
+  })
+  async getAllPosts(): Promise<PostsResponseDto[]> {
+    return await this.postService.getAllPosts();
   }
 
+  @ApiBearerAuth('access-token')
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/posts-user')
   @ApiOperation({ summary: 'Get all posts user' })
   @ApiOkResponse({
     description: 'List of posts',
-    schema: {
-      type: 'array',
-      items: { $ref: getSchemaPath(CreatePostDto) },
-    },
+    type: PostsResponseDto,
+    isArray: true,
   })
-  async getUserPosts(@Req() req: Request): Promise<PostEntity[]> {
+  async getUserPosts(@Req() req: Request): Promise<PostsResponseDto[]> {
     return this.postService.getUserPosts(req['user']);
   }
 
+  @ApiBearerAuth('access-token')
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/posts')
   @UseInterceptors(FileInterceptor('image', multerOptions))
@@ -80,7 +84,11 @@ export class PostController {
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      post.image = '/uploads/' + image?.filename;
+      if (image) {
+        post.image = '/uploads/' + image?.filename;
+      }
+
+      console.log(post)
 
       return await this.postService.createPost(post, req['user']);
     } catch (e) {
@@ -88,24 +96,18 @@ export class PostController {
     }
   }
 
+  @ApiBearerAuth('access-token')
   @Put('/posts/:id')
   @ApiOperation({ summary: 'Change post by ID' })
-  async changePost() {}
+  async changePost() { }
 
+  @ApiBearerAuth('access-token')
   @ResponseMessage('Пост успешно удален!')
   @Delete('/posts/:id')
   @ApiOperation({ summary: 'Delete post by ID' })
   @ApiParam({ name: 'id', description: 'Post ID' })
   @ApiHeader({ name: 'authorization' })
-  async deletePost(
-    @Param(
-      'id',
-      new ParseIntPipe({
-        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
-      }),
-    )
-    id: string,
-  ) {
+  async deletePost(@Param('id') id: string) {
     try {
       await this.postService.deletePostById(id);
     } catch (e) {
@@ -113,6 +115,7 @@ export class PostController {
     }
   }
 
+  @ApiBearerAuth('access-token')
   @ResponseMessage('Пост отправлен на проверку, ожидайте подтверждения!')
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Put('/submit-preview')
