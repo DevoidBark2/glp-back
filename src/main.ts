@@ -5,7 +5,9 @@ import * as process from 'process';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import * as express from 'express';
 import * as compression from 'compression';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,9 +18,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
 
-  app.enableCors({
-    origin: process.env.CLIENT_URL
-  });
   app.use(helmet());
   app.use(compression());
 
@@ -34,9 +33,24 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
+
+  app.enableCors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  });
+
+  // Настройка статической раздачи файлов с заголовками для CORS
+  app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  }, express.static(join(__dirname, '..', 'uploads')))
 
   await app.listen(PORT);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
-bootstrap();
+
+bootstrap().catch(err => {
+  console.error('Error starting the application', err);
+});

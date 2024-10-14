@@ -13,7 +13,7 @@ export class CategoryService {
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
     @InjectRepository(CourseEntity)
     private readonly courseEntityRepository: Repository<CourseEntity>,
-  ) {}
+  ) { }
 
   async getAll() {
     try {
@@ -24,11 +24,7 @@ export class CategoryService {
   }
 
   async create(category: CreateCategoryDto) {
-    const createdCategory = await this.categoryEntityRepository.save(category);
-    return {
-      category: createdCategory,
-      message: 'Категория успешно создана!',
-    };
+    return await this.categoryEntityRepository.save(category);
   }
 
   async delete(id: number) {

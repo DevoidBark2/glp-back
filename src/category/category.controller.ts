@@ -20,35 +20,32 @@ import {
 } from '@nestjs/swagger';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { ChangeCategoryDto } from './dto/change-category.dto';
+import { CategoryEntity } from './entity/category.entity';
 
 @ApiTags('Categories')
 @Controller()
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
-  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @Get('category')
   @ApiExtraModels(CreateCategoryDto)
   @ApiOkResponse({
     status: 200,
-    schema: {
-      $ref: getSchemaPath(CreateCategoryDto),
-    },
+    type: CreateCategoryDto,
+    isArray: true
   })
-  // @ApiBadRequestResponse({
-  //   status: 401,
-  //   schema: {
-  //     $ref: getSchemaPath(BadRequestException),
-  //   },
-  // })
-  async getAll() {
+  async getAll(): Promise<CategoryEntity[]> {
     return this.categoryService.getAll();
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Post('/category')
   async createCategory(@Body() category: CreateCategoryDto) {
-    return await this.categoryService.create(category);
+    const createdCategory = await this.categoryService.create(category);
+    return {
+      category: createdCategory,
+      message: 'Категория успешно создана!',
+    };
   }
 
   @Roles(UserRole.SUPER_ADMIN)
