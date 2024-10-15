@@ -17,7 +17,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async findAll() {
     return await this.userRepository.find({

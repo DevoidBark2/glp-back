@@ -7,7 +7,9 @@ import { User } from 'src/user/entity/user.entity';
 import { FeedbackAttachmentEntity } from './entity/feedback-attachment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FeedBackEntity,User,FeedbackAttachmentEntity])],
+  imports: [
+    TypeOrmModule.forFeature([FeedBackEntity, User, FeedbackAttachmentEntity]),
+  ],
   controllers: [FeedbacksController],
   providers: [FeedbacksService],
 })

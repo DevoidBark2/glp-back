@@ -25,11 +25,14 @@ async function bootstrap() {
     .setTitle('GLP')
     .setDescription('Graph Learning Platform')
     .setVersion('1.0')
-    .addBearerAuth({
-      type: "http",
-      scheme: "bearer",
-      bearerFormat: "JWT"
-    }, 'access-token')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -41,16 +44,20 @@ async function bootstrap() {
   });
 
   // Настройка статической раздачи файлов с заголовками для CORS
-  app.use('/uploads', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
-    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-    next();
-  }, express.static(join(__dirname, '..', 'uploads')))
+  app.use(
+    '/uploads',
+    (req, res, next) => {
+      res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+      res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+      next();
+    },
+    express.static(join(__dirname, '..', 'uploads')),
+  );
 
   await app.listen(PORT);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   console.error('Error starting the application', err);
 });

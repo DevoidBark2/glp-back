@@ -40,8 +40,8 @@ export class GeneralSettingsEntity {
   @Column({ type: 'boolean', default: false })
   moderation_new_course: boolean;
   @Column({ type: 'boolean', default: false })
-  audit_enabled: boolean; 
+  audit_enabled: boolean;
   // For moderators settings
-  @Column({ type: "json", default: [] })
+  @Column({ type: 'json', default: [] })
   accessRights: ModeratorAccessRightsEnum[];
 }

@@ -23,7 +23,7 @@ export type Response<T> = {
 
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
-  constructor(private reflector: Reflector) { }
+  constructor(private reflector: Reflector) {}
 
   intercept(
     context: ExecutionContext,

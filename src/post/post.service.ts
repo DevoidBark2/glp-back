@@ -15,7 +15,7 @@ export class PostService {
     private readonly postEntityRepository: Repository<PostEntity>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async getAllPosts() {
     return this.postEntityRepository.find();

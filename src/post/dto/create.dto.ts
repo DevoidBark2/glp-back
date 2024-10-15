@@ -9,7 +9,7 @@ export class CreatePostDto {
   @ApiProperty({
     type: 'file',
     description: 'The image path associated with the post',
-    required: false
+    required: false,
   })
   image: string;
 

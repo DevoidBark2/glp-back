@@ -1,4 +1,10 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 
 @Catch(HttpException)
 export class FileLimitExceptionFilter implements ExceptionFilter {
@@ -7,18 +13,22 @@ export class FileLimitExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const status = exception.getStatus();
 
-    console.log(response)
-    if (status === HttpStatus.BAD_REQUEST && exception.message.includes('Too many files')) {
+    console.log(response);
+    if (
+      status === HttpStatus.BAD_REQUEST &&
+      exception.message.includes('Too many files')
+    ) {
       return response.status(HttpStatus.BAD_REQUEST).json({
         statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Превышено допустимое количество файлов. Максимум — 10 файлов.',
+        message:
+          'Превышено допустимое количество файлов. Максимум — 10 файлов.',
         error: 'Bad Request',
       });
     }
 
     response.status(status).json({
       statusCode: status,
-      message: "SADasdasdasd",
+      message: 'SADasdasdasd',
     });
   }
 }

@@ -13,7 +13,7 @@ export class CategoryService {
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
     @InjectRepository(CourseEntity)
     private readonly courseEntityRepository: Repository<CourseEntity>,
-  ) { }
+  ) {}
 
   async getAll() {
     try {

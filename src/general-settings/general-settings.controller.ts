@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { GeneralSettingsService } from './general-settings.service';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
@@ -12,7 +19,7 @@ import { multerOptions } from 'src/config/multerConfig';
 export class GeneralSettingsController {
   constructor(
     private readonly generalSettingsService: GeneralSettingsService,
-  ) { }
+  ) {}
 
   @Get('/general-settings')
   async getGeneralSettings() {
@@ -22,7 +29,10 @@ export class GeneralSettingsController {
   @Roles(UserRole.SUPER_ADMIN)
   @Post('/general-settings')
   @UseInterceptors(FileInterceptor('logo', multerOptions))
-  async changeGeneralSettings(@Body() settings: ChangeGeneralSettingsDto, @UploadedFile() logo: Express.Multer.File,) {
+  async changeGeneralSettings(
+    @Body() settings: ChangeGeneralSettingsDto,
+    @UploadedFile() logo: Express.Multer.File,
+  ) {
     if (logo) {
       settings.logo_url = `/uploads/${logo.filename}`;
     }

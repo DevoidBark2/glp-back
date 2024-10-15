@@ -3,7 +3,10 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 
 export const feedbacksMulterConfig = {
   fileFilter: (req: any, file: any, cb: any) => {
-    const fileExtension = file.originalname.split('.').slice(-1)[0].toLowerCase();
+    const fileExtension = file.originalname
+      .split('.')
+      .slice(-1)[0]
+      .toLowerCase();
     // Поддерживаемые форматы для изображений и видео
     if (/^(jpg|jpeg|png|svg|mp4|mov|avi|mkv|webm)$/.test(fileExtension)) {
       cb(null, true);

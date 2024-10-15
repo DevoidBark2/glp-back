@@ -25,14 +25,14 @@ import { CategoryEntity } from './entity/category.entity';
 @ApiTags('Categories')
 @Controller()
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) { }
+  constructor(private readonly categoryService: CategoryService) {}
 
   @Get('category')
   @ApiExtraModels(CreateCategoryDto)
   @ApiOkResponse({
     status: 200,
     type: CreateCategoryDto,
-    isArray: true
+    isArray: true,
   })
   async getAll(): Promise<CategoryEntity[]> {
     return this.categoryService.getAll();

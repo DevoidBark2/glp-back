@@ -21,7 +21,7 @@ export class AuthService {
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async registerUser(user: RegisterUserDto): Promise<BasicResponse> {
     const userExists = await this.userService.findOne(user.email);
@@ -33,7 +33,7 @@ export class AuthService {
       );
     }
 
-    const min_password_length = generalSettings[0].min_password_length
+    const min_password_length = generalSettings[0].min_password_length;
     if (user.password.length < min_password_length) {
       throw new BadRequestException(
         `Пароль должен быть не меньше, чем ${min_password_length} символов, попробуйте еще раз!`,
@@ -46,13 +46,12 @@ export class AuthService {
       .toString()
       .padStart(6, '0');
 
-
-
-
     const newUser = await this.userRepository.save({
       ...user,
       otp_code: otpCode,
-      role: generalSettings ? generalSettings[0].default_user_role : UserRole.STUDENT,
+      role: generalSettings
+        ? generalSettings[0].default_user_role
+        : UserRole.STUDENT,
     });
 
     // Set setting for new user
@@ -78,12 +77,16 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findOne(email);
     if (!user) {
-      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
+      throw new BadRequestException(
+        'Email или пароль не верные, попробуйте еще раз!',
+      );
     }
     const passwordIsMatch = await argon2.verify(user.password, password);
 
     if (!passwordIsMatch) {
-      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
+      throw new BadRequestException(
+        'Email или пароль не верные, попробуйте еще раз!',
+      );
     }
 
     return user;

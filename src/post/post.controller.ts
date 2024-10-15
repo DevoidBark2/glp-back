@@ -40,7 +40,7 @@ import { PostsResponseDto } from './dto/posts-response.dto';
 @ApiTags('Посты')
 @Controller()
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   @Get('/posts')
   @ApiOperation({ summary: 'Get all posts' })
@@ -88,7 +88,7 @@ export class PostController {
         post.image = '/uploads/' + image?.filename;
       }
 
-      console.log(post)
+      console.log(post);
 
       return await this.postService.createPost(post, req['user']);
     } catch (e) {
@@ -99,7 +99,7 @@ export class PostController {
   @ApiBearerAuth('access-token')
   @Put('/posts/:id')
   @ApiOperation({ summary: 'Change post by ID' })
-  async changePost() { }
+  async changePost() {}
 
   @ApiBearerAuth('access-token')
   @ResponseMessage('Пост успешно удален!')

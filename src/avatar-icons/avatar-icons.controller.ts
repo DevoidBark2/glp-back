@@ -18,7 +18,7 @@ import { ResponseMessage } from '../decorators/response-message.decorator';
 @ApiTags('Аватар пользователя')
 @Controller()
 export class AvatarIconsController {
-  constructor(private readonly avatarIconsService: AvatarIconsService) { }
+  constructor(private readonly avatarIconsService: AvatarIconsService) {}
 
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/avatar-icon')
@@ -41,7 +41,12 @@ export class AvatarIconsController {
     }
   }
 
-  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.MODERATOR)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.STUDENT,
+    UserRole.MODERATOR,
+  )
   @Get('/avatar-icons')
   async getAllAvatarIcons() {
     return this.avatarIconsService.getAll();

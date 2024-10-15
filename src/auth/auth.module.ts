@@ -15,7 +15,7 @@ import { GeneralSettingsEntity } from 'src/general-settings/entity/general-setti
   imports: [
     UserModule,
     PassportModule,
-    TypeOrmModule.forFeature([User, SettingsEntity,GeneralSettingsEntity]),
+    TypeOrmModule.forFeature([User, SettingsEntity, GeneralSettingsEntity]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
