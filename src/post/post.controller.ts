@@ -40,7 +40,7 @@ import { PostsResponseDto } from './dto/posts-response.dto';
 @ApiTags('Посты')
 @Controller()
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
   @Get('/posts')
   @ApiOperation({ summary: 'Get all posts' })
@@ -85,7 +85,7 @@ export class PostController {
   ) {
     try {
       if (image) {
-        post.image = '/uploads/' + image?.filename;
+        post.image = 'uploads/' + image?.filename;
       }
 
       console.log(post);
@@ -99,7 +99,7 @@ export class PostController {
   @ApiBearerAuth('access-token')
   @Put('/posts/:id')
   @ApiOperation({ summary: 'Change post by ID' })
-  async changePost() {}
+  async changePost() { }
 
   @ApiBearerAuth('access-token')
   @ResponseMessage('Пост успешно удален!')
@@ -119,7 +119,12 @@ export class PostController {
   @ResponseMessage('Пост отправлен на проверку, ожидайте подтверждения!')
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Put('/submit-preview')
-  async submitPreviewPost(@Query() query: { postId: string }) {
-    await this.postService.submitPreviewPost(Number(query.postId));
+  async submitPreviewPost(@Query('postId') postId: number) {
+    await this.postService.submitPreviewPost(postId);
+  }
+
+  @Get('getPostById')
+  async getPostById(@Query('postId') postId: string) {
+    return await this.postService.getPostById(postId);
   }
 }

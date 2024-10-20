@@ -35,7 +35,7 @@ import { ResponseMessage } from '../decorators/response-message.decorator';
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-  constructor(private readonly courseService: CourseService) {}
+  constructor(private readonly courseService: CourseService) { }
 
   @Get('/courses')
   @UseInterceptors(ResponseCoursesInterceptor)
@@ -57,7 +57,7 @@ export class CourseController {
     required: true,
   })
   async createCourse(@Body() course: CreateCourseDto, @Req() req: Request) {
-    course.image = '/uploads/test.png';
+    course.image = 'uploads/test.png';
     const newCourse = await this.courseService.createCourse(course, req);
 
     return {

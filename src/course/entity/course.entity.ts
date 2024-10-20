@@ -23,6 +23,7 @@ export class CourseEntity {
   @Column({ type: 'text' })
   small_description: string;
   @ManyToOne(() => CategoryEntity, (category) => category.id, {
+    nullable: true,
     onDelete: 'SET NULL',
   })
   category: CategoryEntity;

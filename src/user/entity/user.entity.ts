@@ -56,4 +56,6 @@ export class User {
   posts: PostEntity[];
   @OneToOne(() => SettingsEntity, (settings) => settings.user)
   settings: SettingsEntity;
+  @Column({ type: "varchar", nullable: true })
+  profile_url: string
 }

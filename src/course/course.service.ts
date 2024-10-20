@@ -18,7 +18,7 @@ export class CourseService {
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async findAll() {
     return await this.courseEntityRepository.find({
@@ -29,9 +29,11 @@ export class CourseService {
   async createCourse(createCourse: CreateCourseDto, req: Request) {
     const currentUser: User = req['user'];
 
-    const category = await this.categoryEntityRepository.findOne({
-      where: { id: createCourse.category },
-    });
+    const category = createCourse.category
+      ? await this.categoryEntityRepository.findOne({
+        where: { id: createCourse.category },
+      })
+      : null;
 
     const newCourse = new CourseEntity();
     newCourse.name = createCourse.name;

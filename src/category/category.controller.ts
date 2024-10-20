@@ -16,7 +16,6 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { DeleteCategoryDto } from './dto/delete-category.dto';
 import { ChangeCategoryDto } from './dto/change-category.dto';
@@ -25,7 +24,7 @@ import { CategoryEntity } from './entity/category.entity';
 @ApiTags('Categories')
 @Controller()
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   @Get('category')
   @ApiExtraModels(CreateCategoryDto)
@@ -63,15 +62,5 @@ export class CategoryController {
   @Delete('/category')
   async deleteCategory(@Query() query: DeleteCategoryDto) {
     return await this.categoryService.delete(query.id);
-  }
-
-  @Roles(UserRole.SUPER_ADMIN)
-  @Post('/possible-delete-category')
-  async possibleDeleteCategory(@Body() query: { id: number }) {
-    const data = await this.categoryService.isPossibleDeleteCategory(query.id);
-
-    return {
-      data: data,
-    };
   }
 }

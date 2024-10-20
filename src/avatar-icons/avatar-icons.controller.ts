@@ -1,9 +1,10 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
   Get,
   Post,
-  Req,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,7 +19,7 @@ import { ResponseMessage } from '../decorators/response-message.decorator';
 @ApiTags('Аватар пользователя')
 @Controller()
 export class AvatarIconsController {
-  constructor(private readonly avatarIconsService: AvatarIconsService) {}
+  constructor(private readonly avatarIconsService: AvatarIconsService) { }
 
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/avatar-icon')
@@ -26,16 +27,12 @@ export class AvatarIconsController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Create new avatar icon' })
   @ApiHeader({ name: 'authorization' })
-  @ResponseMessage('Аватар успешно создан!')
+  @ResponseMessage('Иконка успешно создана!')
   async createPost(
-    @Req() req: Request,
     @UploadedFile() image: Express.Multer.File,
   ) {
     try {
-      return await this.avatarIconsService.createAvatarIcon(
-        'uploads/' + image?.filename,
-        req['user'],
-      );
+      return await this.avatarIconsService.createAvatarIcon('uploads/' + image?.filename);
     } catch (e) {
       throw new BadRequestException(`Ошибка при создании аватарки: ${e}`);
     }
@@ -50,5 +47,12 @@ export class AvatarIconsController {
   @Get('/avatar-icons')
   async getAllAvatarIcons() {
     return this.avatarIconsService.getAll();
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Delete('/avatar-icons')
+  @ResponseMessage("Иконка успешно удалена!")
+  async deleteAvatarIcon(@Query('id') id: number) {
+    await this.avatarIconsService.delete(id)
   }
 }

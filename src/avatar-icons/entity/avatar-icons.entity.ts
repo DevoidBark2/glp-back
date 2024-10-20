@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { StatusAvatarIconsEnum } from '../enum/status-avatar-icons.enum';
 
 @Entity('avatar_icons')
 export class AvatarIconsEntity {
-  @PrimaryColumn({ type: 'uuid' })
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
   @Column({ type: 'varchar', length: 255 })
   image: string;
   @CreateDateColumn()

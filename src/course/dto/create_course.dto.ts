@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCourseDto {
   @ApiProperty()
@@ -10,10 +10,9 @@ export class CreateCourseDto {
   small_description: string;
   @ApiProperty({ type: 'file' })
   image: string;
-  @ApiProperty({ type: 'number' })
-  @IsNotEmpty({ message: 'Категория обязательно!' })
-  @IsString({ message: 'Категория должна быть числом' })
-  category: number;
+  @ApiProperty()
+  @IsOptional()
+  category: number | null;
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Права обязательно!' })
   @IsString({ message: 'Права должны быть числом' })

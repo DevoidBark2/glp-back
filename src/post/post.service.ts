@@ -15,10 +15,14 @@ export class PostService {
     private readonly postEntityRepository: Repository<PostEntity>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async getAllPosts() {
-    return this.postEntityRepository.find();
+    return this.postEntityRepository.find({
+      where: {
+        status: PostStatusEnum.ACTIVE
+      }
+    });
   }
 
   async getUserPosts(user: User) {
@@ -58,5 +62,9 @@ export class PostService {
     await this.postEntityRepository.update(postId, {
       status: PostStatusEnum.IN_PROCESSING,
     });
+  }
+
+  async getPostById(postId: string) {
+    return this.postEntityRepository.findOne({ where: { id: postId } })
   }
 }
