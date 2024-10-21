@@ -19,7 +19,7 @@ import { multerOptions } from 'src/config/multerConfig';
 export class GeneralSettingsController {
   constructor(
     private readonly generalSettingsService: GeneralSettingsService,
-  ) {}
+  ) { }
 
   @Get('/general-settings')
   async getGeneralSettings() {
@@ -34,7 +34,7 @@ export class GeneralSettingsController {
     @UploadedFile() logo: Express.Multer.File,
   ) {
     if (logo) {
-      settings.logo_url = `/uploads/${logo.filename}`;
+      settings.logo_url = `uploads/${logo.filename}`;
     }
 
     await this.generalSettingsService.change(settings);

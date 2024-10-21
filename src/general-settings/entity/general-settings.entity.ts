@@ -13,8 +13,8 @@ export class GeneralSettingsEntity {
   logo_url: string;
   @Column({ type: 'boolean', nullable: true, default: false })
   service_mode: boolean;
-  @Column({ type: 'boolean', nullable: true, default: false })
-  cache_enabled: boolean;
+  @Column({ type: 'varchar', nullable: true })
+  service_mode_text: string;
   @Column({ type: 'numeric', default: 8 })
   min_password_length: number;
   @Column({
@@ -44,4 +44,10 @@ export class GeneralSettingsEntity {
   // For moderators settings
   @Column({ type: 'json', default: [] })
   accessRights: ModeratorAccessRightsEnum[];
+  @Column({ type: "varchar", nullable: true })
+  support_email: string
+  @Column({ type: "varchar", nullable: true })
+  contact_phone: string
+  @Column({ type: "varchar", nullable: true })
+  subscription_platform: string
 }

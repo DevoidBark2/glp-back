@@ -10,7 +10,7 @@ export class GeneralSettingsService {
   constructor(
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
-  ) {}
+  ) { }
   private determinePasswordComplexity(
     password: string,
   ): ComplexityPasswordEnum {
