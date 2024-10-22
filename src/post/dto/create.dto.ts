@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
+import { PostStatusEnum } from '../enum/PostStatus.enum';
 
 export class CreatePostDto {
   @ApiProperty({ description: 'The name of the post' })
@@ -18,4 +19,8 @@ export class CreatePostDto {
 
   @ApiProperty({ required: false })
   description: string;
+  @ApiProperty({})
+  status: PostStatusEnum
+  @ApiProperty({})
+  is_publish: boolean
 }

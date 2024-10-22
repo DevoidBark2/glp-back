@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
 import { PostStatusEnum } from './enum/PostStatus.enum';
 import { v4 as uuidv4 } from 'uuid';
+import { UserRole } from 'src/constants/contants';
 
 @Injectable()
 export class PostService {
@@ -20,12 +21,24 @@ export class PostService {
   async getAllPosts() {
     return this.postEntityRepository.find({
       where: {
-        status: PostStatusEnum.ACTIVE
+        is_publish: true
       }
     });
   }
 
   async getUserPosts(user: User) {
+    if (user.role === UserRole.SUPER_ADMIN) {
+      return await this.postEntityRepository.find({
+        relations: {
+          user: true
+        },
+        order: {
+          user: {
+            role: "DESC"
+          }
+        }
+      });
+    }
     return await this.postEntityRepository.find({
       where: {
         user: {
@@ -36,6 +49,7 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, user: User) {
+    console.log(post)
     return this.postEntityRepository.save({
       id: uuidv4(),
       name: post.name,
@@ -43,6 +57,8 @@ export class PostService {
       image: post.image,
       description: post.description,
       user: user,
+      status: post.status,
+      is_publish: post.is_publish
     });
   }
 
@@ -66,5 +82,16 @@ export class PostService {
 
   async getPostById(postId: string) {
     return this.postEntityRepository.findOne({ where: { id: postId } })
+  }
+
+  async getPostForModerators(user: User) {
+    return await this.postEntityRepository.find({
+      where: {
+        status: PostStatusEnum.IN_PROCESSING
+      },
+      relations: {
+        user: true
+      }
+    })
   }
 }

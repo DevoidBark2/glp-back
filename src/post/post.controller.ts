@@ -127,4 +127,10 @@ export class PostController {
   async getPostById(@Query('postId') postId: string) {
     return await this.postService.getPostById(postId);
   }
+
+  @Roles(UserRole.MODERATOR)
+  @Get('posts-for-moderators')
+  async getPostForModerators(@Req() req: Request) {
+    return await this.postService.getPostForModerators(req['user']);
+  }
 }
