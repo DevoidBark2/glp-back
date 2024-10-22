@@ -28,7 +28,7 @@ export class GeneralSettingsController {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Post('/general-settings')
-  @UseInterceptors(FileInterceptor('logo', multerOptions))
+  @UseInterceptors(FileInterceptor('logo_url', multerOptions))
   async changeGeneralSettings(
     @Body() settings: ChangeGeneralSettingsDto,
     @UploadedFile() logo: Express.Multer.File,

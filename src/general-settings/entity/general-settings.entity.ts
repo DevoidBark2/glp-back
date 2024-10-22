@@ -9,7 +9,7 @@ export class GeneralSettingsEntity {
   id: number;
   @Column({ type: 'varchar', default: '' })
   platform_name: string;
-  @Column({ type: 'varchar', length: 255, default: '' })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   logo_url: string;
   @Column({ type: 'boolean', nullable: true, default: false })
   service_mode: boolean;
@@ -50,4 +50,16 @@ export class GeneralSettingsEntity {
   contact_phone: string
   @Column({ type: "varchar", nullable: true })
   subscription_platform: string
+  @Column({type: "numeric",nullable: true})
+  course_creation_limit: number
+  @Column({type: "boolean", nullable: true})
+  course_rating_system: boolean
+  @Column({type: "boolean", nullable: true})
+  allow_extra_materials: boolean
+  @Column({type: "boolean", nullable: true})
+  allow_course_comments: boolean
+  @Column({type: "numeric", nullable: true})
+  max_login_attempts: number
+  @Column({type: "numeric", nullable: true})
+  lockout_duration: number
 }

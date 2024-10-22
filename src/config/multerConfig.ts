@@ -4,7 +4,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export const multerOptions = {
   fileFilter: (req: any, file: any, cb: any) => {
     const fileExtension = file.originalname.split('.').slice(-1)[0];
-    if (/^(jpg|jpeg|png|svg)$/.test(fileExtension)) {
+    if (/^(jpg|jpeg|png|svg|webp)$/.test(fileExtension)) {
       cb(null, true);
     } else {
       cb(
