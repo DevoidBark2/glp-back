@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
@@ -105,5 +106,10 @@ export class CourseController {
   async changeCourse(@Body() body: ChangeCourseDto, @Req() req: Request) {
     console.log('body', body);
     return this.courseService.changeCourse(body, req['user']);
+  }
+
+  @Get('/full-course')
+  async getFullCourse(@Query('courseId') courseId: number) {
+    return await this.courseService.getFullCourseById(courseId);
   }
 }

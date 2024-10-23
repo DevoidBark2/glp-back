@@ -145,4 +145,15 @@ export class CourseService {
       user: user,
     });
   }
+
+  async getFullCourseById(courseId: number) {
+    return await this.courseEntityRepository.findOne({
+      where: { id: courseId },
+      relations: {
+        sections: {
+          components: true
+        }
+      }
+    })
+  }
 }
