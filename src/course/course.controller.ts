@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   Req,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
@@ -57,8 +58,10 @@ export class CourseController {
     description: 'Bearer Token',
     required: true,
   })
-  async createCourse(@Body() course: CreateCourseDto, @Req() req: Request) {
-    course.image = 'uploads/test.png';
+  async createCourse(@Body() course: CreateCourseDto, @Req() req: Request,@UploadedFile() image: Express.Multer.File,) {
+    if (image) {
+      course.image = 'uploads/' + image?.filename;
+    }
     const newCourse = await this.courseService.createCourse(course, req);
 
     return {
