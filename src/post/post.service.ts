@@ -49,9 +49,7 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, user: User) {
-    console.log(post)
     return this.postEntityRepository.save({
-      id: uuidv4(),
       name: post.name,
       content: post.content,
       image: post.image,
@@ -62,7 +60,7 @@ export class PostService {
     });
   }
 
-  async deletePostById(postId: string) {
+  async deletePostById(postId: number) {
     const postDelete = await this.postEntityRepository.findOne({
       where: { id: postId },
     });
@@ -80,7 +78,7 @@ export class PostService {
     });
   }
 
-  async getPostById(postId: string) {
+  async getPostById(postId: number) {
     return this.postEntityRepository.findOne({ where: { id: postId } })
   }
 

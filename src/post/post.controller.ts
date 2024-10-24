@@ -107,7 +107,7 @@ export class PostController {
   @ApiOperation({ summary: 'Delete post by ID' })
   @ApiParam({ name: 'id', description: 'Post ID' })
   @ApiHeader({ name: 'authorization' })
-  async deletePost(@Param('id') id: string) {
+  async deletePost(@Param('id') id: number) {
     try {
       await this.postService.deletePostById(id);
     } catch (e) {
@@ -124,7 +124,7 @@ export class PostController {
   }
 
   @Get('getPostById')
-  async getPostById(@Query('postId') postId: string) {
+  async getPostById(@Query('postId') postId: number) {
     return await this.postService.getPostById(postId);
   }
 

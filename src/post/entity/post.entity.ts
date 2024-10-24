@@ -5,7 +5,7 @@ import {
   JoinTable,
   ManyToOne,
   CreateDateColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { EmojiEntity } from './emoji.entity';
 import { User } from '../../user/entity/user.entity';
@@ -13,8 +13,8 @@ import { PostStatusEnum } from '../enum/PostStatus.enum';
 
 @Entity('posts')
 class PostEntity {
-  @PrimaryColumn({ type: 'uuid' })
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
   @Column({ type: 'varchar' })
   name: string;
   @Column({ type: 'varchar', nullable: true })
