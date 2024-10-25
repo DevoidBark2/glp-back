@@ -26,16 +26,16 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../config/multerConfig';
-import PostEntity from './entity/post.entity';
 import { ResponseMessage } from '../decorators/response-message.decorator';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { PostsResponseDto } from './dto/posts-response.dto';
+import { PublishPostDto } from './dto/publish-post.dro';
+import { ChangePostDto } from './dto/change-post.dto';
 
 @ApiTags('Посты')
 @Controller()
@@ -96,10 +96,14 @@ export class PostController {
     }
   }
 
+  @Roles(UserRole.SUPER_ADMIN,UserRole.TEACHER, UserRole.MODERATOR)
   @ApiBearerAuth('access-token')
-  @Put('/posts/:id')
+  @Put('/post')
   @ApiOperation({ summary: 'Change post by ID' })
-  async changePost() { }
+  @ResponseMessage("Пост успешно обновлен!")
+  async changePost(@Body() body: ChangePostDto, @Req() req: Request) {
+    return await this.postService.changePost(body,req['user']);
+  }
 
   @ApiBearerAuth('access-token')
   @ResponseMessage('Пост успешно удален!')
@@ -132,5 +136,10 @@ export class PostController {
   @Get('posts-for-moderators')
   async getPostForModerators(@Req() req: Request) {
     return await this.postService.getPostForModerators(req['user']);
+  }
+
+  @Post('publish-post')
+  async publishPost(@Body() body: PublishPostDto) {
+    return await this.postService.publishPost(body);
   }
 }
