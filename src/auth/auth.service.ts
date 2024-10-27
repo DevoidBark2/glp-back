@@ -21,7 +21,7 @@ export class AuthService {
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async registerUser(user: RegisterUserDto): Promise<BasicResponse> {
     const userExists = await this.userService.findOne(user.email);
@@ -78,19 +78,66 @@ export class AuthService {
     const user = await this.userService.findOne(email);
     if (!user) {
       throw new BadRequestException(
-        'Email или пароль не верные, попробуйте еще раз!',
+        'Email или пароль не верные, попробуйте еще раз!'
       );
     }
+
+    const generalSettings = await this.generalSettingsEntityRepository.find();
+    const lockPeriodMinutes = generalSettings[0]?.period_of_inactive || 30;
+
+    // Проверка блокировки
+    await this.checkUserLock(user, lockPeriodMinutes);
+
     const passwordIsMatch = await argon2.verify(user.password, password);
 
     if (!passwordIsMatch) {
+      // Обновляем количество попыток, если пароль неверный
+      const newLoginAttempts = user.login_attempts + 1;
+      let lockUntil = user.lock_until;
+
+      if (newLoginAttempts >= 5) {
+        // Устанавливаем время блокировки на 30 минут
+        lockUntil = new Date();
+        lockUntil.setMinutes(lockUntil.getMinutes() + 30);
+      }
+
+      await this.userRepository.update(user.id, {
+        login_attempts: newLoginAttempts,
+        lock_until: lockUntil,
+      });
+
       throw new BadRequestException(
-        'Email или пароль не верные, попробуйте еще раз!',
+        'Email или пароль не верные, попробуйте еще раз!'
       );
     }
 
+    // Сбрасываем попытки при успешной аутентификации
+    await this.userRepository.update(user.id, { login_attempts: 0, lock_until: null });
     return user;
   }
+
+  async checkUserLock(user: User, lockPeriodMinutes: number): Promise<void> {
+    const currentTime = new Date();
+
+    // Проверка на активную блокировку
+    if (user.login_attempts >= 5) {
+      if (user.lock_until && user.lock_until > currentTime) {
+        throw new BadRequestException(
+          'Ваш аккаунт временно заблокирован. Попробуйте снова позже.'
+        );
+      } else if (user.lock_until && user.lock_until <= currentTime) {
+        // Если время блокировки истекло, сбрасываем попытки и обновляем время блокировки на заданный период
+        const newLockUntil = new Date();
+        newLockUntil.setMinutes(newLockUntil.getMinutes() + lockPeriodMinutes);
+
+        await this.userRepository.update(user.id, {
+          login_attempts: 0,
+          lock_until: newLockUntil
+        });
+      }
+    }
+  }
+
 
   async login(user: LoginUserDto) {
     const userData = await this.userService.findOne(user.email);

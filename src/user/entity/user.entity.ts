@@ -58,4 +58,8 @@ export class User {
   settings: SettingsEntity;
   @Column({ type: "varchar", nullable: true })
   profile_url: string
+  @Column({ type: "numeric", nullable: true, default: 0 })
+  login_attempts: number
+  @Column({ type: "date", nullable: true, default: null })
+  lock_until: Date
 }

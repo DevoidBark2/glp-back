@@ -36,6 +36,7 @@ import { UserRole } from '../constants/contants';
 import { PostsResponseDto } from './dto/posts-response.dto';
 import { PublishPostDto } from './dto/publish-post.dro';
 import { ChangePostDto } from './dto/change-post.dto';
+import { UpdatePostStatus } from './dto/update-post-status.dto';
 
 @ApiTags('Посты')
 @Controller()
@@ -96,13 +97,13 @@ export class PostController {
     }
   }
 
-  @Roles(UserRole.SUPER_ADMIN,UserRole.TEACHER, UserRole.MODERATOR)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.MODERATOR)
   @ApiBearerAuth('access-token')
   @Put('/post')
   @ApiOperation({ summary: 'Change post by ID' })
   @ResponseMessage("Пост успешно обновлен!")
   async changePost(@Body() body: ChangePostDto, @Req() req: Request) {
-    return await this.postService.changePost(body,req['user']);
+    return await this.postService.changePost(body, req['user']);
   }
 
   @ApiBearerAuth('access-token')
@@ -141,5 +142,10 @@ export class PostController {
   @Post('publish-post')
   async publishPost(@Body() body: PublishPostDto) {
     return await this.postService.publishPost(body);
+  }
+
+  @Put('update-post-status')
+  async updatePostStatus(@Body() body: UpdatePostStatus) {
+    await this.postService.updatePostStatus(body);
   }
 }

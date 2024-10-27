@@ -8,6 +8,7 @@ import { User } from '../user/entity/user.entity';
 import { CategoryEntity } from '../category/entity/category.entity';
 import { StatusCourseEnum } from './enum/status_course.enum';
 import { ChangeCourseDto } from './dto/change-course.dto';
+import { UserRole } from 'src/constants/contants';
 
 @Injectable()
 export class CourseService {
@@ -51,15 +52,30 @@ export class CourseService {
     return await this.courseEntityRepository.save(newCourse);
   }
 
-  async getAllUserCourses(req: Request) {
-    const user: User = req['user'];
-
-    return await this.courseEntityRepository.find({
+  async getAllUserCourses(user: User) {
+    const courses = user.role === UserRole.SUPER_ADMIN ? this.courseEntityRepository.find({
+      relations: {
+        category: true,
+        user: true
+      },
+      order: {
+        user: {
+          role: "DESC"
+        }
+      }
+    }) : await this.courseEntityRepository.find({
       where: { user: { id: user.id } },
       relations: {
         category: true,
       },
+      order: {
+        user: {
+          role: "DESC"
+        }
+      }
     });
+
+    return courses;
   }
 
   async delete(courseId: number) {

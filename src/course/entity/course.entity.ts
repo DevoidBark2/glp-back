@@ -18,7 +18,7 @@ export class CourseEntity {
   id: number;
   @Column({ type: 'varchar', length: 255 })
   name: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   image: string;
   @Column({ type: 'text' })
   small_description: string;

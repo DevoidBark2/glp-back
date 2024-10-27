@@ -58,7 +58,7 @@ export class CourseController {
     description: 'Bearer Token',
     required: true,
   })
-  async createCourse(@Body() course: CreateCourseDto, @Req() req: Request,@UploadedFile() image: Express.Multer.File,) {
+  async createCourse(@Body() course: CreateCourseDto, @Req() req: Request, @UploadedFile() image: Express.Multer.File,) {
     if (image) {
       course.image = 'uploads/' + image?.filename;
     }
@@ -75,7 +75,7 @@ export class CourseController {
   @LogAction(ActionEvent.ENROLL_STUDENT, 'view details of course')
   async getUserCourses(@Req() req: Request) {
     try {
-      const courses = await this.courseService.getAllUserCourses(req);
+      const courses = await this.courseService.getAllUserCourses(req['user']);
 
       return {
         courses: courses,
