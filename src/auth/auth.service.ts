@@ -25,7 +25,6 @@ export class AuthService {
 
   async registerUser(user: RegisterUserDto): Promise<BasicResponse> {
     const userExists = await this.userService.findOne(user.email);
-    const generalSettings = await this.generalSettingsEntityRepository.find();
 
     if (userExists) {
       throw new BadRequestException(
@@ -33,6 +32,7 @@ export class AuthService {
       );
     }
 
+    const generalSettings = await this.generalSettingsEntityRepository.find();
     const min_password_length = generalSettings[0].min_password_length;
     if (user.password.length < min_password_length) {
       throw new BadRequestException(
@@ -86,19 +86,22 @@ export class AuthService {
     const lockPeriodMinutes = generalSettings[0]?.period_of_inactive || 30;
 
     // Проверка блокировки
-    await this.checkUserLock(user, lockPeriodMinutes);
-
+    await this.checkUserLock(user);
+//     const lockTime = new Date().setMinutes(user.lock_until.getMinutes() + lockPeriodMinutes);
+// console.log("Lock",lockTime)
+      
     const passwordIsMatch = await argon2.verify(user.password, password);
 
     if (!passwordIsMatch) {
       // Обновляем количество попыток, если пароль неверный
-      const newLoginAttempts = user.login_attempts + 1;
+      const newLoginAttempts = Number(user.login_attempts) + 1;
       let lockUntil = user.lock_until;
 
+      console.log(newLoginAttempts)
       if (newLoginAttempts >= 5) {
-        // Устанавливаем время блокировки на 30 минут
-        lockUntil = new Date();
-        lockUntil.setMinutes(lockUntil.getMinutes() + 30);
+        const lockTime = new Date().setMinutes(user.lock_until.getMinutes() + lockPeriodMinutes);
+
+      
       }
 
       await this.userRepository.update(user.id, {
@@ -116,25 +119,28 @@ export class AuthService {
     return user;
   }
 
-  async checkUserLock(user: User, lockPeriodMinutes: number): Promise<void> {
+  async checkUserLock(user: User): Promise<void> {
     const currentTime = new Date();
 
     // Проверка на активную блокировку
     if (user.login_attempts >= 5) {
-      if (user.lock_until && user.lock_until > currentTime) {
-        throw new BadRequestException(
-          'Ваш аккаунт временно заблокирован. Попробуйте снова позже.'
-        );
-      } else if (user.lock_until && user.lock_until <= currentTime) {
-        // Если время блокировки истекло, сбрасываем попытки и обновляем время блокировки на заданный период
-        const newLockUntil = new Date();
-        newLockUntil.setMinutes(newLockUntil.getMinutes() + lockPeriodMinutes);
+      throw new BadRequestException(
+        `Ваш аккаунт временно заблокирован. Попробуйте снова позже. Через ${user.lock_until}`
+      );
+      // if (user.lock_until && user.lock_until > currentTime) {
+      //   throw new BadRequestException(
+      //     'Ваш аккаунт временно заблокирован. Попробуйте снова позже.'
+      //   );
+      // } else if (user.lock_until && user.lock_until <= currentTime) {
+      //   // Если время блокировки истекло, сбрасываем попытки и обновляем время блокировки на заданный период
+      //   const newLockUntil = new Date();
+      //   newLockUntil.setMinutes(newLockUntil.getMinutes() + lockPeriodMinutes);
 
-        await this.userRepository.update(user.id, {
-          login_attempts: 0,
-          lock_until: newLockUntil
-        });
-      }
+      //   await this.userRepository.update(user.id, {
+      //     login_attempts: 0,
+      //     lock_until: newLockUntil
+      //   });
+      // }
     }
   }
 
