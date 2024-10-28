@@ -33,4 +33,6 @@ export class ChangeGeneralSettingsDto {
   moderation_review_course: boolean;
   @ApiProperty()
   moderation_new_course: boolean;
+  @ApiProperty()
+  default_avatar: string
 }

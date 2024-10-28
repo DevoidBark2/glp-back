@@ -8,5 +8,6 @@ import { GeneralSettingsEntity } from './entity/general-settings.entity';
   imports: [TypeOrmModule.forFeature([GeneralSettingsEntity])],
   controllers: [GeneralSettingsController],
   providers: [GeneralSettingsService],
+  exports: [GeneralSettingsService],
 })
-export class GeneralSettingsModule {}
+export class GeneralSettingsModule { }

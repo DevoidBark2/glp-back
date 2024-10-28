@@ -50,16 +50,18 @@ export class GeneralSettingsEntity {
   contact_phone: string
   @Column({ type: "varchar", nullable: true })
   subscription_platform: string
-  @Column({type: "numeric",nullable: true})
+  @Column({ type: "numeric", nullable: true })
   course_creation_limit: number
-  @Column({type: "boolean", nullable: true})
+  @Column({ type: "boolean", nullable: true })
   course_rating_system: boolean
-  @Column({type: "boolean", nullable: true})
+  @Column({ type: "boolean", nullable: true })
   allow_extra_materials: boolean
-  @Column({type: "boolean", nullable: true})
+  @Column({ type: "boolean", nullable: true })
   allow_course_comments: boolean
-  @Column({type: "numeric", nullable: true})
+  @Column({ type: "numeric", nullable: true })
   max_login_attempts: number
-  @Column({type: "numeric", nullable: true})
+  @Column({ type: "numeric", nullable: true })
   lockout_duration: number
+  @Column({ type: "varchar", nullable: true })
+  default_avatar: string
 }

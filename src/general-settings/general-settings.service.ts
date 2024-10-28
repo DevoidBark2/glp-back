@@ -11,7 +11,7 @@ export class GeneralSettingsService {
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
   ) { }
-  private determinePasswordComplexity(
+  public determinePasswordComplexity(
     password: string,
   ): ComplexityPasswordEnum {
     let complexity = 0;

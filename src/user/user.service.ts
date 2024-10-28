@@ -17,7 +17,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async findAll() {
     return await this.userRepository.find({
@@ -49,7 +49,6 @@ export class UserService {
   async getUserByToken(token: string) {
     const decodedToken = await this.jwtService.decode(token.split(' ')[1]);
 
-    console.log('Decoded Token', decodedToken);
     if (!decodedToken) {
       throw new UnauthorizedException('Invalid Token!');
     }

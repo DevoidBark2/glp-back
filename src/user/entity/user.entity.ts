@@ -60,6 +60,6 @@ export class User {
   profile_url: string
   @Column({ type: "numeric", nullable: true, default: 0 })
   login_attempts: number
-  @Column({ type: "date", nullable: true, default: null })
-  lock_until: Date
+  @Column({ type: "numeric", nullable: true, default: 0 })
+  lock_until: number
 }

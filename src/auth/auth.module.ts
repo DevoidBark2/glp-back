@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entity/user.entity';
 import { SettingsEntity } from '../settings/entity/settings.entity';
 import { GeneralSettingsEntity } from 'src/general-settings/entity/general-settings.entity';
+import { GeneralSettingsModule } from 'src/general-settings/general-settings.module';
 
 @Module({
   imports: [
@@ -26,8 +27,9 @@ import { GeneralSettingsEntity } from 'src/general-settings/entity/general-setti
       }),
       inject: [ConfigService],
     }),
+    GeneralSettingsModule
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }

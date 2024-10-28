@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { GeneralSettingsService } from './general-settings.service';
@@ -11,7 +12,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { ApiTags } from '@nestjs/swagger';
 import { ChangeGeneralSettingsDto } from './dto/change-general-settings.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/config/multerConfig';
 
 @ApiTags('Основые настройки')
@@ -28,13 +29,29 @@ export class GeneralSettingsController {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Post('/general-settings')
-  @UseInterceptors(FileInterceptor('logo_url', multerOptions))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'logo_url', maxCount: 1 },
+      { name: 'default_avatar', maxCount: 1 },
+    ], multerOptions)
+  )
   async changeGeneralSettings(
     @Body() settings: ChangeGeneralSettingsDto,
-    @UploadedFile() logo: Express.Multer.File,
+    @UploadedFiles() files: { logo_url?: Express.Multer.File[]; default_avatar?: Express.Multer.File[] },
   ) {
-    if (logo) {
-      settings.logo_url = `uploads/${logo.filename}`;
+    console.log(files)
+    // Initialize default values for the file paths
+    settings.logo_url = null;
+    settings.default_avatar = null;
+
+    // Check if files are uploaded
+    if (files.logo_url && files.logo_url.length > 0) {
+      settings.logo_url = `uploads/${files.logo_url[0].filename}`;
+    }
+
+    // Check if default avatar is uploaded
+    if (files.default_avatar && files.default_avatar.length > 0) {
+      settings.default_avatar = `uploads/${files.default_avatar[0].filename}`;
     }
 
     await this.generalSettingsService.change(settings);
