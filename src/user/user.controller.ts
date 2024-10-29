@@ -8,6 +8,8 @@ import {
   Put,
   Query,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -20,6 +22,9 @@ import { UserDetailsByIdDto } from './dto/user_details_by_id.dto';
 import { UsersResponseDto } from './dto/users_response_dto';
 import { ResponseMessage } from '../decorators/response-message.decorator';
 import { GlobalActionDto } from './dto/global-action.dto';
+import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/config/multerConfig';
 
 @ApiTags('Пользователи')
 @Controller()
@@ -86,5 +91,37 @@ export class UserController {
   @Get('/profile-user')
   async getUserProfileInfo(@Req() req: Request) {
     return await this.userService.getUserProfileInfo(req['user']);
+  }
+
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.MODERATOR,
+    UserRole.STUDENT,
+  )
+  @Put('/profile')
+  @ResponseMessage("Данные успешно сохранены!")
+  async updateProfile(@Body() body: ChangeUserProfileDto, @Req() req: Request) {
+    return await this.userService.updateProfile(body,req['user']);
+  }
+
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.MODERATOR,
+    UserRole.STUDENT,
+  )
+  @Put('/upload-avatar')
+  @ResponseMessage("Данные успешно сохранены!")
+  @UseInterceptors(FileInterceptor('logo_avatar', multerOptions))
+  async uploadAvatar(@UploadedFile() image: Express.Multer.File, @Req() req: Request) {
+    let imagePath = null;
+    if(image) {
+      imagePath = 'uploads/' + image.filename;
+    }
+    
+    await this.userService.uploadAvatar(imagePath,req['user']);
+
+    return imagePath;
   }
 }

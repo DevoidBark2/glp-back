@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create_user.dto';
 import * as argon2 from 'argon2';
 import { UserRole } from '../constants/contants';
 import { GlobalActionDto } from './dto/global-action.dto';
+import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -122,5 +123,25 @@ export class UserService {
 
   async getUserProfileInfo(user: User) {
     return user;
+  }
+
+  async updateProfile(body: ChangeUserProfileDto, user: User) {
+    const currentUser = await this.userRepository.findOne({where: {id: user.id}});
+
+    if(!currentUser) {
+      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
+    }
+
+     await this.userRepository.update(user.id,body);
+  }
+
+  async uploadAvatar(image: string, user: User){
+    const currentUser = await this.userRepository.findOne({where: {id: user.id}});
+
+    if(!currentUser) {
+      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
+    }
+
+    await this.userRepository.update(user.id,{profile_url: image});
   }
 }

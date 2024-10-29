@@ -26,12 +26,16 @@ export class User {
   last_name: string;
   @Column()
   email: string;
+  @Column({ nullable: true })
+  phone: string;
   @Column()
   password: string;
   @Column({ nullable: true })
   city: string;
   @Column({ nullable: true })
   university: string;
+  @Column({ nullable: true })
+  about_me: string;
   @Column({
     type: 'enum',
     enum: StatusUserEnum,
