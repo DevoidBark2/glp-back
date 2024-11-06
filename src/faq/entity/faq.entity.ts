@@ -6,6 +6,6 @@ export class FaqEntity {
     id: number;
     @Column({ type: "varchar", length: 255 })
     question: string
-    @Column({ type: "varchar", length: 255 })
+    @Column({ type: "varchar" })
     answer: string;
 }

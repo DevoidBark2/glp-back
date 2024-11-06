@@ -17,4 +17,6 @@ export class ChangeUserProfileDto {
     city: string
     @ApiProperty()
     about_me:string
+    @ApiProperty()
+    pagination_size:number;
 }

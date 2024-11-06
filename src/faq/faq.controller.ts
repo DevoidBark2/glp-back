@@ -35,6 +35,7 @@ export class FaqController {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Delete(':id')
+  @ResponseMessage("Запись успешно удалена!")
   remove(@Query('id') id: string) {
     return this.faqService.remove(+id);
   }

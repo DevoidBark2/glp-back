@@ -7,6 +7,7 @@ import { CourseEntity } from '../course/entity/course.entity';
 import { SectionEntity } from '../section/entity/section.entity';
 import { UserRole } from '../constants/contants';
 import { PostStatusEnum } from '../post/enum/PostStatus.enum';
+import { StatusCourseEnum } from 'src/course/enum/status_course.enum';
 
 @Injectable()
 export class StatisticsService {
@@ -57,17 +58,14 @@ export class StatisticsService {
   }
 
   async getStatistics(user: User) {
-    // Если учитель,то для него кол-во курсов иначе для админа всего постов
     const courseCount = user.role === UserRole.SUPER_ADMIN ? await this.courseEntityRepository.count() : await this.courseEntityRepository.count({
       where: { user: { id: user.id } },
     });
 
-    // Если учитель,то для него кол-во постов иначе для админа всего постов
     const postCount = user.role === UserRole.SUPER_ADMIN ? await this.postEntityRepository.count() : await this.postEntityRepository.count({
       where: { user: { id: user.id } },
     });
 
-    // Если учитель,то для него кол-во опубликованных постов иначе для админа всего опубликованных постов
     const publishPosts = user.role === UserRole.SUPER_ADMIN ? await this.postEntityRepository.count({
       where: {
         is_publish: true
@@ -79,7 +77,6 @@ export class StatisticsService {
       },
     });
 
-    // Если учитель,то для него кол-во новых постов иначе для админа всего новых постов
     const newPosts = user.role === UserRole.SUPER_ADMIN ? await this.postEntityRepository.count({
       where: {
         status: PostStatusEnum.NEW,
@@ -113,18 +110,63 @@ export class StatisticsService {
       },
     });
 
+    const publishCourse = user.role === UserRole.SUPER_ADMIN ? await this.courseEntityRepository.count({
+      where: {
+        status: StatusCourseEnum.ACTIVE
+      }
+    }) : await this.courseEntityRepository.count({
+      where: {
+        status: StatusCourseEnum.ACTIVE,
+        user: { id: user.id },
+      },
+    });
+
+    const newCourse = user.role === UserRole.SUPER_ADMIN ? await this.courseEntityRepository.count({
+      where: {
+        status: StatusCourseEnum.NEW,
+      },
+    }) : await this.courseEntityRepository.count({
+      where: {
+        user: { id: user.id },
+        status: StatusCourseEnum.NEW,
+      },
+    });
+
+    const inProcessingCourse = user.role === UserRole.SUPER_ADMIN ? await this.courseEntityRepository.count({
+      where: {
+        status: StatusCourseEnum.IN_PROCESSING,
+      },
+    }) : await this.courseEntityRepository.count({
+      where: {
+        user: { id: user.id },
+        status: StatusCourseEnum.IN_PROCESSING,
+      },
+    });
+
+    const rejectCourse = user.role === UserRole.SUPER_ADMIN ? await this.courseEntityRepository.count({
+      where: {
+        status: StatusCourseEnum.REJECTED,
+      },
+    }) : await this.courseEntityRepository.count({
+      where: {
+        user: { id: user.id },
+        status: StatusCourseEnum.REJECTED,
+      },
+    });
+
     const countUsers = await this.userRepository.count({
       where: {
         role: Not(UserRole.SUPER_ADMIN)
       }
     });
 
-    console.log(publishPosts)
-    console.log(postCount)
-    console.log(((publishPosts / postCount) * 100).toFixed(2))
     return {
       countUsers: countUsers,
       courseCount: courseCount,
+      courseCountPublish: courseCount !== 0 ? ((publishCourse / courseCount) * 100).toFixed(2) : 0,
+      courseCountNew: courseCount !== 0 ? ((newCourse / courseCount) * 100).toFixed(2) : 0,
+      courseCountIsProcessing: courseCount !== 0 ? ((inProcessingCourse / courseCount) * 100).toFixed(2) : 0,
+      courseCountReject: courseCount !== 0 ? ((rejectCourse / courseCount) * 100).toFixed(2) : 0,
       postCount: postCount,
       postsCountPublish:
         postCount !== 0 ? ((publishPosts / postCount) * 100).toFixed(2) : 0,

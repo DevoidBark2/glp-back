@@ -66,4 +66,6 @@ export class User {
   login_attempts: number
   @Column({ type: "numeric", nullable: true, default: 0 })
   lock_until: number
+  @Column({type: 'numeric', nullable: true})
+  pagination_size: number;
 }
