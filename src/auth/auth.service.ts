@@ -186,6 +186,10 @@ export class AuthService {
       role: userData.role,
       user_name: `${userData.second_name} ${userData.first_name} ${userData.last_name}`,
       token: token,
+      pagination_size: userData.pagination_size,
+      table_size: userData.table_size,
+      show_footer_table: userData.show_footer_table,
+      footerContent: userData.footerContent
     };
   }
 
