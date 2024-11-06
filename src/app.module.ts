@@ -22,6 +22,7 @@ import { AvatarIconsModule } from './avatar-icons/avatar-icons.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { AchievementsModule } from './achievements/achievements.module';
 import { FaqModule } from './faq/faq.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { FaqModule } from './faq/faq.module';
     FeedbacksModule,
     AchievementsModule,
     FaqModule,
+    SupportModule,
   ],
   providers: [
     WebsocketGateway,
