@@ -35,7 +35,16 @@ export class PostService {
     if (user.role === UserRole.SUPER_ADMIN) {
       return await this.postEntityRepository.find({
         relations: {
-          user: true
+          user:true
+        },
+        select: {
+          user: {
+            id: true,
+            first_name: true,
+            second_name: true,
+            last_name: true,
+            role: true
+          }
         },
         order: {
           user: {
@@ -59,7 +68,7 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, user: User) {
-    return this.postEntityRepository.save({
+    const newPost = await this.postEntityRepository.save({
       name: post.name,
       content: post.content,
       image: post.image,
@@ -68,6 +77,14 @@ export class PostService {
       status: post.status,
       is_publish: post.is_publish
     });
+
+    return {...newPost,user: {
+      id: newPost.user.id,
+      first_name: newPost.user.first_name,
+      second_name: newPost.user.second_name,
+      last_name: newPost.user.last_name,
+      role: newPost.user.role
+    }}
   }
 
   async deletePostById(postId: number) {
