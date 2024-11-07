@@ -9,6 +9,9 @@ import { CategoryEntity } from '../category/entity/category.entity';
 import { StatusCourseEnum } from './enum/status_course.enum';
 import { ChangeCourseDto } from './dto/change-course.dto';
 import { UserRole } from 'src/constants/contants';
+import { SubscribeCourseDto } from './dto/subsribe-course.dto';
+import { CourseUser } from './entity/course-user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class CourseService {
@@ -19,13 +22,56 @@ export class CourseService {
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    @InjectRepository(CourseUser)
+    private readonly courseUserRepository: Repository<CourseUser>,
   ) { }
 
-  async findAll() {
-    return await this.courseEntityRepository.find({
-      relations: ['user', 'category'],
+  async findAll(req: Request) {
+    const userToken = req.headers['authorization'] as string | undefined;
+
+    // If no token is provided, return all courses with basic relations
+    if (!userToken) {
+      return await this.courseEntityRepository.find({
+        relations: ['user', 'category']  // Relations with course creator and category
+      });
+    }
+
+    // Get user from token
+    const user = await this.userService.getUserByToken(userToken);
+
+    // If user does not exist (invalid token), return all courses as in the first case
+    if (!user) {
+      return await this.courseEntityRepository.find({
+        relations: ['user', 'category']
+      });
+    }
+
+    // Fetch courses related to the specific user in courseUsers, with a conditional check
+    const coursesForUser = await this.courseEntityRepository.find({
+      where: {
+        courseUsers: { user: user }
+      },
+      relations: {
+        category: true,
+        courseUsers: {
+          user: true
+        }
+      }
     });
+
+    // If no specific course-user relation is found, return all courses with basic relations
+    if (coursesForUser.length < 1) {
+      return await this.courseEntityRepository.find({
+        relations: ['user', 'category'],
+      });
+    }
+
+    // Otherwise, return the courses associated with the user including courseUsers relation
+    return coursesForUser;
   }
+
+
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
     const currentUser: User = req['user'];
@@ -170,6 +216,25 @@ export class CourseService {
           components: true
         }
       }
+    })
+  }
+
+  async subscribeCourse(body: SubscribeCourseDto) {
+    const course = await this.courseEntityRepository.findOne({ where: { id: body.courseId } })
+
+    if (!course) {
+      throw new BadRequestException(`Курс с ID ${body.courseId} не найден!`)
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: body.userId } })
+
+    if (!user) {
+      throw new BadRequestException(`Пользователь с ID ${body.courseId} не найден!`)
+    }
+
+    return await this.courseUserRepository.save({
+      user: user,
+      course: course
     })
   }
 }

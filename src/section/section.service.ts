@@ -12,7 +12,7 @@ export class SectionService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(SectionEntity)
     private readonly sectionEntityRepository: Repository<SectionEntity>,
-  ) {}
+  ) { }
   async findAll(user: User) {
     return this.sectionEntityRepository.find({
       where: { user: { id: user.id } },
@@ -32,7 +32,7 @@ export class SectionService {
       externalLinks: section.externalLinks,
       uploadFile: section.uploadFile,
       user: user,
-      status: StatusSectionEnum.NEW,
+      status: StatusSectionEnum.ACTIVE,
     });
   }
 }

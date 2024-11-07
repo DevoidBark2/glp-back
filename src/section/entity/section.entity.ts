@@ -27,7 +27,7 @@ export class SectionEntity {
   @Column({
     type: 'enum',
     enum: StatusSectionEnum,
-    default: StatusSectionEnum.NEW,
+    default: StatusSectionEnum.ACTIVE,
   })
   status: StatusSectionEnum;
   @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })

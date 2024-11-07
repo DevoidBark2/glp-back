@@ -10,6 +10,7 @@ export class ResponseCoursesInterceptor implements NestInterceptor {
           const res = {
             ...item,
           };
+          delete res.secret_key;
           delete res.user.password;
           return res;
         }),

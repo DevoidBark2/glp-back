@@ -11,6 +11,7 @@ import { CategoryEntity } from '../../category/entity/category.entity';
 import { AccessRightEnum } from '../enum/access_right.enum';
 import { LevelCourseEnum } from '../enum/level_course.enum';
 import { StatusCourseEnum } from '../enum/status_course.enum';
+import { CourseUser } from './course-user.entity';
 
 @Entity('courses')
 export class CourseEntity {
@@ -49,4 +50,6 @@ export class CourseEntity {
   user: User;
   @OneToMany(() => SectionEntity, (sections) => sections.course)
   sections: SectionEntity[];
+  @OneToMany(() => CourseUser, courseUser => courseUser.course)
+  courseUsers: CourseUser[];
 }

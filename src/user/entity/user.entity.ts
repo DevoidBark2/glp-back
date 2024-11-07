@@ -15,6 +15,7 @@ import { SettingsEntity } from '../../settings/entity/settings.entity';
 import { StatusUserEnum } from '../enum/user-status.enum';
 import { TableSize } from '../enum/table-size.enum';
 import { TableFooter } from '../enum/table-footer.enum';
+import { CourseUser } from 'src/course/entity/course-user.entity';
 
 @Entity('users')
 export class User {
@@ -68,12 +69,14 @@ export class User {
   login_attempts: number
   @Column({ type: "numeric", nullable: true, default: 0 })
   lock_until: number
-  @Column({type: 'numeric', nullable: true, default: 5})
+  @Column({ type: 'numeric', nullable: true, default: 5 })
   pagination_size: number;
-  @Column({type: "enum", enum: TableSize, default: TableSize.MIDDLE})
+  @Column({ type: "enum", enum: TableSize, default: TableSize.MIDDLE })
   table_size: TableSize;
-  @Column({type: "boolean", nullable: true,default: false})
+  @Column({ type: "boolean", nullable: true, default: false })
   show_footer_table: boolean;
-  @Column({type: "enum", enum: TableFooter, default: TableFooter.TOTAL_ENTRIES})
+  @Column({ type: "enum", enum: TableFooter, default: TableFooter.TOTAL_ENTRIES })
   footerContent: TableFooter
+  @OneToMany(() => CourseUser, courseUser => courseUser.user)
+  courseUsers: CourseUser[];
 }

@@ -32,6 +32,7 @@ import { LogAction } from '../decorators/log-action.decorator';
 import { ActionEvent } from '../events/enum/action-event.enum';
 import { ChangeCourseDto } from './dto/change-course.dto';
 import { ResponseMessage } from '../decorators/response-message.decorator';
+import { SubscribeCourseDto } from './dto/subsribe-course.dto';
 
 @ApiTags('Курсы')
 @UseInterceptors(EventLoggingInterceptor)
@@ -42,8 +43,9 @@ export class CourseController {
   @Get('/courses')
   @UseInterceptors(ResponseCoursesInterceptor)
   @ApiOperation({ summary: 'Get all courses' })
-  async findAll(): Promise<CourseEntity[]> {
-    return await this.courseService.findAll();
+  async findAll(@Req() req: Request): Promise<CourseEntity[]> {
+    console.log('asd')
+    return await this.courseService.findAll(req);
   }
 
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
@@ -114,5 +116,10 @@ export class CourseController {
   @Get('/full-course')
   async getFullCourse(@Query('courseId') courseId: number) {
     return await this.courseService.getFullCourseById(courseId);
+  }
+
+  @Post('subscribe-course')
+  async subscribeCourse(@Body() body: SubscribeCourseDto) {
+    await this.courseService.subscribeCourse(body);
   }
 }
