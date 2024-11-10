@@ -30,10 +30,20 @@ export class CourseService {
   async findAll(req: Request) {
     const userToken = req.headers['authorization'] as string | undefined;
 
-    // If no token is provided, return all courses with basic relations
     if (!userToken) {
       return await this.courseEntityRepository.find({
-        relations: ['user', 'category']  // Relations with course creator and category
+        relations: {
+          category: true,
+          user: true,
+        },
+        select: {
+          user: {
+            id: true,
+            first_name: true,
+            second_name: true,
+            last_name: true
+          }
+        }
       });
     }
 
@@ -43,31 +53,36 @@ export class CourseService {
     // If user does not exist (invalid token), return all courses as in the first case
     if (!user) {
       return await this.courseEntityRepository.find({
-        relations: ['user', 'category']
+        relations: {
+          category: true,
+          user: true,
+        },
+        select: {
+          user: {
+            id: true,
+            first_name: true,
+            second_name: true,
+            last_name: true
+          }
+        }
       });
     }
 
     // Fetch courses related to the specific user in courseUsers, with a conditional check
     const coursesForUser = await this.courseEntityRepository.find({
-      where: {
-        courseUsers: { user: user }
-      },
       relations: {
         category: true,
-        courseUsers: {
-          user: true
-        }
+        courseUsers: true,
+        user: true
       }
     });
 
-    // If no specific course-user relation is found, return all courses with basic relations
-    if (coursesForUser.length < 1) {
-      return await this.courseEntityRepository.find({
-        relations: ['user', 'category'],
-      });
-    }
-
-    // Otherwise, return the courses associated with the user including courseUsers relation
+    coursesForUser.map(it => {
+      return {
+        ...it,
+        inCourse: it.courseUsers.length > 0
+      }
+    })
     return coursesForUser;
   }
 

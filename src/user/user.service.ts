@@ -12,11 +12,13 @@ import * as argon2 from 'argon2';
 import { UserRole } from '../constants/contants';
 import { GlobalActionDto } from './dto/global-action.dto';
 import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
+import { CourseUser } from 'src/course/entity/course-user.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(CourseUser) private readonly courseUserRepository: Repository<CourseUser>,
     private readonly jwtService: JwtService,
   ) { }
 
@@ -122,26 +124,49 @@ export class UserService {
   }
 
   async getUserProfileInfo(user: User) {
-    return user;
+    const userCourses = await this.courseUserRepository.find({
+      where: {
+        user: { id: user.id }
+      }
+    })
+
+    return {
+      id: user.id,
+      first_name: user.first_name,
+      second_name: user.second_name,
+      last_name: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      city: user.city,
+      userCourses: userCourses.map(courseUser => {
+        return {
+          id: courseUser.id,
+          enrolledAt: courseUser.enrolledAt,
+          progress: courseUser.progress,
+          name: courseUser.course.name,
+          image: courseUser.course.image
+        }
+      })
+    }
   }
 
   async updateProfile(body: ChangeUserProfileDto, user: User) {
-    const currentUser = await this.userRepository.findOne({where: {id: user.id}});
+    const currentUser = await this.userRepository.findOne({ where: { id: user.id } });
 
-    if(!currentUser) {
+    if (!currentUser) {
       throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
     }
 
-     await this.userRepository.update(user.id,body);
+    await this.userRepository.update(user.id, body);
   }
 
-  async uploadAvatar(image: string, user: User){
-    const currentUser = await this.userRepository.findOne({where: {id: user.id}});
+  async uploadAvatar(image: string, user: User) {
+    const currentUser = await this.userRepository.findOne({ where: { id: user.id } });
 
-    if(!currentUser) {
+    if (!currentUser) {
       throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
     }
 
-    await this.userRepository.update(user.id,{profile_url: image});
+    await this.userRepository.update(user.id, { profile_url: image });
   }
 }
