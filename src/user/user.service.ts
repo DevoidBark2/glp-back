@@ -135,6 +135,7 @@ export class UserService {
       first_name: user.first_name,
       second_name: user.second_name,
       last_name: user.last_name,
+      image: user.profile_url,
       email: user.email,
       phone: user.phone,
       city: user.city,
@@ -144,7 +145,8 @@ export class UserService {
           enrolledAt: courseUser.enrolledAt,
           progress: courseUser.progress,
           name: courseUser.course.name,
-          image: courseUser.course.image
+          image: courseUser.course.image,
+          small_description: courseUser.course.small_description
         }
       })
     }
