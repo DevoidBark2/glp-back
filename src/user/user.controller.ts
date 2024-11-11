@@ -25,6 +25,7 @@ import { GlobalActionDto } from './dto/global-action.dto';
 import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/config/multerConfig';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('Пользователи')
 @Controller()
@@ -123,5 +124,17 @@ export class UserController {
     await this.userService.uploadAvatar(imagePath,req['user']);
 
     return imagePath;
+  }
+
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.MODERATOR,
+    UserRole.STUDENT,
+  )
+  @Post('change-password')
+  @ResponseMessage("Пароль успешно обновлен!")
+  async changePassword(@Body() body: ChangePasswordDto,@Req() req: Request) {
+    return await this.userService.changePassword(body,req['user'])
   }
 }

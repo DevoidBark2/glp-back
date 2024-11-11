@@ -13,6 +13,7 @@ import { UserRole } from '../constants/contants';
 import { GlobalActionDto } from './dto/global-action.dto';
 import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
 import { CourseUser } from 'src/course/entity/course-user.entity';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -142,6 +143,7 @@ export class UserService {
       userCourses: userCourses.map(courseUser => {
         return {
           id: courseUser.id,
+          courseId: courseUser.course.id,
           enrolledAt: courseUser.enrolledAt,
           progress: courseUser.progress,
           name: courseUser.course.name,
@@ -170,5 +172,22 @@ export class UserService {
     }
 
     await this.userRepository.update(user.id, { profile_url: image });
+  }
+
+  async changePassword(body: ChangePasswordDto,user: User) {  
+    const currentUser = await this.userRepository.findOne({where: {
+      id: user.id
+    }})
+
+    const passwordIsMatch = await argon2.verify(currentUser.password, body.currentPassword);
+
+    if(!passwordIsMatch) {
+      throw new BadRequestException("Текущий пароль не верный,попробуйте еще раз!")
+    }
+
+
+    await this.userRepository.update(currentUser.id, {
+      password: await argon2.hash(body.newPassword)
+    })
   }
 }

@@ -252,4 +252,21 @@ export class CourseService {
       course: course
     })
   }
+
+  async leaveCourse(id: number,user: User) {
+    const course = await this.courseEntityRepository.findOne({where: {id: id}})
+    const courseUser = await this.courseUserRepository.findOne({
+      where: {
+        user: user,
+        course: course
+      }
+    })
+
+
+    if (!course) {
+      throw new BadRequestException(`Курс с ID ${id} не найден!`)
+    }
+
+    await this.courseUserRepository.delete(courseUser.id)
+  }
 }

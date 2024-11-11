@@ -122,4 +122,9 @@ export class CourseController {
   async subscribeCourse(@Body() body: SubscribeCourseDto) {
     await this.courseService.subscribeCourse(body);
   }
+
+  @Delete('/leave-course/:id')
+  async leaveFromCourse(@Param('id') id: number,@Req() req: Request) {
+    return await this.courseService.leaveCourse(id,req['user']);
+  }
 }
