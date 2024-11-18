@@ -23,9 +23,9 @@ export class User {
   id: number;
   @Column()
   first_name: string;
-  @Column()
+  @Column({ nullable: true })
   second_name: string;
-  @Column()
+  @Column({ nullable: true })
   last_name: string;
   @Column()
   email: string;
@@ -47,8 +47,6 @@ export class User {
   status: StatusUserEnum;
   @Column({ nullable: true })
   birth_day: Date;
-  @Column({ nullable: true })
-  otp_code: string;
   @Column({ type: 'enum', enum: UserRole })
   role: UserRole;
   @CreateDateColumn()
@@ -79,4 +77,6 @@ export class User {
   footerContent: TableFooter
   @OneToMany(() => CourseUser, courseUser => courseUser.user)
   courseUsers: CourseUser[];
+  @Column({ nullable: true })
+  verify_email: Date
 }

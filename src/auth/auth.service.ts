@@ -70,28 +70,17 @@ export class AuthService {
     const minPasswordLength = generalSettings[0].min_password_length;
     const requiredComplexity = generalSettings[0].password_complexity as ComplexityPasswordEnum;
 
-    // Проверка длины пароля
-    if (user.password.length < minPasswordLength) {
-      throw new BadRequestException(
-        `Пароль должен содержать не менее ${minPasswordLength} символов. Пожалуйста, попробуйте снова, используя более сложный пароль.`
-      );
-    }
-
     // Проверка сложности пароля
     this.checkPasswordComplexity(user.password, requiredComplexity, minPasswordLength);
 
     // Хеширование пароля перед сохранением
     user.password = await argon2.hash(user.password);
 
-    const otpCode = Math.floor(Math.random() * 10 ** 6)
-      .toString()
-      .padStart(6, '0');
-
     // Создание пользователя с настройками по умолчанию
     const newUser = await this.userRepository.save({
       ...user,
-      otp_code: otpCode,
       role: generalSettings ? generalSettings[0].default_user_role : UserRole.STUDENT,
+      verify_email: generalSettings[0].auto_confirm_register ? new Date() : null
     });
 
     const settingForNewUser = this.settingsEntityRepository.create({
@@ -108,7 +97,9 @@ export class AuthService {
 
     return {
       success: true,
-      message: 'Ваш аккаунт успешно создан! На вашу почту было отправлено письмо с кодом.',
+      message: !generalSettings[0].auto_confirm_register
+        ? 'Ваш аккаунт успешно создан! Мы отправили письмо с кодом подтверждения на вашу почту.'
+        : 'Вы успешно зарегистрировались!',
     };
   }
   async validateUser(email: string, password: string): Promise<any> {
