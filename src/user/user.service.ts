@@ -185,6 +185,11 @@ export class UserService {
       throw new BadRequestException("Текущий пароль не верный,попробуйте еще раз!")
     }
 
+    if (body.currentPassword === body.newPassword) {
+      throw new BadRequestException(
+        "Новый пароль совпадает с текущим паролем, используйте другой!"
+      );
+    }
 
     await this.userRepository.update(currentUser.id, {
       password: await argon2.hash(body.newPassword)

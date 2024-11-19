@@ -67,8 +67,8 @@ export class AuthService {
 
     // Получаем настройки сложности и длины пароля из БД
     const generalSettings = await this.generalSettingsEntityRepository.find();
-    const minPasswordLength = generalSettings[0].min_password_length;
-    const requiredComplexity = generalSettings[0].password_complexity as ComplexityPasswordEnum;
+    const minPasswordLength = generalSettings[0]?.min_password_length;
+    const requiredComplexity = generalSettings[0]?.password_complexity as ComplexityPasswordEnum;
 
     // Проверка сложности пароля
     this.checkPasswordComplexity(user.password, requiredComplexity, minPasswordLength);
