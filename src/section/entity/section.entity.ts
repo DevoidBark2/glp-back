@@ -18,7 +18,7 @@ export class SectionEntity {
   id: number;
   @Column({ type: 'text' })
   name: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
   @Column({ type: 'json', nullable: true })
   externalLinks: string[];
