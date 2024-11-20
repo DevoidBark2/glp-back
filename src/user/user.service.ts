@@ -140,6 +140,12 @@ export class UserService {
       email: user.email,
       phone: user.phone,
       city: user.city,
+      birth_day: user.birth_day,
+      about_me: user.about_me,
+      pagination_size: user.pagination_size,
+      table_size: user.table_size,
+      show_footer_table: user.show_footer_table,
+      footerContent: user.footerContent,
       userCourses: userCourses.map(courseUser => {
         return {
           id: courseUser.id,
@@ -174,14 +180,16 @@ export class UserService {
     await this.userRepository.update(user.id, { profile_url: image });
   }
 
-  async changePassword(body: ChangePasswordDto,user: User) {  
-    const currentUser = await this.userRepository.findOne({where: {
-      id: user.id
-    }})
+  async changePassword(body: ChangePasswordDto, user: User) {
+    const currentUser = await this.userRepository.findOne({
+      where: {
+        id: user.id
+      }
+    })
 
     const passwordIsMatch = await argon2.verify(currentUser.password, body.currentPassword);
 
-    if(!passwordIsMatch) {
+    if (!passwordIsMatch) {
       throw new BadRequestException("Текущий пароль не верный,попробуйте еще раз!")
     }
 
