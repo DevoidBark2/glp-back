@@ -14,6 +14,9 @@ import { GlobalActionDto } from './dto/global-action.dto';
 import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
 import { CourseUser } from 'src/course/entity/course-user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ChangeUserRoleDto } from './dto/change-user-role.dto';
+import { BlockUserDto } from './dto/block-user.dto';
+import { StatusUserEnum } from './enum/user-status.enum';
 
 @Injectable()
 export class UserService {
@@ -44,7 +47,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BadRequestException(`User with ID ${id} not found!`);
+      throw new BadRequestException(`Пользователя с ID ${id} не найден!`);
     }
 
     return user;
@@ -202,5 +205,39 @@ export class UserService {
     await this.userRepository.update(currentUser.id, {
       password: await argon2.hash(body.newPassword)
     })
+  }
+
+  async changeUserRole(body: ChangeUserRoleDto) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: body.userId
+      }
+    })
+
+    if (!user) {
+      throw new BadRequestException(`Пользователь с ID ${body.userId} не найден`)
+    }
+
+    await this.userRepository.update(body.userId, { role: body.role });
+  }
+
+  async blockUser(body: BlockUserDto) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: body.userId
+      }
+    })
+
+    if (!user) {
+      throw new BadRequestException(`Пользователь с ID ${body.userId} не найден`)
+    }
+
+    console.log(body)
+
+    await this.userRepository.update(body.userId, { status: body.status });
+
+    return {
+      message: body.status === StatusUserEnum.ACTIVATED ? "Пользователь успешно разблокирован!" : "Пользователь успешно заблокирован!"
+    }
   }
 }

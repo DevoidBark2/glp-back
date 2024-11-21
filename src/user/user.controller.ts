@@ -26,11 +26,13 @@ import { ChangeUserProfileDto } from './dto/change-user-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/config/multerConfig';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ChangeUserRoleDto } from './dto/change-user-role.dto';
+import { BlockUserDto } from './dto/block-user.dto';
 
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get('users')
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -41,10 +43,11 @@ export class UserController {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Delete('user')
+  @Delete('user/:id')
   @ApiOperation({ summary: 'Delete user' })
-  async deleteUser(@Query() query: DeleteUserDto) {
-    await this.userService.delete(query.id);
+  @ResponseMessage("Пользователь успешно удален!")
+  async deleteUser(@Param('id') id: number) {
+    return await this.userService.delete(id);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
@@ -59,7 +62,7 @@ export class UserController {
 
   @Get('users/:id')
   @ApiOperation({ summary: 'Get ' })
- // @Serialize(UserDetailsByIdDto)
+  // @Serialize(UserDetailsByIdDto)
   async getUserById(@Param('id') id: number) {
     return await this.userService.findOneById(id);
   }
@@ -103,7 +106,7 @@ export class UserController {
   @Put('/profile')
   @ResponseMessage("Данные успешно сохранены!")
   async updateProfile(@Body() body: ChangeUserProfileDto, @Req() req: Request) {
-    return await this.userService.updateProfile(body,req['user']);
+    return await this.userService.updateProfile(body, req['user']);
   }
 
   @Roles(
@@ -117,11 +120,11 @@ export class UserController {
   @UseInterceptors(FileInterceptor('logo_avatar', multerOptions))
   async uploadAvatar(@UploadedFile() image: Express.Multer.File, @Req() req: Request) {
     let imagePath = null;
-    if(image) {
+    if (image) {
       imagePath = 'uploads/' + image.filename;
     }
-    
-    await this.userService.uploadAvatar(imagePath,req['user']);
+
+    await this.userService.uploadAvatar(imagePath, req['user']);
 
     return imagePath;
   }
@@ -134,7 +137,20 @@ export class UserController {
   )
   @Post('change-password')
   @ResponseMessage("Пароль успешно обновлен!")
-  async changePassword(@Body() body: ChangePasswordDto,@Req() req: Request) {
-    return await this.userService.changePassword(body,req['user'])
+  async changePassword(@Body() body: ChangePasswordDto, @Req() req: Request) {
+    return await this.userService.changePassword(body, req['user'])
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Put('change-user-role')
+  @ResponseMessage("Роль успешно обновлена!")
+  async chnageUserRole(@Body() body: ChangeUserRoleDto) {
+    await this.userService.changeUserRole(body);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Put('/block-user')
+  async blockUser(@Body() body: BlockUserDto) {
+    return await this.userService.blockUser(body);
   }
 }

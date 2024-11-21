@@ -43,7 +43,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Настройка статической раздачи файлов с заголовками для CORS
   app.use(
     '/uploads',
     (req, res, next) => {
