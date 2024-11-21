@@ -1,6 +1,7 @@
 import { Expose } from 'class-transformer';
 import { CourseEntity } from '../../course/entity/course.entity';
 import PostEntity from '../../post/entity/post.entity';
+import { StatusUserEnum } from '../enum/user-status.enum';
 
 export class UserDetailsByIdDto {
   @Expose()
@@ -16,11 +17,11 @@ export class UserDetailsByIdDto {
   @Expose()
   email: string;
   @Expose()
-  is_active: boolean;
+  phone: string;
   @Expose()
   city: string;
   @Expose()
-  university: string;
+  status: StatusUserEnum;
   @Expose()
   birth_day: Date;
   @Expose()
@@ -31,4 +32,6 @@ export class UserDetailsByIdDto {
   courses: CourseEntity;
   @Expose()
   posts: PostEntity;
+  @Expose()
+  profile_url: string;
 }

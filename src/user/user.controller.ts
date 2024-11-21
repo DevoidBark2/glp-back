@@ -59,7 +59,7 @@ export class UserController {
 
   @Get('users/:id')
   @ApiOperation({ summary: 'Get ' })
-  @Serialize(UserDetailsByIdDto)
+ // @Serialize(UserDetailsByIdDto)
   async getUserById(@Param('id') id: number) {
     return await this.userService.findOneById(id);
   }
