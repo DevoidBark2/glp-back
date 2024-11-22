@@ -43,6 +43,8 @@ export class PostService {
             first_name: true,
             second_name: true,
             last_name: true,
+            email: true,
+            phone: true,
             role: true
           }
         },
