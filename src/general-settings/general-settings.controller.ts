@@ -39,8 +39,6 @@ export class GeneralSettingsController {
     @Body() settings: ChangeGeneralSettingsDto,
     @UploadedFiles() files: { logo_url?: Express.Multer.File[]; default_avatar?: Express.Multer.File[] },
   ) {
-    console.log(files)
-    // Initialize default values for the file paths
     settings.logo_url = null;
     settings.default_avatar = null;
 

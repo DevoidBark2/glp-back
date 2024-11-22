@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ComplexityPasswordEnum } from '../enum/complexity-password.enum';
 import { UserRole } from '../../constants/contants';
 import { ModeratorAccessRightsEnum } from '../enum/moderator-access-rights.enum';
+import { ModerationAccess } from '../enum/moderation-access.enum';
 
 @Entity('general-settings')
 export class GeneralSettingsEntity {
@@ -64,4 +65,6 @@ export class GeneralSettingsEntity {
   lockout_duration: number
   @Column({ type: "varchar", nullable: true })
   default_avatar: string
+  @Column({ type: "json", default: [] })
+  moderationAccess: ModerationAccess
 }

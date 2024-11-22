@@ -35,7 +35,7 @@ export class PostService {
     if (user.role === UserRole.SUPER_ADMIN) {
       return await this.postEntityRepository.find({
         relations: {
-          user:true
+          user: true
         },
         select: {
           user: {
@@ -76,17 +76,19 @@ export class PostService {
       image: post.image,
       description: post.description,
       user: user,
-      status: post.status,
+      status: user.role === UserRole.SUPER_ADMIN ? PostStatusEnum.APPROVED : PostStatusEnum.NEW,
       is_publish: post.is_publish
     });
 
-    return {...newPost,user: {
-      id: newPost.user.id,
-      first_name: newPost.user.first_name,
-      second_name: newPost.user.second_name,
-      last_name: newPost.user.last_name,
-      role: newPost.user.role
-    }}
+    return {
+      ...newPost, user: {
+        id: newPost.user.id,
+        first_name: newPost.user.first_name,
+        second_name: newPost.user.second_name,
+        last_name: newPost.user.last_name,
+        role: newPost.user.role
+      }
+    }
   }
 
   async deletePostById(postId: number) {
@@ -187,7 +189,7 @@ export class PostService {
       throw new BadRequestException(`Поста с ID ${post.id} не существует!`)
     }
 
-    if (post !== currentPost) {
+    if (post !== currentPost && user.role !== UserRole.SUPER_ADMIN) {
       post.is_publish = false;
       post.status = PostStatusEnum.MODIFIED;
 
