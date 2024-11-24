@@ -21,12 +21,18 @@ import { ResponseMessage } from '../decorators/response-message.decorator';
 @ApiTags('Компоненты раздела')
 @Controller('')
 export class ComponentTaskController {
-  constructor(private readonly componentTaskService: ComponentTaskService) {}
+  constructor(private readonly componentTaskService: ComponentTaskService) { }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/component-task')
   async getComponentTask(@Req() req: Request) {
     return await this.componentTaskService.getAll(req['user']);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Get('/component-task/:id')
+  async getComponentTaskById(@Param('id') id: number) {
+    return await this.componentTaskService.getComponentById(id);
   }
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)

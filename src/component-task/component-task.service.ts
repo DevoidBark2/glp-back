@@ -64,4 +64,10 @@ export class ComponentTaskService {
       )
       .getMany();
   }
+
+  async getComponentById(id: number) {
+    return await this.componentTaskRepository.findOne({
+      where: { id: id },
+    });
+  }
 }
