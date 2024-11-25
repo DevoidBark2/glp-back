@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
 import { SectionService } from './section.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateSectionCourseDto } from './dto/create_section_course.dto';
@@ -17,6 +17,12 @@ export class SectionController {
     return await this.sectionService.findAll(req['user']);
   }
 
+  @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+  @Get('/sections/:id')
+  async getSectionCourseById(@Param('id') id: number) {
+    return await this.sectionService.findById(id);
+  }
+
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Post('/sections')
   @ApiBody({ type: CreateSectionCourseDto })
@@ -26,5 +32,12 @@ export class SectionController {
     @Req() req: Request,
   ) {
     await this.sectionService.createSection(newSectionCourse, req['user']);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Delete('/sections/:id')
+  @ResponseMessage("Раздел успешно удален!")
+  async deleteSectionCourse(@Param('id') id: number) {
+    await this.sectionService.deleteSection(id);
   }
 }

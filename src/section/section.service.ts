@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '../user/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -34,5 +34,31 @@ export class SectionService {
       user: user,
       status: StatusSectionEnum.ACTIVE,
     });
+  }
+
+  async deleteSection(id: number) {
+    const section = await this.sectionEntityRepository.findOne({where: {id: id}})
+
+    if (!section) {
+      throw new BadRequestException(`Раздел с ID ${id} не найден!`)
+    }
+
+    await this.sectionEntityRepository.delete(id);
+  }
+
+  async findById(id: number) {
+    const section = await this.sectionEntityRepository.findOne({
+      where: {id: id},
+      relations: {
+        course: true,
+        components: true
+      }
+    })
+
+    if (!section) {
+      throw new BadRequestException(`Раздел с ID ${id} не найден!`)
+    }
+
+    return section;
   }
 }
