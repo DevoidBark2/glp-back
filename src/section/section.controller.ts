@@ -40,4 +40,10 @@ export class SectionController {
   async deleteSectionCourse(@Param('id') id: number) {
     await this.sectionService.deleteSection(id);
   }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Get('main-section')
+  async getMainSections(@Req() req: Request) {
+    return await this.sectionService.getMainSection(req['user']);
+  }
 }

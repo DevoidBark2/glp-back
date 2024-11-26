@@ -5,11 +5,13 @@ import { Repository } from 'typeorm';
 import { SectionEntity } from './entity/section.entity';
 import { CreateSectionCourseDto } from './dto/create_section_course.dto';
 import { StatusSectionEnum } from './enum/status_section.enum';
+import { MainSection } from './entity/main-section.entity';
 
 @Injectable()
 export class SectionService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(MainSection) private readonly mainSectionRepository: Repository<MainSection>,
     @InjectRepository(SectionEntity)
     private readonly sectionEntityRepository: Repository<SectionEntity>,
   ) { }
@@ -60,5 +62,13 @@ export class SectionService {
     }
 
     return section;
+  }
+
+  async getMainSection(user: User) {
+    return await this.mainSectionRepository.find({
+      where: {
+        user: {id: user.id}
+      }
+    })
   }
 }
