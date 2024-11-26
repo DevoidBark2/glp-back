@@ -13,7 +13,6 @@ export class FileLimitExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const status = exception.getStatus();
 
-    console.log(response);
     if (
       status === HttpStatus.BAD_REQUEST &&
       exception.message.includes('Too many files')

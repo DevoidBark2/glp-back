@@ -6,6 +6,7 @@ import { SectionEntity } from './entity/section.entity';
 import { CreateSectionCourseDto } from './dto/create_section_course.dto';
 import { StatusSectionEnum } from './enum/status_section.enum';
 import { MainSection } from './entity/main-section.entity';
+import { MainSectionDto } from './dto/create-main-section.dto';
 
 @Injectable()
 export class SectionService {
@@ -26,6 +27,10 @@ export class SectionService {
   }
 
   async createSection(section: CreateSectionCourseDto, user: User) {
+    const parentSection = section.parentSection
+     ? await this.mainSectionRepository.findOne({where: {id: section.parentSection}})
+     : null
+
     await this.sectionEntityRepository.save({
       name: section.name,
       description: section.description,
@@ -35,6 +40,7 @@ export class SectionService {
       uploadFile: section.uploadFile,
       user: user,
       status: StatusSectionEnum.ACTIVE,
+      parentSection: parentSection
     });
   }
 
@@ -70,5 +76,9 @@ export class SectionService {
         user: {id: user.id}
       }
     })
+  }
+
+  async createMainSections (body: MainSectionDto,user: User) {
+    return await this.mainSectionRepository.save({...body, user: user});
   }
 }

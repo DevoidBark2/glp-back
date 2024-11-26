@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CourseEntity } from '../../course/entity/course.entity';
 import { ComponentTask } from '../../component-task/entity/component-task.entity';
+import { MainSection } from '../entity/main-section.entity';
 
 export class CreateSectionCourseDto {
   @ApiProperty({ type: 'string' })
@@ -15,4 +16,6 @@ export class CreateSectionCourseDto {
   externalLinks: string[];
   @ApiProperty({ type: 'json' })
   uploadFile: string[];
+  @ApiProperty({type: "number"})
+  parentSection: number
 }

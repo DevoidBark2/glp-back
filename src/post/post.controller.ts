@@ -89,8 +89,6 @@ export class PostController {
         post.image = 'uploads/' + image?.filename;
       }
 
-      console.log(post);
-
       return await this.postService.createPost(post, req['user']);
     } catch (e) {
       throw new BadRequestException(`Ошибка при создании поста: ${e}`);

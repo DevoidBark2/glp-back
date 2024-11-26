@@ -5,6 +5,7 @@ import { CreateSectionCourseDto } from './dto/create_section_course.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { ResponseMessage } from '../decorators/response-message.decorator';
+import { MainSectionDto } from './dto/create-main-section.dto';
 
 @ApiTags('Разделы курсов')
 @Controller()
@@ -45,5 +46,11 @@ export class SectionController {
   @Get('main-section')
   async getMainSections(@Req() req: Request) {
     return await this.sectionService.getMainSection(req['user']);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Post('main-section')
+  async createMainSections(@Body() body: MainSectionDto,@Req() req: Request) {
+    return await this.sectionService.createMainSections(body, req['user']);
   }
 }

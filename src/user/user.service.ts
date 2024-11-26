@@ -232,8 +232,6 @@ export class UserService {
       throw new BadRequestException(`Пользователь с ID ${body.userId} не найден`)
     }
 
-    console.log(body)
-
     await this.userRepository.update(body.userId, { status: body.status });
 
     return {

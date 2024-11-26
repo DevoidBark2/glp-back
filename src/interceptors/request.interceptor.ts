@@ -12,7 +12,6 @@ export class RequestInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    console.log(context);
     return undefined;
   }
 }

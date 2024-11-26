@@ -44,7 +44,6 @@ export class CourseController {
   @UseInterceptors(ResponseCoursesInterceptor)
   @ApiOperation({ summary: 'Get all courses' })
   async findAll(@Req() req: Request): Promise<CourseEntity[]> {
-    console.log('asd')
     return await this.courseService.findAll(req);
   }
 
@@ -109,7 +108,6 @@ export class CourseController {
   @Put('/course')
   @ResponseMessage('Курс успешно обновлен!')
   async changeCourse(@Body() body: ChangeCourseDto, @Req() req: Request) {
-    console.log('body', body);
     return this.courseService.changeCourse(body, req['user']);
   }
 

@@ -16,7 +16,6 @@ export class FaqController {
   @Post('faq')
   @ResponseMessage("Запись успешно создана!")
   create(@Body() createFaqDto: CreateFaqDto) {
-    console.log(createFaqDto)
     return this.faqService.create(createFaqDto);
   }
 

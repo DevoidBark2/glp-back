@@ -11,6 +11,7 @@ import { CourseEntity } from '../../course/entity/course.entity';
 import { ComponentTask } from '../../component-task/entity/component-task.entity';
 import { User } from '../../user/entity/user.entity';
 import { StatusSectionEnum } from '../enum/status_section.enum';
+import { MainSection } from './main-section.entity';
 
 @Entity('sections')
 export class SectionEntity {
@@ -48,4 +49,6 @@ export class SectionEntity {
   user: User;
   @CreateDateColumn()
   created_at: Date;
+  @ManyToOne(() => MainSection, (mainSection) => mainSection.id, {onDelete: "SET NULL", nullable: true})
+  parentSection: MainSection;
 }

@@ -206,7 +206,7 @@ export class CourseService {
         id: course.category,
       },
     });
-    console.log(course);
+    
     await this.courseEntityRepository.update(course.id, {
       name: course.name,
       image: course.image,
@@ -224,15 +224,78 @@ export class CourseService {
   }
 
   async getFullCourseById(courseId: number) {
-    return await this.courseEntityRepository.findOne({
-      where: { id: courseId },
-      relations: {
-        sections: {
-          components: true
+    const course = await this.courseEntityRepository.findOne({
+        where: { id: courseId },
+        relations: {
+            sections: {
+                components: true,
+                parentSection: true, // Загружаем родительскую сущность (MainSection)
+            },
+        },
+    });
+
+    if (!course) {
+        throw new Error(`Course with ID ${courseId} not found`);
+    }
+
+    const sections = course.sections;
+
+    if (!sections || sections.length === 0) {
+        return {
+            courseId: course.id,
+            courseName: course.name,
+            sections: [], // Если нет секций
+        };
+    }
+
+    // Карта для группировки секций по parentSection.id
+    const mainSectionMap = new Map<number, any>(); // Храним MainSection и его секции
+    const rootSections: any[] = []; // Секции без parentSection (корневые)
+
+    sections.forEach((section) => {
+        if (section.parentSection) {
+            const mainSectionId = section.parentSection.id;
+
+            // Если MainSection еще не в карте, инициализируем
+            if (!mainSectionMap.has(mainSectionId)) {
+                mainSectionMap.set(mainSectionId, {
+                    id: mainSectionId,
+                    title: section.parentSection.title,
+                    ...section,
+                    children: [],
+                });
+            }
+
+            // Добавляем текущую секцию как дочернюю к ее MainSection
+            mainSectionMap.get(mainSectionId).children.push({
+                id: section.id,
+                name: section.name,
+                ...section,
+                children: [],
+            });
+        } else {
+            // Если секция не привязана к MainSection, она корневая
+            rootSections.push({
+                id: section.id,
+                name: section.name,
+                ...section,
+                children: [],
+            });
         }
-      }
-    })
-  }
+    });
+
+    // Преобразуем Map в массив для возвращаемого результата
+    const groupedSections = [...mainSectionMap.values(), ...rootSections];
+
+    // Возвращаем результат
+    return {
+        courseId: course.id,
+        courseName: course.name,
+        sections: groupedSections, // Группированные секции
+    };
+}
+
+
 
   async subscribeCourse(body: SubscribeCourseDto) {
     const course = await this.courseEntityRepository.findOne({ where: { id: body.courseId } })
