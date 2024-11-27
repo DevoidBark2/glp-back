@@ -229,7 +229,7 @@ export class CourseService {
         relations: {
             sections: {
                 components: true,
-                parentSection: true, // Загружаем родительскую сущность (MainSection)
+                parentSection: true,
             },
         },
     });
@@ -244,7 +244,7 @@ export class CourseService {
         return {
             courseId: course.id,
             courseName: course.name,
-            sections: [], // Если нет секций
+            sections: [],
         };
     }
 
@@ -260,8 +260,7 @@ export class CourseService {
             if (!mainSectionMap.has(mainSectionId)) {
                 mainSectionMap.set(mainSectionId, {
                     id: mainSectionId,
-                    title: section.parentSection.title,
-                    ...section,
+                    name: section.parentSection.title,
                     children: [],
                 });
             }
@@ -290,7 +289,7 @@ export class CourseService {
     // Возвращаем результат
     return {
         courseId: course.id,
-        courseName: course.name,
+        name: course.name,
         sections: groupedSections, // Группированные секции
     };
 }
