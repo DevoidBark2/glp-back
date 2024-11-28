@@ -5,6 +5,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CourseEntity } from '../../course/entity/course.entity';
@@ -12,6 +13,7 @@ import { ComponentTask } from '../../component-task/entity/component-task.entity
 import { User } from '../../user/entity/user.entity';
 import { StatusSectionEnum } from '../enum/status_section.enum';
 import { MainSection } from './main-section.entity';
+import { SectionComponentTask } from './section-component-task.entity';
 
 @Entity('sections')
 export class SectionEntity {
@@ -31,16 +33,16 @@ export class SectionEntity {
     default: StatusSectionEnum.ACTIVE,
   })
   status: StatusSectionEnum;
-  @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })
-  @JoinTable({
-    name: 'section_component_task',
-    joinColumn: { name: 'section_id', referencedColumnName: 'id' },
-    inverseJoinColumn: {
-      name: 'component_task_id',
-      referencedColumnName: 'id',
-    },
-  })
-  components: ComponentTask[];
+  // @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })
+  // @JoinTable({
+  //   name: 'section_component_task',
+  //   joinColumn: { name: 'section_id', referencedColumnName: 'id' },
+  //   inverseJoinColumn: {
+  //     name: 'component_task_id',
+  //     referencedColumnName: 'id',
+  //   },
+  // })
+  //components: ComponentTask[];
   @ManyToOne(() => CourseEntity, (course) => course.sections, {
     onDelete: 'CASCADE',
   })
@@ -49,6 +51,10 @@ export class SectionEntity {
   user: User;
   @CreateDateColumn()
   created_at: Date;
-  @ManyToOne(() => MainSection, (mainSection) => mainSection.id, {onDelete: "SET NULL", nullable: true})
+  @ManyToOne(() => MainSection, (mainSection) => mainSection.id, { onDelete: "SET NULL", nullable: true })
   parentSection: MainSection;
+  @Column({ type: "numeric", nullable: true })
+  sort: number
+  @OneToMany(() => SectionComponentTask, (sectionComponent) => sectionComponent.section)
+  sectionComponents: SectionComponentTask[];
 }

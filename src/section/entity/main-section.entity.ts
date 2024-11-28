@@ -5,8 +5,10 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 export class MainSection {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column({type: "varchar"})
+    @Column({ type: "varchar" })
     title: string;
-    @ManyToOne(() => User, user => user.id, {onDelete: "CASCADE"})
+    @ManyToOne(() => User, user => user.id, { onDelete: "CASCADE" })
     user: User;
+    @Column({ type: "numeric", nullable: true })
+    sort: number
 }

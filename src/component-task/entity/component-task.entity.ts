@@ -4,12 +4,14 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CourseComponentType } from '../enum/course-component-type.enum';
 import { User } from '../../user/entity/user.entity';
 import { StatusComponentTaskEnum } from '../enum/status-component-task.enum';
 import { SectionEntity } from '../../section/entity/section.entity';
+import { SectionComponentTask } from 'src/section/entity/section-component-task.entity';
 
 export type QuestionsType = {
   question: string;
@@ -42,6 +44,10 @@ export class ComponentTask {
   tags: string[];
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
-  @ManyToMany(() => SectionEntity, (section) => section.components)
-  sections: SectionEntity[];
+  // @ManyToMany(() => SectionEntity, (section) => section.components)
+  // sections: SectionEntity[];
+  @Column({ type: "numeric", nullable: true })
+  sort: number
+  @OneToMany(() => SectionComponentTask, (sectionComponent) => sectionComponent.componentTask)
+  sectionComponents: SectionComponentTask[];
 }

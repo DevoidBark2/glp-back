@@ -188,7 +188,7 @@ export class CourseService {
       relations: {
         category: true,
         sections: {
-          components: true,
+          sectionComponents: true,
         },
       },
     });
@@ -206,7 +206,7 @@ export class CourseService {
         id: course.category,
       },
     });
-    
+
     await this.courseEntityRepository.update(course.id, {
       name: course.name,
       image: course.image,
@@ -225,27 +225,36 @@ export class CourseService {
 
   async getFullCourseById(courseId: number) {
     const course = await this.courseEntityRepository.findOne({
-        where: { id: courseId },
-        relations: {
-            sections: {
-                components: true,
-                parentSection: true,
-            },
+      where: { id: courseId },
+      relations: {
+        sections: {
+          sectionComponents: {
+            componentTask: true
+          },
+          parentSection: true,
         },
+      },
+      order: {
+        sections: {
+          sectionComponents: { sort: "ASC" },
+          parentSection: { sort: "ASC" },
+          sort: "ASC"
+        }
+      }
     });
 
     if (!course) {
-        throw new Error(`Course with ID ${courseId} not found`);
+      throw new Error(`Course with ID ${courseId} not found`);
     }
 
     const sections = course.sections;
 
     if (!sections || sections.length === 0) {
-        return {
-            courseId: course.id,
-            courseName: course.name,
-            sections: [],
-        };
+      return {
+        courseId: course.id,
+        courseName: course.name,
+        sections: [],
+      };
     }
 
     // Карта для группировки секций по parentSection.id
@@ -253,34 +262,34 @@ export class CourseService {
     const rootSections: any[] = []; // Секции без parentSection (корневые)
 
     sections.forEach((section) => {
-        if (section.parentSection) {
-            const mainSectionId = section.parentSection.id;
+      if (section.parentSection) {
+        const mainSectionId = section.parentSection.id;
 
-            // Если MainSection еще не в карте, инициализируем
-            if (!mainSectionMap.has(mainSectionId)) {
-                mainSectionMap.set(mainSectionId, {
-                    id: mainSectionId,
-                    name: section.parentSection.title,
-                    children: [],
-                });
-            }
-
-            // Добавляем текущую секцию как дочернюю к ее MainSection
-            mainSectionMap.get(mainSectionId).children.push({
-                id: section.id,
-                name: section.name,
-                ...section,
-                children: [],
-            });
-        } else {
-            // Если секция не привязана к MainSection, она корневая
-            rootSections.push({
-                id: section.id,
-                name: section.name,
-                ...section,
-                children: [],
-            });
+        // Если MainSection еще не в карте, инициализируем
+        if (!mainSectionMap.has(mainSectionId)) {
+          mainSectionMap.set(mainSectionId, {
+            id: mainSectionId,
+            name: section.parentSection.title,
+            children: [],
+          });
         }
+
+        // Добавляем текущую секцию как дочернюю к ее MainSection
+        mainSectionMap.get(mainSectionId).children.push({
+          id: section.id,
+          name: section.name,
+          ...section,
+          children: [],
+        });
+      } else {
+        // Если секция не привязана к MainSection, она корневая
+        rootSections.push({
+          id: section.id,
+          name: section.name,
+          ...section,
+          children: [],
+        });
+      }
     });
 
     // Преобразуем Map в массив для возвращаемого результата
@@ -288,11 +297,11 @@ export class CourseService {
 
     // Возвращаем результат
     return {
-        courseId: course.id,
-        name: course.name,
-        sections: groupedSections, // Группированные секции
+      courseId: course.id,
+      name: course.name,
+      sections: groupedSections, // Группированные секции
     };
-}
+  }
 
 
 
@@ -315,8 +324,8 @@ export class CourseService {
     })
   }
 
-  async leaveCourse(id: number,user: User) {
-    const course = await this.courseEntityRepository.findOne({where: {id: id}})
+  async leaveCourse(id: number, user: User) {
+    const course = await this.courseEntityRepository.findOne({ where: { id: id } })
     const courseUser = await this.courseUserRepository.findOne({
       where: {
         user: user,
