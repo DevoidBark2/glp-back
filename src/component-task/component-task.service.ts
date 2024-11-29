@@ -5,12 +5,16 @@ import { ComponentTask } from './entity/component-task.entity';
 import { CreateComponentTaskDto } from './dto/create-component-task.dto';
 import { User } from '../user/entity/user.entity';
 import { StatusComponentTaskEnum } from './enum/status-component-task.enum';
+import { AnswersComponentUser } from './entity/component-task-user.entity';
+import { SaveTaskUserDto } from './dto/save-task-user.dto';
 
 @Injectable()
 export class ComponentTaskService {
   constructor(
     @InjectRepository(ComponentTask)
     private readonly componentTaskRepository: Repository<ComponentTask>,
+    @InjectRepository(AnswersComponentUser)
+    private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
   ) { }
 
   async create(componentTask: CreateComponentTaskDto, user: User) {
@@ -69,5 +73,14 @@ export class ComponentTaskService {
     return await this.componentTaskRepository.findOne({
       where: { id: id },
     });
+  }
+
+  async addAnswerForTask(body: SaveTaskUserDto,user: User) {
+    const data = await this.answersComponentUserRepository.save({
+      user: user,
+      task: body.task,
+      answer: {},
+      isCorrect: true
+    })
   }
 }

@@ -17,6 +17,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { ResponseComponentTaskInterceptor } from '../interceptors/response-component-task.interceptor';
 import { ResponseMessage } from '../decorators/response-message.decorator';
+import { SaveTaskUserDto } from './dto/save-task-user.dto';
 
 @ApiTags('Компоненты раздела')
 @Controller('')
@@ -72,5 +73,12 @@ export class ComponentTaskController {
     @Req() req: Request,
   ) {
     return await this.componentTaskService.searchComponent(query, req['user']);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.MODERATOR)
+  @Post('save-task-user')
+  async saveUserTask(@Body() body: SaveTaskUserDto, @Req() req: Request) {
+    console.log(body.task)
+    await this.componentTaskService.addAnswerForTask(body,req['user']);
   }
 }
