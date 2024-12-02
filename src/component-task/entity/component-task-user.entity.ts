@@ -26,9 +26,6 @@ import {
     isCorrect: boolean; // Показывает, правильный ли ответ
   
     @CreateDateColumn()
-    created_at: Date; // Дата, когда ответ был дан
-  
-    @Column({ type: 'text', nullable: true })
-    feedback: string; // Комментарий к ответу (если нужно)
+    created_at: Date;
   }
   

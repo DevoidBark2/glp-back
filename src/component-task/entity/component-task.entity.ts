@@ -29,7 +29,7 @@ export class ComponentTask {
   @Column({ type: 'enum', enum: CourseComponentType })
   type: CourseComponentType;
   @Column({ type: 'json', nullable: true })
-  questions: QuestionsType;
+  questions: QuestionsType[];
   @Column({ type: 'text', nullable: true })
   content_description: string;
   @CreateDateColumn()

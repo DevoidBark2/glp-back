@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { CourseComponentType } from "../enum/course-component-type.enum";
+import { ComponentTask } from "../entity/component-task.entity";
 
 export class SaveTaskUserDto {
     @ApiProperty()
-    task: CourseComponentType;
+    task: ComponentTask;
     @ApiProperty()
     answers: number[]
 }

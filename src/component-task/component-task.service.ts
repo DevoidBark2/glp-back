@@ -7,6 +7,7 @@ import { User } from '../user/entity/user.entity';
 import { StatusComponentTaskEnum } from './enum/status-component-task.enum';
 import { AnswersComponentUser } from './entity/component-task-user.entity';
 import { SaveTaskUserDto } from './dto/save-task-user.dto';
+import { CourseComponentType } from './enum/course-component-type.enum';
 
 @Injectable()
 export class ComponentTaskService {
@@ -76,6 +77,14 @@ export class ComponentTaskService {
   }
 
   async addAnswerForTask(body: SaveTaskUserDto,user: User) {
+    console.log(body)
+    if(body.task.type === CourseComponentType.Quiz) {
+      let correctQuestions = 0;
+      body.task.questions.forEach((element,index) => {
+        if(element.correctOption === body.answers[index]) correctQuestions++;
+      });
+      console.log(correctQuestions)
+    }
     const data = await this.answersComponentUserRepository.save({
       user: user,
       task: body.task,

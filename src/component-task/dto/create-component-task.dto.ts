@@ -12,7 +12,7 @@ export class CreateComponentTaskDto {
   @ApiProperty()
   type: CourseComponentType;
   @ApiProperty()
-  questions: QuestionsType;
+  questions: QuestionsType[];
   @ApiProperty()
   content_description: string;
 }
