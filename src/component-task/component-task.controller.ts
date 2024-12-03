@@ -78,7 +78,6 @@ export class ComponentTaskController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.MODERATOR)
   @Post('save-task-user')
   async saveUserTask(@Body() body: SaveTaskUserDto, @Req() req: Request) {
-    console.log(body.task)
     await this.componentTaskService.addAnswerForTask(body,req['user']);
   }
 }

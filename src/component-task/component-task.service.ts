@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, ILike, Repository } from 'typeorm';
 import { ComponentTask } from './entity/component-task.entity';
@@ -76,20 +76,52 @@ export class ComponentTaskService {
     });
   }
 
-  async addAnswerForTask(body: SaveTaskUserDto,user: User) {
-    console.log(body)
-    if(body.task.type === CourseComponentType.Quiz) {
-      let correctQuestions = 0;
-      body.task.questions.forEach((element,index) => {
-        if(element.correctOption === body.answers[index]) correctQuestions++;
-      });
-      console.log(correctQuestions)
+  async addAnswerForTask(body: SaveTaskUserDto, user: User) {
+    const task = await this.componentTaskRepository.findOne({
+      where: { id: body.task.id },
+    });
+  
+    if (!task) {
+      throw new BadRequestException(`Задачи с ID ${body.task.id} не существует`);
     }
-    const data = await this.answersComponentUserRepository.save({
-      user: user,
-      task: body.task,
-      answer: {},
-      isCorrect: true
+  
+    // Список правильных и неправильных ответов
+    const userAnswers = body.answers;
+    const results = task.questions.map((question, index) => {
+      const isCorrect = question.correctOption === userAnswers[index];
+      return {
+        question: question.question,
+        userAnswer: userAnswers[index],
+        correctAnswer: question.correctOption,
+        isCorrect,
+      };
+    });
+  
+    // Логирование результата для проверки
+    console.log('Результаты проверки:', results);
+  
+    // Сохранение ответа пользователя в базу
+    // const savedAnswers = await Promise.all(
+    //   results.map((result) =>
+        
+    //   )
+    // );
+
+    this.answersComponentUserRepository.save({
+      user,
+      task,
+      answer: results,
     })
+  
+    // console.log('Сохраненные ответы:', savedAnswers);
+  
+    // // Возвращение результата
+    // return {
+    //   message: 'Ответы успешно сохранены',
+    //   correctCount: results.filter((res) => res.isCorrect).length,
+    //   totalQuestions: task.questions.length,
+    //   answers: savedAnswers,
+    // };
   }
+  
 }
