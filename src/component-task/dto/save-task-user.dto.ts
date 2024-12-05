@@ -6,4 +6,6 @@ export class SaveTaskUserDto {
     task: ComponentTask;
     @ApiProperty()
     answers: number[]
+    @ApiProperty()
+    currentSection: number;
 }

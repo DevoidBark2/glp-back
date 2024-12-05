@@ -8,12 +8,16 @@ import { StatusComponentTaskEnum } from './enum/status-component-task.enum';
 import { AnswersComponentUser } from './entity/component-task-user.entity';
 import { SaveTaskUserDto } from './dto/save-task-user.dto';
 import { CourseComponentType } from './enum/course-component-type.enum';
+import { SectionComponentTask } from 'src/section/entity/section-component-task.entity';
+import { SectionEntity } from 'src/section/entity/section.entity';
 
 @Injectable()
 export class ComponentTaskService {
   constructor(
     @InjectRepository(ComponentTask)
     private readonly componentTaskRepository: Repository<ComponentTask>,
+    @InjectRepository(SectionEntity)
+    private readonly sectionRepository: Repository<SectionEntity>,
     @InjectRepository(AnswersComponentUser)
     private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
   ) { }
@@ -80,7 +84,16 @@ export class ComponentTaskService {
     const task = await this.componentTaskRepository.findOne({
       where: { id: body.task.id },
     });
-  
+
+    console.log(body.currentSection)
+    const section = await this.sectionRepository.findOne({
+      where: {
+        id: Number(body.currentSection)
+      }
+    })
+
+    console.log(section)
+
     if (!task) {
       throw new BadRequestException(`Задачи с ID ${body.task.id} не существует`);
     }
@@ -96,21 +109,20 @@ export class ComponentTaskService {
       };
     });
 
-    const savedAnswers = this.answersComponentUserRepository.save({
+    const savedAnswers = await this.answersComponentUserRepository.save({
       user,
       task,
       answer: results,
+      section: section
     })
 
 
-    console.log("Count corrct", results.filter((res) => res.isCorrect).length)
-    console.log("all question", task.questions.length)
+    // console.log("Count corrct", results.filter((res) => res.isCorrect).length)
+    // console.log("all question", task.questions.length)
     return {
       message: 'Ответы успешно сохранены',
-      correctCount: results.filter((res) => res.isCorrect).length,
-      totalQuestions: task.questions.length,
       answers: savedAnswers,
     };
   }
-  
+
 }

@@ -13,6 +13,7 @@ import { SubscribeCourseDto } from './dto/subsribe-course.dto';
 import { CourseUser } from './entity/course-user.entity';
 import { UserService } from 'src/user/user.service';
 import { AnswersComponentUser } from 'src/component-task/entity/component-task-user.entity';
+import { SectionEntity } from 'src/section/entity/section.entity';
 
 @Injectable()
 export class CourseService {
@@ -28,6 +29,8 @@ export class CourseService {
     private readonly courseUserRepository: Repository<CourseUser>,
     @InjectRepository(AnswersComponentUser)
     private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
+    @InjectRepository(SectionEntity)
+    private readonly sectionRepository: Repository<SectionEntity>,
   ) { }
 
   async findAll(req: Request) {
@@ -232,7 +235,7 @@ export class CourseService {
       relations: {
         sections: {
           sectionComponents: {
-            componentTask: true
+            componentTask: true,
           },
           parentSection: true,
         },
@@ -241,17 +244,17 @@ export class CourseService {
         sections: {
           sectionComponents: { sort: "ASC" },
           parentSection: { sort: "ASC" },
-          sort: "ASC"
-        }
-      }
+          sort: "ASC",
+        },
+      },
     });
-  
+
     if (!course) {
       throw new Error(`Course with ID ${courseId} not found`);
     }
-  
+
     const sections = course.sections;
-  
+
     if (!sections || sections.length === 0) {
       return {
         courseId: course.id,
@@ -259,36 +262,40 @@ export class CourseService {
         sections: [],
       };
     }
-  
-    // Получение всех ответов пользователя для задач из текущего курса
-    const taskIds = sections
-      .flatMap(section => section.sectionComponents)
-      .map(component => component.componentTask?.id)
-      .filter(id => !!id);
-  
+
+    // Получение всех уникальных пар (task.id, section.id)
+    const taskSectionPairs = sections
+      .flatMap((section) =>
+        section.sectionComponents.map((component) => ({
+          taskId: component.componentTask?.id,
+          sectionId: section.id,
+        }))
+      )
+      .filter(({ taskId }) => !!taskId);
+
+    // Получение ответов пользователя с учетом связи task <-> section
     const userAnswers = await this.answersComponentUserRepository.find({
       where: {
         user: { id: user.id },
-        task: { id: In(taskIds) },
+        task: { id: In(taskSectionPairs.map((pair) => pair.taskId)) },
+        section: { id: In(taskSectionPairs.map((pair) => pair.sectionId)) },
       },
-      relations: ['task'],
+      relations: ["task", "section"],
     });
-  
+
     // Преобразуем ответы в Map для быстрого доступа
     const userAnswersMap = new Map(
-      userAnswers.map(answer => [answer.task.id, answer])
+      userAnswers.map((answer) => [`${answer.task.id}-${answer.section.id}`, answer])
     );
 
-    console.log(userAnswersMap)
-  
     // Карта для группировки секций по parentSection.id
     const mainSectionMap = new Map<number, any>(); // Храним MainSection и его секции
     const rootSections: any[] = []; // Секции без parentSection (корневые)
-  
+
     sections.forEach((section) => {
       if (section.parentSection) {
         const mainSectionId = section.parentSection.id;
-  
+
         // Если MainSection еще не в карте, инициализируем
         if (!mainSectionMap.has(mainSectionId)) {
           mainSectionMap.set(mainSectionId, {
@@ -297,7 +304,7 @@ export class CourseService {
             children: [],
           });
         }
-  
+
         // Добавляем текущую секцию как дочернюю к ее MainSection
         mainSectionMap.get(mainSectionId).children.push({
           id: section.id,
@@ -314,20 +321,26 @@ export class CourseService {
           children: [],
         });
       }
-  
-      // Добавляем ответы в компонент задачи
-      section.sectionComponents.forEach(component => {
+
+      // Добавляем ответы в компонент задачи только если они есть
+      section.sectionComponents.forEach((component) => {
         if (component.componentTask) {
           const taskId = component.componentTask.id;
-          const userAnswer = userAnswersMap.get(taskId);
-          component.componentTask.userAnswer = userAnswer ? userAnswer.answer : null;
+          const sectionId = section.id;
+          const userAnswer = userAnswersMap.get(`${taskId}-${sectionId}`);
+          if (userAnswer) {
+            component.componentTask.userAnswer = userAnswer.answer;
+          }
+          else {
+            component.componentTask.userAnswer = null
+          }
         }
       });
     });
-  
+
     // Преобразуем Map в массив для возвращаемого результата
     const groupedSections = [...mainSectionMap.values(), ...rootSections];
-  
+
     // Возвращаем результат
     return {
       courseId: course.id,
@@ -335,7 +348,9 @@ export class CourseService {
       sections: groupedSections, // Группированные секции с ответами пользователя
     };
   }
-  
+
+
+
 
 
 
