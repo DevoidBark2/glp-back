@@ -230,6 +230,7 @@ export class CourseService {
   }
 
   async getFullCourseById(courseId: number, user: User) {
+    // Загружаем курс с секциями и компонентами задач, упорядоченные по заданным условиям
     const course = await this.courseEntityRepository.findOne({
       where: { id: courseId },
       relations: {
@@ -244,7 +245,7 @@ export class CourseService {
         sections: {
           sectionComponents: { sort: "ASC" },
           parentSection: { sort: "ASC" },
-          sort: "ASC",
+          sort_number: "ASC"
         },
       },
     });
@@ -263,91 +264,82 @@ export class CourseService {
       };
     }
 
-    // Получение всех уникальных пар (task.id, section.id)
-    const taskSectionPairs = sections
-      .flatMap((section) =>
-        section.sectionComponents.map((component) => ({
-          taskId: component.componentTask?.id,
-          sectionId: section.id,
-        }))
-      )
-      .filter(({ taskId }) => !!taskId);
+    // Подготовка списка пар (taskId, sectionId)
+    const taskSectionPairs = sections.flatMap(section =>
+      section.sectionComponents.map(component => ({
+        taskId: component.componentTask?.id,
+        sectionId: section.id,
+      }))
+    ).filter(pair => pair.taskId);
 
-    // Получение ответов пользователя с учетом связи task <-> section
+    // Получение всех ответов пользователя для соответствующих задач и секций
     const userAnswers = await this.answersComponentUserRepository.find({
       where: {
         user: { id: user.id },
-        task: { id: In(taskSectionPairs.map((pair) => pair.taskId)) },
-        section: { id: In(taskSectionPairs.map((pair) => pair.sectionId)) },
+        task: { id: In(taskSectionPairs.map(pair => pair.taskId)) },
+        section: { id: In(taskSectionPairs.map(pair => pair.sectionId)) },
       },
       relations: ["task", "section"],
     });
 
-    // Преобразуем ответы в Map для быстрого доступа
+    // Создаем Map с ключами вида "taskId-sectionId" для быстрого доступа
     const userAnswersMap = new Map(
-      userAnswers.map((answer) => [`${answer.task.id}-${answer.section.id}`, answer])
+      userAnswers.map(answer => [`${answer.task.id}-${answer.section.id}`, answer])
     );
 
-    // Карта для группировки секций по parentSection.id
-    const mainSectionMap = new Map<number, any>(); // Храним MainSection и его секции
-    const rootSections: any[] = []; // Секции без parentSection (корневые)
+    // Группируем секции по parentSection
+    const mainSectionMap = new Map<number, any>();
+    const rootSections: any[] = [];
 
-    sections.forEach((section) => {
-      if (section.parentSection) {
-        const mainSectionId = section.parentSection.id;
+    // Обработка секций и добавление ответов в компоненты задач
+    sections.forEach(section => {
+      const sectionId = section.id;
+      const parentSection = section.parentSection;
 
-        // Если MainSection еще не в карте, инициализируем
+      if (parentSection) {
+        const mainSectionId = parentSection.id;
         if (!mainSectionMap.has(mainSectionId)) {
           mainSectionMap.set(mainSectionId, {
             id: mainSectionId,
-            name: section.parentSection.title,
+            name: parentSection.title,
             children: [],
           });
         }
-
-        // Добавляем текущую секцию как дочернюю к ее MainSection
         mainSectionMap.get(mainSectionId).children.push({
-          id: section.id,
+          id: sectionId,
           name: section.name,
           ...section,
           children: [],
         });
       } else {
-        // Если секция не привязана к MainSection, она корневая
         rootSections.push({
-          id: section.id,
+          id: sectionId,
           name: section.name,
           ...section,
           children: [],
         });
       }
 
-      // Добавляем ответы в компонент задачи только если они есть
-      section.sectionComponents.forEach((component) => {
+      // Применяем ответы к компонентам задач
+      section.sectionComponents.forEach(component => {
         if (component.componentTask) {
-          const taskId = component.componentTask.id;
-          const sectionId = section.id;
-          const userAnswer = userAnswersMap.get(`${taskId}-${sectionId}`);
-          if (userAnswer) {
-            component.componentTask.userAnswer = userAnswer.answer;
-          }
-          else {
-            component.componentTask.userAnswer = null
-          }
+          const taskKey = `${component.componentTask.id}-${sectionId}`;
+          const userAnswer = userAnswersMap.get(taskKey);
+          component.componentTask.userAnswer = userAnswer ? userAnswer.answer : null;
         }
       });
     });
 
-    // Преобразуем Map в массив для возвращаемого результата
+    // Собираем все секции в один результат
     const groupedSections = [...mainSectionMap.values(), ...rootSections];
 
-    // Возвращаем результат
     return {
       courseId: course.id,
       name: course.name,
-      sections: groupedSections, // Группированные секции с ответами пользователя
+      sections: groupedSections,
     };
   }
+
 
 
 

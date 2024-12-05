@@ -54,7 +54,7 @@ export class SectionEntity {
   @ManyToOne(() => MainSection, (mainSection) => mainSection.id, { onDelete: "SET NULL", nullable: true })
   parentSection: MainSection;
   @Column({ type: "numeric", nullable: true })
-  sort: number
+  sort_number: number
   @OneToMany(() => SectionComponentTask, (sectionComponent) => sectionComponent.section)
   sectionComponents: SectionComponentTask[];
 }
