@@ -22,9 +22,6 @@ import {
     @Column({ type: 'json', nullable: false })
     answer: any; // Содержит ответ пользователя (можно использовать объект для хранения данных)
   
-    @Column({ type: 'boolean', nullable: false, default: false })
-    isCorrect: boolean; // Показывает, правильный ли ответ
-  
     @CreateDateColumn()
     created_at: Date;
   }

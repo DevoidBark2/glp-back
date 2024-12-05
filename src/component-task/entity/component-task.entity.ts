@@ -12,8 +12,10 @@ import { User } from '../../user/entity/user.entity';
 import { StatusComponentTaskEnum } from '../enum/status-component-task.enum';
 import { SectionEntity } from '../../section/entity/section.entity';
 import { SectionComponentTask } from 'src/section/entity/section-component-task.entity';
+import { AnswersComponentUser } from './component-task-user.entity';
 
 export type QuestionsType = {
+  id: string;
   question: string;
   options: string[];
   correctOption: number;
@@ -50,4 +52,6 @@ export class ComponentTask {
   sort: number
   @OneToMany(() => SectionComponentTask, (sectionComponent) => sectionComponent.componentTask)
   sectionComponents: SectionComponentTask[];
+  @ManyToOne(() => AnswersComponentUser, (user) => user.id, { onDelete: 'CASCADE' })
+  userAnswer: AnswersComponentUser;
 }

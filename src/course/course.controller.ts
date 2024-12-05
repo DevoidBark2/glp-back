@@ -111,9 +111,10 @@ export class CourseController {
     return this.courseService.changeCourse(body, req['user']);
   }
 
+  @Roles(UserRole.MODERATOR, UserRole.STUDENT, UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/full-course')
-  async getFullCourse(@Query('courseId') courseId: number) {
-    return await this.courseService.getFullCourseById(courseId);
+  async getFullCourse(@Query('courseId') courseId: number,@Req() req: Request) {
+    return await this.courseService.getFullCourseById(courseId, req['user']);
   }
 
   @Post('subscribe-course')

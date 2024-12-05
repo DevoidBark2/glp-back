@@ -9,10 +9,11 @@ import { CategoryEntity } from '../category/entity/category.entity';
 import { EventsModule } from '../events/events.module';
 import { CourseUser } from './entity/course-user.entity';
 import { UserModule } from 'src/user/user.module';
+import { AnswersComponentUser } from 'src/component-task/entity/component-task-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CourseEntity, User, CategoryEntity, CourseUser]),
+    TypeOrmModule.forFeature([CourseEntity, User, CategoryEntity, CourseUser,AnswersComponentUser]),
     JwtModule,
     EventsModule,
     UserModule

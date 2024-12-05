@@ -84,44 +84,33 @@ export class ComponentTaskService {
     if (!task) {
       throw new BadRequestException(`Задачи с ID ${body.task.id} не существует`);
     }
-  
-    // Список правильных и неправильных ответов
-    const userAnswers = body.answers;
+
     const results = task.questions.map((question, index) => {
-      const isCorrect = question.correctOption === userAnswers[index];
+      const isCorrect = question.correctOption === body.answers[index];
       return {
+        id: question.id,
         question: question.question,
-        userAnswer: userAnswers[index],
+        userAnswer: body.answers[index],
         correctAnswer: question.correctOption,
         isCorrect,
       };
     });
-  
-    // Логирование результата для проверки
-    console.log('Результаты проверки:', results);
-  
-    // Сохранение ответа пользователя в базу
-    // const savedAnswers = await Promise.all(
-    //   results.map((result) =>
-        
-    //   )
-    // );
 
-    this.answersComponentUserRepository.save({
+    const savedAnswers = this.answersComponentUserRepository.save({
       user,
       task,
       answer: results,
     })
-  
-    // console.log('Сохраненные ответы:', savedAnswers);
-  
-    // // Возвращение результата
-    // return {
-    //   message: 'Ответы успешно сохранены',
-    //   correctCount: results.filter((res) => res.isCorrect).length,
-    //   totalQuestions: task.questions.length,
-    //   answers: savedAnswers,
-    // };
+
+
+    console.log("Count corrct", results.filter((res) => res.isCorrect).length)
+    console.log("all question", task.questions.length)
+    return {
+      message: 'Ответы успешно сохранены',
+      correctCount: results.filter((res) => res.isCorrect).length,
+      totalQuestions: task.questions.length,
+      answers: savedAnswers,
+    };
   }
   
 }

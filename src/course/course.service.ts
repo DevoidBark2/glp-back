@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CourseEntity } from './entity/course.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create_course.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/entity/user.entity';
@@ -12,6 +12,7 @@ import { UserRole } from 'src/constants/contants';
 import { SubscribeCourseDto } from './dto/subsribe-course.dto';
 import { CourseUser } from './entity/course-user.entity';
 import { UserService } from 'src/user/user.service';
+import { AnswersComponentUser } from 'src/component-task/entity/component-task-user.entity';
 
 @Injectable()
 export class CourseService {
@@ -25,6 +26,8 @@ export class CourseService {
     private readonly userService: UserService,
     @InjectRepository(CourseUser)
     private readonly courseUserRepository: Repository<CourseUser>,
+    @InjectRepository(AnswersComponentUser)
+    private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
   ) { }
 
   async findAll(req: Request) {
@@ -223,7 +226,7 @@ export class CourseService {
     });
   }
 
-  async getFullCourseById(courseId: number) {
+  async getFullCourseById(courseId: number, user: User) {
     const course = await this.courseEntityRepository.findOne({
       where: { id: courseId },
       relations: {
@@ -242,13 +245,13 @@ export class CourseService {
         }
       }
     });
-
+  
     if (!course) {
       throw new Error(`Course with ID ${courseId} not found`);
     }
-
+  
     const sections = course.sections;
-
+  
     if (!sections || sections.length === 0) {
       return {
         courseId: course.id,
@@ -256,15 +259,36 @@ export class CourseService {
         sections: [],
       };
     }
+  
+    // Получение всех ответов пользователя для задач из текущего курса
+    const taskIds = sections
+      .flatMap(section => section.sectionComponents)
+      .map(component => component.componentTask?.id)
+      .filter(id => !!id);
+  
+    const userAnswers = await this.answersComponentUserRepository.find({
+      where: {
+        user: { id: user.id },
+        task: { id: In(taskIds) },
+      },
+      relations: ['task'],
+    });
+  
+    // Преобразуем ответы в Map для быстрого доступа
+    const userAnswersMap = new Map(
+      userAnswers.map(answer => [answer.task.id, answer])
+    );
 
+    console.log(userAnswersMap)
+  
     // Карта для группировки секций по parentSection.id
     const mainSectionMap = new Map<number, any>(); // Храним MainSection и его секции
     const rootSections: any[] = []; // Секции без parentSection (корневые)
-
+  
     sections.forEach((section) => {
       if (section.parentSection) {
         const mainSectionId = section.parentSection.id;
-
+  
         // Если MainSection еще не в карте, инициализируем
         if (!mainSectionMap.has(mainSectionId)) {
           mainSectionMap.set(mainSectionId, {
@@ -273,7 +297,7 @@ export class CourseService {
             children: [],
           });
         }
-
+  
         // Добавляем текущую секцию как дочернюю к ее MainSection
         mainSectionMap.get(mainSectionId).children.push({
           id: section.id,
@@ -290,18 +314,28 @@ export class CourseService {
           children: [],
         });
       }
+  
+      // Добавляем ответы в компонент задачи
+      section.sectionComponents.forEach(component => {
+        if (component.componentTask) {
+          const taskId = component.componentTask.id;
+          const userAnswer = userAnswersMap.get(taskId);
+          component.componentTask.userAnswer = userAnswer ? userAnswer.answer : null;
+        }
+      });
     });
-
+  
     // Преобразуем Map в массив для возвращаемого результата
     const groupedSections = [...mainSectionMap.values(), ...rootSections];
-
+  
     // Возвращаем результат
     return {
       courseId: course.id,
       name: course.name,
-      sections: groupedSections, // Группированные секции
+      sections: groupedSections, // Группированные секции с ответами пользователя
     };
   }
+  
 
 
 
