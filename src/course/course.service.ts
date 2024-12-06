@@ -245,19 +245,19 @@ export class CourseService {
         },
       },
     });
-  
+
     if (!course) {
       throw new Error(`Course with ID ${courseId} not found`);
     }
-  
+
     const sections = course.sections;
-  
+
     if (!sections || sections.length === 0) {
       return [];
     }
-  
+
     const sectionIds = sections.map((section) => section.id);
-  
+
     // Загружаем ответы пользователя
     const userAnswers = await this.answersComponentUserRepository.find({
       where: {
@@ -266,25 +266,25 @@ export class CourseService {
       },
       relations: ["section"],
     });
-  
+
     const userAnswersMap = new Map(
       userAnswers.map((answer) => [answer.section.id, answer.answer])
     );
-  
+
     // Группируем секции по parentSection
     const mainSectionMap = new Map<number, any>();
     const rootSections: any[] = [];
-  
+
     sections.forEach((section) => {
       const sectionId = section.id;
       const parentSection = section.parentSection;
-  
+
       // Получаем ответ пользователя для текущего подраздела
       const rawUserAnswer = userAnswersMap.get(sectionId) || null;
-  
+
       // Обработка userAnswer
       let userAnswer = null;
-  
+
       if (rawUserAnswer) {
         if (rawUserAnswer.confirmedStep) {
           userAnswer = { confirmedStep: rawUserAnswer.confirmedStep };
@@ -299,7 +299,7 @@ export class CourseService {
           };
         }
       }
-  
+
       if (parentSection) {
         const mainSectionId = parentSection.id;
         if (!mainSectionMap.has(mainSectionId)) {
@@ -323,15 +323,18 @@ export class CourseService {
         });
       }
     });
-  
+
     // Собираем итоговый список родительских секций и их потомков
     const groupedSections = [...mainSectionMap.values(), ...rootSections];
-  
-    return groupedSections;
+
+    return {
+      sections: groupedSections,
+      courseName: course.name
+    };
   }
-  
-  
-  
+
+
+
 
   async getFullCourseById(courseId: number, user: User) {
     const course = await this.courseEntityRepository.findOne({
@@ -354,13 +357,13 @@ export class CourseService {
     });
 
     console.log(course)
-  
+
     if (!course) {
       throw new Error('Course with ID ${courseId} not found');
     }
-  
+
     const sections = course.sections;
-  
+
     if (!sections || sections.length === 0) {
       return {
         courseId: course.id,
@@ -368,9 +371,9 @@ export class CourseService {
         sections: [],
       };
     }
-  
+
     const sectionIds = sections.map((section) => section.id);
-  
+
     // Получение всех ответов пользователя для разделов (включая задачи и без них)
     const userAnswers = await this.answersComponentUserRepository.find({
       where: {
@@ -379,21 +382,21 @@ export class CourseService {
       },
       relations: ["task", "section"],
     });
-  
+
     // Создаем Map по sectionId для быстрого доступа
     const userAnswersMap = new Map(
       userAnswers.map((answer) => [answer.section.id, answer.answer])
     );
-  
+
     // Группируем секции по parentSection
     const mainSectionMap = new Map<number, any>();
     const rootSections: any[] = [];
-  
+
     // Обработка секций и добавление ответов в компоненты задач
     sections.forEach((section) => {
       const sectionId = section.id;
       const parentSection = section.parentSection;
-  
+
       if (parentSection) {
         const mainSectionId = parentSection.id;
         if (!mainSectionMap.has(mainSectionId)) {
@@ -417,7 +420,7 @@ export class CourseService {
           children: [],
         });
       }
-  
+
       // Применяем ответы к компонентам задач
       const userAnswer = userAnswersMap.get(sectionId) || null;
       section.sectionComponents.forEach((component) => {
@@ -426,10 +429,10 @@ export class CourseService {
         }
       });
     });
-  
+
     // Собираем все секции в один результат
     const groupedSections = [...mainSectionMap.values(), ...rootSections];
-  
+
     return {
       courseId: course.id,
       name: course.name,
@@ -477,49 +480,114 @@ export class CourseService {
   async updateSectionStep(prevSectionStep: number, user: User) {
     // Найти раздел с указанным ID, включая связанные компоненты.
     const section = await this.sectionRepository.findOne({
-        where: { id: prevSectionStep },
-        relations: { sectionComponents: { componentTask: true } }
+      where: { id: prevSectionStep },
+      relations: { sectionComponents: { componentTask: true } }
     });
 
     if (!section) {
-        throw new BadRequestException(`Раздел с ID ${prevSectionStep} не существует!`);
+      throw new BadRequestException(`Раздел с ID ${prevSectionStep} не существует!`);
     }
 
     // Проверить, есть ли в разделе задачи типа Quiz или Matching
     const hasTasks = section.sectionComponents.some(it =>
-        it.componentTask && [CourseComponentType.Quiz, CourseComponentType.Matching].includes(it.componentTask.type)
+      it.componentTask && [CourseComponentType.Quiz, CourseComponentType.Matching].includes(it.componentTask.type)
     );
 
     if (hasTasks) {
-        console.log(`Раздел ${prevSectionStep} содержит задачи. Добавление записи пропущено.`);
-        return; // Если задачи есть, ничего не делать.
+      console.log(`Раздел ${prevSectionStep} содержит задачи. Добавление записи пропущено.`);
+      return; // Если задачи есть, ничего не делать.
     }
 
     // Проверить, существует ли запись для данного пользователя и раздела
     const sectionExist = await this.answersComponentUserRepository.findOne({
-        where: {
-            section: { id: prevSectionStep },
-            user: { id: user.id }
-        }
+      where: {
+        section: { id: prevSectionStep },
+        user: { id: user.id }
+      }
     });
 
     if (sectionExist) {
-        console.log(`Запись для пользователя ${user.id} и раздела ${prevSectionStep} уже существует.`);
-        return; // Если запись существует, ничего не делать.
+      console.log(`Запись для пользователя ${user.id} и раздела ${prevSectionStep} уже существует.`);
+      return; // Если запись существует, ничего не делать.
     }
 
     // Сохранить новую запись в таблице
     try {
-        await this.answersComponentUserRepository.save({
-            user: user,
-            answer: { confirmedStep: prevSectionStep },
-            section: section
-        });
-        console.log(`Запись успешно добавлена для пользователя ${user.id} и раздела ${prevSectionStep}.`);
+      console.log("here")
+
+      console.log(`Запись успешно добавлена для пользователя ${user.id} и раздела ${prevSectionStep}.`);
+      return await this.answersComponentUserRepository.save({
+        user: user,
+        answer: { confirmedStep: prevSectionStep },
+        section: section
+      });
     } catch (error) {
-        console.error('Ошибка при сохранении записи:', error);
-        throw new Error('Ошибка при добавлении записи. Пожалуйста, попробуйте снова.');
+      console.error('Ошибка при сохранении записи:', error);
+      throw new Error('Ошибка при добавлении записи. Пожалуйста, попробуйте снова.');
     }
-}
+  }
+
+
+  async getCurrentSection(courseId: number, sectionId: number, user: User) {
+    console.log(typeof sectionId)
+    // Получаем курс с секциями и их компонентами по заданному courseId
+    const course = await this.courseEntityRepository.findOne({
+      where: { id: courseId },
+      relations: {
+        sections: {
+          sectionComponents: {
+            componentTask: true,
+          },
+        },
+      },
+    });
+
+    // Если курс не найден, выбрасываем ошибку
+    if (!course) {
+      throw new Error(`Course with ID ${courseId} not found`);
+    }
+
+    console.log(course.sections)
+    // Находим нужную секцию по sectionId
+    const currentSection = course.sections.find((section) => section.id === sectionId);
+
+    console.log("-----------", currentSection)
+    if (!currentSection) {
+      throw new Error(`Section with ID ${sectionId} not found in course with ID ${courseId}`);
+    }
+
+    // Получаем компоненты текущей секции
+    const sectionComponents = currentSection.sectionComponents;
+
+    // Создаем структуру ответа, добавляя ответы пользователя к компонентам, если они есть
+    const userAnswers = await this.answersComponentUserRepository.find({
+      where: {
+        user: { id: user.id },
+        section: { id: sectionId },
+      },
+      relations: ["task", "section"],
+    });
+
+    // Создаем Map для быстрого доступа к ответам пользователя
+    const userAnswersMap = new Map(
+      userAnswers.map((answer) => [`${answer.task.id}-${answer.section.id}`, answer.answer])
+    );
+
+    // Применяем ответы к компонентам задач
+    sectionComponents.forEach((component) => {
+      if (component.componentTask) {
+        const taskId = component.componentTask.id;
+        const answerKey = `${taskId}-${sectionId}`;
+        component.componentTask.userAnswer = userAnswersMap.get(answerKey) || null;
+      }
+    });
+
+    // Возвращаем только компоненты текущей секции
+    return {
+      sectionId: currentSection.id,
+      name: currentSection.name,
+      components: sectionComponents,
+    };
+  }
 
 }
