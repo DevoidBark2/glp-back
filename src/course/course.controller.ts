@@ -114,7 +114,7 @@ export class CourseController {
   @Roles(UserRole.MODERATOR, UserRole.STUDENT, UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/full-course')
   async getFullCourse(@Query('courseId') courseId: number,@Req() req: Request) {
-    return await this.courseService.getFullCourseById(courseId, req['user']);
+    return await this.courseService.getCourseMenuById(courseId,req['user']);
   }
 
   @Post('subscribe-course')
@@ -125,5 +125,11 @@ export class CourseController {
   @Delete('/leave-course/:id')
   async leaveFromCourse(@Param('id') id: number,@Req() req: Request) {
     return await this.courseService.leaveCourse(id,req['user']);
+  }
+
+  @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN, UserRole.MODERATOR)
+  @Post('/update-step')
+  async updateSectionStep(@Body() body: {prevSection: number}, @Req() req: Request) {
+    return await this.courseService.updateSectionStep(body.prevSection, req['user']);
   }
 }
