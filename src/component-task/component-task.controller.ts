@@ -22,7 +22,7 @@ import { SaveTaskUserDto } from './dto/save-task-user.dto';
 @ApiTags('Компоненты раздела')
 @Controller('')
 export class ComponentTaskController {
-  constructor(private readonly componentTaskService: ComponentTaskService) { }
+  constructor(private readonly componentTaskService: ComponentTaskService) {}
 
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
   @Get('/component-task')
@@ -75,9 +75,14 @@ export class ComponentTaskController {
     return await this.componentTaskService.searchComponent(query, req['user']);
   }
 
-  @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.MODERATOR)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+    UserRole.STUDENT,
+    UserRole.MODERATOR,
+  )
   @Post('save-task-user')
   async saveUserTask(@Body() body: SaveTaskUserDto, @Req() req: Request) {
-    return await this.componentTaskService.addAnswerForTask(body,req['user']);
+    return await this.componentTaskService.addAnswerForTask(body, req['user']);
   }
 }

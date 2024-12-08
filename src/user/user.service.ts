@@ -22,9 +22,10 @@ import { StatusUserEnum } from './enum/user-status.enum';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(CourseUser) private readonly courseUserRepository: Repository<CourseUser>,
+    @InjectRepository(CourseUser)
+    private readonly courseUserRepository: Repository<CourseUser>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async findAll() {
     return await this.userRepository.find({
@@ -130,9 +131,9 @@ export class UserService {
   async getUserProfileInfo(user: User) {
     const userCourses = await this.courseUserRepository.find({
       where: {
-        user: { id: user.id }
-      }
-    })
+        user: { id: user.id },
+      },
+    });
 
     return {
       id: user.id,
@@ -149,7 +150,7 @@ export class UserService {
       table_size: user.table_size,
       show_footer_table: user.show_footer_table,
       footerContent: user.footerContent,
-      userCourses: userCourses.map(courseUser => {
+      userCourses: userCourses.map((courseUser) => {
         return {
           id: courseUser.id,
           courseId: courseUser.course.id,
@@ -157,27 +158,31 @@ export class UserService {
           progress: courseUser.progress,
           name: courseUser.course.name,
           image: courseUser.course.image,
-          small_description: courseUser.course.small_description
-        }
-      })
-    }
+          small_description: courseUser.course.small_description,
+        };
+      }),
+    };
   }
 
   async updateProfile(body: ChangeUserProfileDto, user: User) {
-    const currentUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const currentUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
 
     if (!currentUser) {
-      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
+      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`);
     }
 
     await this.userRepository.update(user.id, body);
   }
 
   async uploadAvatar(image: string, user: User) {
-    const currentUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const currentUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
 
     if (!currentUser) {
-      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`)
+      throw new BadRequestException(`Пользователь с ID ${user.id} не найден!`);
     }
 
     await this.userRepository.update(user.id, { profile_url: image });
@@ -186,36 +191,43 @@ export class UserService {
   async changePassword(body: ChangePasswordDto, user: User) {
     const currentUser = await this.userRepository.findOne({
       where: {
-        id: user.id
-      }
-    })
+        id: user.id,
+      },
+    });
 
-    const passwordIsMatch = await argon2.verify(currentUser.password, body.currentPassword);
+    const passwordIsMatch = await argon2.verify(
+      currentUser.password,
+      body.currentPassword,
+    );
 
     if (!passwordIsMatch) {
-      throw new BadRequestException("Текущий пароль не верный,попробуйте еще раз!")
+      throw new BadRequestException(
+        'Текущий пароль не верный,попробуйте еще раз!',
+      );
     }
 
     if (body.currentPassword === body.newPassword) {
       throw new BadRequestException(
-        "Новый пароль совпадает с текущим паролем, используйте другой!"
+        'Новый пароль совпадает с текущим паролем, используйте другой!',
       );
     }
 
     await this.userRepository.update(currentUser.id, {
-      password: await argon2.hash(body.newPassword)
-    })
+      password: await argon2.hash(body.newPassword),
+    });
   }
 
   async changeUserRole(body: ChangeUserRoleDto) {
     const user = await this.userRepository.findOne({
       where: {
-        id: body.userId
-      }
-    })
+        id: body.userId,
+      },
+    });
 
     if (!user) {
-      throw new BadRequestException(`Пользователь с ID ${body.userId} не найден`)
+      throw new BadRequestException(
+        `Пользователь с ID ${body.userId} не найден`,
+      );
     }
 
     await this.userRepository.update(body.userId, { role: body.role });
@@ -224,18 +236,23 @@ export class UserService {
   async blockUser(body: BlockUserDto) {
     const user = await this.userRepository.findOne({
       where: {
-        id: body.userId
-      }
-    })
+        id: body.userId,
+      },
+    });
 
     if (!user) {
-      throw new BadRequestException(`Пользователь с ID ${body.userId} не найден`)
+      throw new BadRequestException(
+        `Пользователь с ID ${body.userId} не найден`,
+      );
     }
 
     await this.userRepository.update(body.userId, { status: body.status });
 
     return {
-      message: body.status === StatusUserEnum.ACTIVATED ? "Пользователь успешно разблокирован!" : "Пользователь успешно заблокирован!"
-    }
+      message:
+        body.status === StatusUserEnum.ACTIVATED
+          ? 'Пользователь успешно разблокирован!'
+          : 'Пользователь успешно заблокирован!',
+    };
   }
 }

@@ -10,10 +10,8 @@ export class GeneralSettingsService {
   constructor(
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
-  ) { }
-  public determinePasswordComplexity(
-    password: string,
-  ): ComplexityPasswordEnum {
+  ) {}
+  public determinePasswordComplexity(password: string): ComplexityPasswordEnum {
     let complexity = 0;
 
     if (password.length >= 8) {

@@ -27,9 +27,9 @@ import { GeneralSettingsModule } from 'src/general-settings/general-settings.mod
       }),
       inject: [ConfigService],
     }),
-    GeneralSettingsModule
+    GeneralSettingsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy],
 })
-export class AuthModule { }
+export class AuthModule {}

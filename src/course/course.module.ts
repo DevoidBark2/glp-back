@@ -14,12 +14,19 @@ import { SectionEntity } from 'src/section/entity/section.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CourseEntity, User, CategoryEntity, CourseUser, AnswersComponentUser, SectionEntity]),
+    TypeOrmModule.forFeature([
+      CourseEntity,
+      User,
+      CategoryEntity,
+      CourseUser,
+      AnswersComponentUser,
+      SectionEntity,
+    ]),
     JwtModule,
     EventsModule,
-    UserModule
+    UserModule,
   ],
   controllers: [CourseController],
   providers: [CourseService],
 })
-export class CourseModule { }
+export class CourseModule {}

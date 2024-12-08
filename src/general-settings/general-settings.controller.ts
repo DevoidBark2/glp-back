@@ -12,7 +12,11 @@ import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../constants/contants';
 import { ApiTags } from '@nestjs/swagger';
 import { ChangeGeneralSettingsDto } from './dto/change-general-settings.dto';
-import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { multerOptions } from 'src/config/multerConfig';
 
 @ApiTags('Основые настройки')
@@ -20,7 +24,7 @@ import { multerOptions } from 'src/config/multerConfig';
 export class GeneralSettingsController {
   constructor(
     private readonly generalSettingsService: GeneralSettingsService,
-  ) { }
+  ) {}
 
   @Get('/general-settings')
   async getGeneralSettings() {
@@ -30,14 +34,21 @@ export class GeneralSettingsController {
   @Roles(UserRole.SUPER_ADMIN)
   @Post('/general-settings')
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'logo_url', maxCount: 1 },
-      { name: 'default_avatar', maxCount: 1 },
-    ], multerOptions)
+    FileFieldsInterceptor(
+      [
+        { name: 'logo_url', maxCount: 1 },
+        { name: 'default_avatar', maxCount: 1 },
+      ],
+      multerOptions,
+    ),
   )
   async changeGeneralSettings(
     @Body() settings: ChangeGeneralSettingsDto,
-    @UploadedFiles() files: { logo_url?: Express.Multer.File[]; default_avatar?: Express.Multer.File[] },
+    @UploadedFiles()
+    files: {
+      logo_url?: Express.Multer.File[];
+      default_avatar?: Express.Multer.File[];
+    },
   ) {
     settings.logo_url = null;
     settings.default_avatar = null;

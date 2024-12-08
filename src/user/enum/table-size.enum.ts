@@ -1,5 +1,5 @@
 export enum TableSize {
-    SMALL = "small",
-    MIDDLE = "middle",
-    LARGE = "large"
+  SMALL = 'small',
+  MIDDLE = 'middle',
+  LARGE = 'large',
 }

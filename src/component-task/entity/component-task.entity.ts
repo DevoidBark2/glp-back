@@ -48,10 +48,15 @@ export class ComponentTask {
   user: User;
   // @ManyToMany(() => SectionEntity, (section) => section.components)
   // sections: SectionEntity[];
-  @Column({ type: "numeric", nullable: true })
-  sort: number
-  @OneToMany(() => SectionComponentTask, (sectionComponent) => sectionComponent.componentTask)
+  @Column({ type: 'numeric', nullable: true })
+  sort: number;
+  @OneToMany(
+    () => SectionComponentTask,
+    (sectionComponent) => sectionComponent.componentTask,
+  )
   sectionComponents: SectionComponentTask[];
-  @ManyToOne(() => AnswersComponentUser, (user) => user.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => AnswersComponentUser, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
   userAnswer: AnswersComponentUser;
 }

@@ -9,4 +9,4 @@ import { FaqEntity } from './entity/faq.entity';
   controllers: [FaqController],
   providers: [FaqService],
 })
-export class FaqModule { }
+export class FaqModule {}

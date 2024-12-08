@@ -19,7 +19,7 @@ import { ResponseMessage } from '../decorators/response-message.decorator';
 @ApiTags('Аватар пользователя')
 @Controller()
 export class AvatarIconsController {
-  constructor(private readonly avatarIconsService: AvatarIconsService) { }
+  constructor(private readonly avatarIconsService: AvatarIconsService) {}
 
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/avatar-icon')
@@ -28,11 +28,11 @@ export class AvatarIconsController {
   @ApiOperation({ summary: 'Create new avatar icon' })
   @ApiHeader({ name: 'authorization' })
   @ResponseMessage('Иконка успешно создана!')
-  async createPost(
-    @UploadedFile() image: Express.Multer.File,
-  ) {
+  async createPost(@UploadedFile() image: Express.Multer.File) {
     try {
-      return await this.avatarIconsService.createAvatarIcon('uploads/' + image?.filename);
+      return await this.avatarIconsService.createAvatarIcon(
+        'uploads/' + image?.filename,
+      );
     } catch (e) {
       throw new BadRequestException(`Ошибка при создании аватарки: ${e}`);
     }
@@ -51,8 +51,8 @@ export class AvatarIconsController {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Delete('/avatar-icons')
-  @ResponseMessage("Иконка успешно удалена!")
+  @ResponseMessage('Иконка успешно удалена!')
   async deleteAvatarIcon(@Query('id') id: number) {
-    await this.avatarIconsService.delete(id)
+    await this.avatarIconsService.delete(id);
   }
 }

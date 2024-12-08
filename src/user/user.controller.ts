@@ -32,7 +32,7 @@ import { BlockUserDto } from './dto/block-user.dto';
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get('users')
   @Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -45,7 +45,7 @@ export class UserController {
   @Roles(UserRole.SUPER_ADMIN)
   @Delete('user/:id')
   @ApiOperation({ summary: 'Delete user' })
-  @ResponseMessage("Пользователь успешно удален!")
+  @ResponseMessage('Пользователь успешно удален!')
   async deleteUser(@Param('id') id: number) {
     return await this.userService.delete(id);
   }
@@ -104,7 +104,7 @@ export class UserController {
     UserRole.STUDENT,
   )
   @Put('/profile')
-  @ResponseMessage("Данные успешно сохранены!")
+  @ResponseMessage('Данные успешно сохранены!')
   async updateProfile(@Body() body: ChangeUserProfileDto, @Req() req: Request) {
     return await this.userService.updateProfile(body, req['user']);
   }
@@ -116,9 +116,12 @@ export class UserController {
     UserRole.STUDENT,
   )
   @Put('/upload-avatar')
-  @ResponseMessage("Данные успешно сохранены!")
+  @ResponseMessage('Данные успешно сохранены!')
   @UseInterceptors(FileInterceptor('logo_avatar', multerOptions))
-  async uploadAvatar(@UploadedFile() image: Express.Multer.File, @Req() req: Request) {
+  async uploadAvatar(
+    @UploadedFile() image: Express.Multer.File,
+    @Req() req: Request,
+  ) {
     let imagePath = null;
     if (image) {
       imagePath = 'uploads/' + image.filename;
@@ -136,14 +139,14 @@ export class UserController {
     UserRole.STUDENT,
   )
   @Post('change-password')
-  @ResponseMessage("Пароль успешно обновлен!")
+  @ResponseMessage('Пароль успешно обновлен!')
   async changePassword(@Body() body: ChangePasswordDto, @Req() req: Request) {
-    return await this.userService.changePassword(body, req['user'])
+    return await this.userService.changePassword(body, req['user']);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Put('change-user-role')
-  @ResponseMessage("Роль успешно обновлена!")
+  @ResponseMessage('Роль успешно обновлена!')
   async chnageUserRole(@Body() body: ChangeUserRoleDto) {
     await this.userService.changeUserRole(body);
   }

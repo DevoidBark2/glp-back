@@ -9,7 +9,7 @@ export class AvatarIconsService {
   constructor(
     @InjectRepository(AvatarIconsEntity)
     private readonly avatarIconsEntityRepository: Repository<AvatarIconsEntity>,
-  ) { }
+  ) {}
   async createAvatarIcon(image: string) {
     return await this.avatarIconsEntityRepository.save({
       image: image,
@@ -20,10 +20,12 @@ export class AvatarIconsService {
     return this.avatarIconsEntityRepository.find();
   }
   async delete(id: number) {
-    const existsAvatarIcon = await this.avatarIconsEntityRepository.findOneBy({ id });
+    const existsAvatarIcon = await this.avatarIconsEntityRepository.findOneBy({
+      id,
+    });
 
     if (!existsAvatarIcon)
-      throw new BadRequestException(`Иконки с ${id} не существует!`)
+      throw new BadRequestException(`Иконки с ${id} не существует!`);
 
     await this.avatarIconsEntityRepository.delete(id);
   }

@@ -19,15 +19,16 @@ export class PostService {
     @InjectRepository(PostEntity)
     private readonly postEntityRepository: Repository<PostEntity>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(ModeratorsPost) private readonly moderatorPostRepository: Repository<ModeratorsPost>,
+    @InjectRepository(ModeratorsPost)
+    private readonly moderatorPostRepository: Repository<ModeratorsPost>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async getAllPosts() {
     return this.postEntityRepository.find({
       where: {
-        is_publish: true
-      }
+        is_publish: true,
+      },
     });
   }
 
@@ -35,7 +36,7 @@ export class PostService {
     if (user.role === UserRole.SUPER_ADMIN) {
       return await this.postEntityRepository.find({
         relations: {
-          user: true
+          user: true,
         },
         select: {
           user: {
@@ -45,24 +46,24 @@ export class PostService {
             last_name: true,
             email: true,
             phone: true,
-            role: true
-          }
+            role: true,
+          },
         },
         order: {
           user: {
-            role: "DESC"
-          }
-        }
+            role: 'DESC',
+          },
+        },
       });
     }
     return await this.postEntityRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user') // Присоединяем таблицу пользователя
       .leftJoinAndMapOne(
-        'post.moderatorFeedBack',         // Маппим новое поле `moderatorsPost` на сущность поста
-        'moderators_posts',            // Имя таблицы `moderators_posts`
-        'mp',                          // Алиас для таблицы `moderators_posts`
-        'mp.post_id = post.id'         // Условие соединения по post_id
+        'post.moderatorFeedBack', // Маппим новое поле `moderatorsPost` на сущность поста
+        'moderators_posts', // Имя таблицы `moderators_posts`
+        'mp', // Алиас для таблицы `moderators_posts`
+        'mp.post_id = post.id', // Условие соединения по post_id
       )
       .addSelect(['mp.comment', 'mp.comments']) // Включаем нужные поля из `moderators_posts`
       .where('user.id = :userId', { userId: user.id }) // Фильтрация по пользователю
@@ -70,25 +71,30 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, user: User) {
+    console.log(post);
     const newPost = await this.postEntityRepository.save({
       name: post.name,
       content: post.content,
       image: post.image,
       description: post.description,
       user: user,
-      status: user.role === UserRole.SUPER_ADMIN ? PostStatusEnum.APPROVED : PostStatusEnum.NEW,
-      is_publish: post.is_publish
+      status:
+        user.role === UserRole.SUPER_ADMIN
+          ? PostStatusEnum.APPROVED
+          : PostStatusEnum.NEW,
+      is_publish: post.is_publish,
     });
 
     return {
-      ...newPost, user: {
+      ...newPost,
+      user: {
         id: newPost.user.id,
         first_name: newPost.user.first_name,
         second_name: newPost.user.second_name,
         last_name: newPost.user.last_name,
-        role: newPost.user.role
-      }
-    }
+        role: newPost.user.role,
+      },
+    };
   }
 
   async deletePostById(postId: number) {
@@ -112,24 +118,24 @@ export class PostService {
   }
 
   async getPostById(postId: number) {
-    return this.postEntityRepository.findOne({ where: { id: postId } })
+    return this.postEntityRepository.findOne({ where: { id: postId } });
   }
 
   async getPostForModerators(user: User) {
     const moderatorPosts = await this.moderatorPostRepository.find({
       where: {
         user: { id: user.id },
-        post: { status: PostStatusEnum.IN_PROCESSING }
+        post: { status: PostStatusEnum.IN_PROCESSING },
       },
       relations: {
         post: {
-          user: true
+          user: true,
         },
       },
     });
 
     // Форматируем данные вручную под структуру postMapper
-    return moderatorPosts.map(moderatorPost => ({
+    return moderatorPosts.map((moderatorPost) => ({
       id: moderatorPost.post.id,
       name: moderatorPost.post.name,
       image: moderatorPost.post.image,
@@ -147,10 +153,9 @@ export class PostService {
         role: moderatorPost.post.user.role,
         status: moderatorPost.post.user.status,
         email: moderatorPost.post.user.email,
-        created_at: moderatorPost.post.user.created_at
-      }
+        created_at: moderatorPost.post.user.created_at,
+      },
     }));
-
 
     // return await this.postEntityRepository.find({
     //   where: {
@@ -164,29 +169,33 @@ export class PostService {
 
   async publishPost(body: PublishPostDto) {
     const post = await this.postEntityRepository.findOne({
-      where: { id: body.id }
-    })
+      where: { id: body.id },
+    });
 
     if (!post) {
-      throw new BadRequestException(`Поста с ID ${body.id} не существует!`)
+      throw new BadRequestException(`Поста с ID ${body.id} не существует!`);
     }
 
-    await this.postEntityRepository.update(body.id, { is_publish: body.checked })
+    await this.postEntityRepository.update(body.id, {
+      is_publish: body.checked,
+    });
 
     return {
-      message: body.checked ? "Пост успешно опубликован!" : "Пост снят с публикации!"
-    }
+      message: body.checked
+        ? 'Пост успешно опубликован!'
+        : 'Пост снят с публикации!',
+    };
   }
 
   async changePost(post: ChangePostDto, user: User) {
     const currentPost = await this.postEntityRepository.findOne({
       where: {
-        id: post.id
-      }
-    })
+        id: post.id,
+      },
+    });
 
     if (!currentPost) {
-      throw new BadRequestException(`Поста с ID ${post.id} не существует!`)
+      throw new BadRequestException(`Поста с ID ${post.id} не существует!`);
     }
 
     if (post !== currentPost && user.role !== UserRole.SUPER_ADMIN) {
@@ -197,7 +206,10 @@ export class PostService {
 
       return {
         post: post,
-        message: post.status && currentPost.status !== post.status && "Пост снят с публикации, так как статус изменился!"
+        message:
+          post.status &&
+          currentPost.status !== post.status &&
+          'Пост снят с публикации, так как статус изменился!',
       };
     }
 
@@ -208,28 +220,37 @@ export class PostService {
 
     return {
       post: post,
-      message: post.status && currentPost.status !== post.status && "Пост снят с публикации, так как статус изменился!"
+      message:
+        post.status &&
+        currentPost.status !== post.status &&
+        'Пост снят с публикации, так как статус изменился!',
     };
   }
 
   async updatePostStatus(body: UpdatePostStatus) {
-    await this.postEntityRepository.update(body.postId, { status: body.status })
+    await this.postEntityRepository.update(body.postId, {
+      status: body.status,
+    });
     const moderatorPost = await this.moderatorPostRepository.findOne({
       where: {
-        post: { id: body.postId }
-      }
-    })
-    await this.moderatorPostRepository.update(moderatorPost.id, { comment: body.comment, comments: body.comments })
+        post: { id: body.postId },
+      },
+    });
+    await this.moderatorPostRepository.update(moderatorPost.id, {
+      comment: body.comment,
+      comments: body.comments,
+    });
   }
 
   private async randomAssignPost(postId: number) {
     const moderators = await this.userRepository.find({
       where: {
-        role: UserRole.MODERATOR
-      }
-    })
+        role: UserRole.MODERATOR,
+      },
+    });
 
-    const randomModerator = moderators[Math.floor(Math.random() * moderators.length)];
+    const randomModerator =
+      moderators[Math.floor(Math.random() * moderators.length)];
     await this.moderatorPostRepository.save({
       user: randomModerator,
       post: { id: postId } as PostEntity,

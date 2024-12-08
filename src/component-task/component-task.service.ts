@@ -20,7 +20,7 @@ export class ComponentTaskService {
     private readonly sectionRepository: Repository<SectionEntity>,
     @InjectRepository(AnswersComponentUser)
     private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
-  ) { }
+  ) {}
 
   async create(componentTask: CreateComponentTaskDto, user: User) {
     return await this.componentTaskRepository.save({
@@ -67,9 +67,13 @@ export class ComponentTaskService {
       .andWhere(
         new Brackets((qb) => {
           qb.where('component_task.title ILIKE :queryString', { queryString })
-            .orWhere('component_task.status = :status', { status: StatusComponentTaskEnum.ACTIVATED })
-            .orWhere("component_task.tags::jsonb @> :tagQuery", { tagQuery: JSON.stringify([query]) });
-        })
+            .orWhere('component_task.status = :status', {
+              status: StatusComponentTaskEnum.ACTIVATED,
+            })
+            .orWhere('component_task.tags::jsonb @> :tagQuery', {
+              tagQuery: JSON.stringify([query]),
+            });
+        }),
       )
       .getMany();
   }
@@ -85,17 +89,19 @@ export class ComponentTaskService {
       where: { id: body.task.id },
     });
 
-    console.log(body.currentSection)
+    console.log(body.currentSection);
     const section = await this.sectionRepository.findOne({
       where: {
-        id: Number(body.currentSection)
-      }
-    })
+        id: Number(body.currentSection),
+      },
+    });
 
-    console.log(section)
+    console.log(section);
 
     if (!task) {
-      throw new BadRequestException(`Задачи с ID ${body.task.id} не существует`);
+      throw new BadRequestException(
+        `Задачи с ID ${body.task.id} не существует`,
+      );
     }
 
     const results = task.questions.map((question, index) => {
@@ -113,9 +119,8 @@ export class ComponentTaskService {
       user,
       task,
       answer: results,
-      section: section
-    })
-
+      section: section,
+    });
 
     // console.log("Count corrct", results.filter((res) => res.isCorrect).length)
     // console.log("all question", task.questions.length)
@@ -124,5 +129,4 @@ export class ComponentTaskService {
       answers: savedAnswers,
     };
   }
-
 }

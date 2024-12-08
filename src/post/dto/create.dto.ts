@@ -20,7 +20,7 @@ export class CreatePostDto {
   @ApiProperty({ required: false })
   description: string;
   @ApiProperty({})
-  status: PostStatusEnum
+  status: PostStatusEnum;
   @ApiProperty({})
-  is_publish: boolean
+  is_publish: boolean;
 }

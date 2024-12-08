@@ -34,5 +34,5 @@ export class ChangeGeneralSettingsDto {
   @ApiProperty()
   moderation_new_course: boolean;
   @ApiProperty()
-  default_avatar: string
+  default_avatar: string;
 }

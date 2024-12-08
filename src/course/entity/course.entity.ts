@@ -50,6 +50,6 @@ export class CourseEntity {
   user: User;
   @OneToMany(() => SectionEntity, (sections) => sections.course)
   sections: SectionEntity[];
-  @OneToMany(() => CourseUser, courseUser => courseUser.course)
+  @OneToMany(() => CourseUser, (courseUser) => courseUser.course)
   courseUsers: CourseUser[];
 }

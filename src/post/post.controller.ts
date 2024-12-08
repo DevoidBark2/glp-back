@@ -41,7 +41,7 @@ import { UpdatePostStatus } from './dto/update-post-status.dto';
 @ApiTags('Посты')
 @Controller()
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(private readonly postService: PostService) {}
 
   @Get('/posts')
   @ApiOperation({ summary: 'Get all posts' })
@@ -99,7 +99,7 @@ export class PostController {
   @ApiBearerAuth('access-token')
   @Put('/post')
   @ApiOperation({ summary: 'Change post by ID' })
-  @ResponseMessage("Пост успешно обновлен!")
+  @ResponseMessage('Пост успешно обновлен!')
   async changePost(@Body() body: ChangePostDto, @Req() req: Request) {
     return await this.postService.changePost(body, req['user']);
   }

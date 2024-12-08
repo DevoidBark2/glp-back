@@ -15,13 +15,13 @@ import { PostStatusEnum } from '../enum/PostStatus.enum';
 class PostEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 100 })
   name: string;
   @Column({ type: 'varchar', nullable: true })
   image: string;
   @Column({ type: 'text' })
   content: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', nullable: true, length: 255 })
   description: string;
   @Column({ type: 'enum', enum: PostStatusEnum, default: PostStatusEnum.NEW })
   status: PostStatusEnum;

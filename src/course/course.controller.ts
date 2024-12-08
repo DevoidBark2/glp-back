@@ -38,7 +38,7 @@ import { SubscribeCourseDto } from './dto/subsribe-course.dto';
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-  constructor(private readonly courseService: CourseService) { }
+  constructor(private readonly courseService: CourseService) {}
 
   @Get('/courses')
   @UseInterceptors(ResponseCoursesInterceptor)
@@ -59,7 +59,11 @@ export class CourseController {
     description: 'Bearer Token',
     required: true,
   })
-  async createCourse(@Body() course: CreateCourseDto, @Req() req: Request, @UploadedFile() image: Express.Multer.File,) {
+  async createCourse(
+    @Body() course: CreateCourseDto,
+    @Req() req: Request,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
     if (image) {
       course.image = 'uploads/' + image?.filename;
     }
@@ -111,9 +115,17 @@ export class CourseController {
     return this.courseService.changeCourse(body, req['user']);
   }
 
-  @Roles(UserRole.MODERATOR, UserRole.STUDENT, UserRole.SUPER_ADMIN, UserRole.TEACHER)
+  @Roles(
+    UserRole.MODERATOR,
+    UserRole.STUDENT,
+    UserRole.SUPER_ADMIN,
+    UserRole.TEACHER,
+  )
   @Get('/full-course')
-  async getFullCourse(@Query('courseId') courseId: number, @Req() req: Request) {
+  async getFullCourse(
+    @Query('courseId') courseId: number,
+    @Req() req: Request,
+  ) {
     return await this.courseService.getCourseMenuById(courseId, req['user']);
   }
 
@@ -127,16 +139,40 @@ export class CourseController {
     return await this.courseService.leaveCourse(id, req['user']);
   }
 
-  @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN, UserRole.MODERATOR)
+  @Roles(
+    UserRole.STUDENT,
+    UserRole.TEACHER,
+    UserRole.SUPER_ADMIN,
+    UserRole.MODERATOR,
+  )
   @Post('/update-step')
-  async updateSectionStep(@Body() body: { prevSection: number }, @Req() req: Request) {
-    return await this.courseService.updateSectionStep(body.prevSection, req['user']);
+  async updateSectionStep(
+    @Body() body: { prevSection: number },
+    @Req() req: Request,
+  ) {
+    return await this.courseService.updateSectionStep(
+      body.prevSection,
+      req['user'],
+    );
   }
 
-  @Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN, UserRole.MODERATOR)
+  @Roles(
+    UserRole.STUDENT,
+    UserRole.TEACHER,
+    UserRole.SUPER_ADMIN,
+    UserRole.MODERATOR,
+  )
   @Get('/get-current-section')
-  async getCurrentSectionStep(@Query('courseId') courseId: number, @Query('currentSection') currentSection: number, @Req() req: Request) {
-    console.log(courseId, currentSection)
-    return await this.courseService.getCurrentSection(+courseId, +currentSection, req['user']);
+  async getCurrentSectionStep(
+    @Query('courseId') courseId: number,
+    @Query('currentSection') currentSection: number,
+    @Req() req: Request,
+  ) {
+    console.log(courseId, currentSection);
+    return await this.courseService.getCurrentSection(
+      +courseId,
+      +currentSection,
+      req['user'],
+    );
   }
 }

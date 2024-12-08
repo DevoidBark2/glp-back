@@ -24,29 +24,47 @@ export class AuthService {
     @InjectRepository(GeneralSettingsEntity)
     private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   // Метод для точного соответствия требованиям каждого уровня
-  private checkPasswordComplexity(password: string, requiredComplexity: ComplexityPasswordEnum, minPasswordLength: number): void {
+  private checkPasswordComplexity(
+    password: string,
+    requiredComplexity: ComplexityPasswordEnum,
+    minPasswordLength: number,
+  ): void {
     // Сообщения по уровням сложности
     const complexityMessages = {
       [ComplexityPasswordEnum.LOW]: `Пароль должен содержать минимум ${minPasswordLength} символов.`,
       [ComplexityPasswordEnum.MEDIUM]: `Пароль должен быть не менее ${minPasswordLength} символов и содержать как минимум одну заглавную букву, одну строчную букву и одну цифру.`,
       [ComplexityPasswordEnum.HIGH]: `Пароль должен быть не менее ${minPasswordLength} символов и содержать заглавные и строчные буквы, цифры и хотя бы один специальный символ.`,
-      [ComplexityPasswordEnum.VERY_HIGH]: `Пароль должен быть не менее ${minPasswordLength} символов и содержать заглавные и строчные буквы, цифры и несколько специальных символов для повышенной безопасности.`
+      [ComplexityPasswordEnum.VERY_HIGH]: `Пароль должен быть не менее ${minPasswordLength} символов и содержать заглавные и строчные буквы, цифры и несколько специальных символов для повышенной безопасности.`,
     };
 
     // Проверка для каждого уровня
     let isValid = false;
     switch (requiredComplexity) {
       case ComplexityPasswordEnum.VERY_HIGH:
-        isValid = /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password) && password.length >= minPasswordLength;
+        isValid =
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          /\d/.test(password) &&
+          /[^A-Za-z0-9]/.test(password) &&
+          password.length >= minPasswordLength;
         break;
       case ComplexityPasswordEnum.HIGH:
-        isValid = /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password) && password.length >= minPasswordLength;
+        isValid =
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          /\d/.test(password) &&
+          /[^A-Za-z0-9]/.test(password) &&
+          password.length >= minPasswordLength;
         break;
       case ComplexityPasswordEnum.MEDIUM:
-        isValid = /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && password.length >= minPasswordLength;
+        isValid =
+          /[A-Z]/.test(password) &&
+          /[a-z]/.test(password) &&
+          /\d/.test(password) &&
+          password.length >= minPasswordLength;
         break;
       case ComplexityPasswordEnum.LOW:
         isValid = password.length >= minPasswordLength;
@@ -62,16 +80,23 @@ export class AuthService {
     const userExists = await this.userService.findOne(user.email);
 
     if (userExists) {
-      throw new BadRequestException('Пользователь с таким email уже существует!');
+      throw new BadRequestException(
+        'Пользователь с таким email уже существует!',
+      );
     }
 
     // Получаем настройки сложности и длины пароля из БД
     const generalSettings = await this.generalSettingsEntityRepository.find();
     const minPasswordLength = generalSettings[0]?.min_password_length;
-    const requiredComplexity = generalSettings[0]?.password_complexity as ComplexityPasswordEnum;
+    const requiredComplexity = generalSettings[0]
+      ?.password_complexity as ComplexityPasswordEnum;
 
     // Проверка сложности пароля
-    this.checkPasswordComplexity(user.password, requiredComplexity, minPasswordLength);
+    this.checkPasswordComplexity(
+      user.password,
+      requiredComplexity,
+      minPasswordLength,
+    );
 
     // Хеширование пароля перед сохранением
     user.password = await argon2.hash(user.password);
@@ -79,8 +104,12 @@ export class AuthService {
     // Создание пользователя с настройками по умолчанию
     const newUser = await this.userRepository.save({
       ...user,
-      role: generalSettings ? generalSettings[0].default_user_role : UserRole.STUDENT,
-      verify_email: generalSettings[0].auto_confirm_register ? new Date() : null
+      role: generalSettings
+        ? generalSettings[0].default_user_role
+        : UserRole.STUDENT,
+      verify_email: generalSettings[0].auto_confirm_register
+        ? new Date()
+        : null,
     });
 
     const settingForNewUser = this.settingsEntityRepository.create({
@@ -105,7 +134,9 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findOne(email);
     if (!user) {
-      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
+      throw new BadRequestException(
+        'Email или пароль не верные, попробуйте еще раз!',
+      );
     }
 
     const generalSettings = await this.generalSettingsEntityRepository.find();
@@ -129,10 +160,15 @@ export class AuthService {
         lock_until: lockUntil,
       });
 
-      throw new BadRequestException('Email или пароль не верные, попробуйте еще раз!');
+      throw new BadRequestException(
+        'Email или пароль не верные, попробуйте еще раз!',
+      );
     }
 
-    await this.userRepository.update(user.id, { login_attempts: 0, lock_until: null });
+    await this.userRepository.update(user.id, {
+      login_attempts: 0,
+      lock_until: null,
+    });
     return user;
   }
 
@@ -142,17 +178,23 @@ export class AuthService {
     if (user.lock_until && user.lock_until > currentTime) {
       const unlockDate = new Date(Number(user.lock_until));
       const unlockTime = unlockDate.toLocaleString('ru-RU', {
-        day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
       });
-      throw new BadRequestException(`Ваш аккаунт временно заблокирован. Разблокировка: ${unlockTime}`);
+      throw new BadRequestException(
+        `Ваш аккаунт временно заблокирован. Разблокировка: ${unlockTime}`,
+      );
     }
 
     if (user.lock_until && user.lock_until <= currentTime) {
-      await this.userRepository.update(user.id, { login_attempts: 0, lock_until: null });
+      await this.userRepository.update(user.id, {
+        login_attempts: 0,
+        lock_until: null,
+      });
     }
   }
-
-
 
   async login(user: LoginUserDto) {
     const userData = await this.userService.findOne(user.email);
@@ -180,7 +222,7 @@ export class AuthService {
       pagination_size: userData.pagination_size,
       table_size: userData.table_size,
       show_footer_table: userData.show_footer_table,
-      footerContent: userData.footerContent
+      footerContent: userData.footerContent,
     };
   }
 

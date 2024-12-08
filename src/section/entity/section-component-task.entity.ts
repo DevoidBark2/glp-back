@@ -5,15 +5,21 @@ import { SectionEntity } from './section.entity';
 
 @Entity('section_component_task')
 export class SectionComponentTask {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => SectionEntity, (section) => section.sectionComponents, { onDelete: 'CASCADE' })
-    section: SectionEntity;
+  @ManyToOne(() => SectionEntity, (section) => section.sectionComponents, {
+    onDelete: 'CASCADE',
+  })
+  section: SectionEntity;
 
-    @ManyToOne(() => ComponentTask, (componentTask) => componentTask.sectionComponents, { onDelete: 'CASCADE' })
-    componentTask: ComponentTask;
+  @ManyToOne(
+    () => ComponentTask,
+    (componentTask) => componentTask.sectionComponents,
+    { onDelete: 'CASCADE' },
+  )
+  componentTask: ComponentTask;
 
-    @Column({ type: 'numeric', default: 0 })
-    sort: number; // Порядок компонента в разделе
+  @Column({ type: 'numeric', default: 0 })
+  sort: number; // Порядок компонента в разделе
 }

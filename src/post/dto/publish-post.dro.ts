@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PublishPostDto {
-    @ApiProperty()
-    id: number;
-    @ApiProperty()
-    checked: boolean;
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  checked: boolean;
 }

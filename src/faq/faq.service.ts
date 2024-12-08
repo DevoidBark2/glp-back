@@ -10,19 +10,19 @@ export class FaqService {
   constructor(
     @InjectRepository(FaqEntity)
     private readonly faqEntityRepository: Repository<FaqEntity>,
-  ) { }
+  ) {}
   async create(createFaqDto: CreateFaqDto) {
     const existingFaq = await this.faqEntityRepository.findOne({
       where: { question: createFaqDto.question },
     });
 
     if (existingFaq) {
-      throw new Error("FAQ with this question already exists.");
+      throw new Error('FAQ with this question already exists.');
     }
 
     return await this.faqEntityRepository.save({
       question: createFaqDto.question,
-      answer: createFaqDto.answer
+      answer: createFaqDto.answer,
     });
   }
 
@@ -33,7 +33,7 @@ export class FaqService {
   async update(updateFaqDto: UpdateFaqDto) {
     await this.faqEntityRepository.update(updateFaqDto.id, {
       question: updateFaqDto.question,
-      answer: updateFaqDto.answer
+      answer: updateFaqDto.answer,
     });
   }
 

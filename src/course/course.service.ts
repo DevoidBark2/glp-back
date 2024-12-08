@@ -32,7 +32,7 @@ export class CourseService {
     private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
     @InjectRepository(SectionEntity)
     private readonly sectionRepository: Repository<SectionEntity>,
-  ) { }
+  ) {}
 
   async findAll(req: Request) {
     const userToken = req.headers['authorization'] as string | undefined;
@@ -48,9 +48,9 @@ export class CourseService {
             id: true,
             first_name: true,
             second_name: true,
-            last_name: true
-          }
-        }
+            last_name: true,
+          },
+        },
       });
     }
 
@@ -69,9 +69,9 @@ export class CourseService {
             id: true,
             first_name: true,
             second_name: true,
-            last_name: true
-          }
-        }
+            last_name: true,
+          },
+        },
       });
     }
 
@@ -80,28 +80,26 @@ export class CourseService {
       relations: {
         category: true,
         courseUsers: true,
-        user: true
-      }
+        user: true,
+      },
     });
 
-    coursesForUser.map(it => {
+    coursesForUser.map((it) => {
       return {
         ...it,
-        inCourse: it.courseUsers.length > 0
-      }
-    })
+        inCourse: it.courseUsers.length > 0,
+      };
+    });
     return coursesForUser;
   }
-
-
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
     const currentUser: User = req['user'];
 
     const category = createCourse.category
       ? await this.categoryEntityRepository.findOne({
-        where: { id: createCourse.category },
-      })
+          where: { id: createCourse.category },
+        })
       : null;
 
     const newCourse = new CourseEntity();
@@ -121,27 +119,30 @@ export class CourseService {
   }
 
   async getAllUserCourses(user: User) {
-    const courses = user.role === UserRole.SUPER_ADMIN ? this.courseEntityRepository.find({
-      relations: {
-        category: true,
-        user: true
-      },
-      order: {
-        user: {
-          role: "DESC"
-        }
-      }
-    }) : await this.courseEntityRepository.find({
-      where: { user: { id: user.id } },
-      relations: {
-        category: true,
-      },
-      order: {
-        user: {
-          role: "DESC"
-        }
-      }
-    });
+    const courses =
+      user.role === UserRole.SUPER_ADMIN
+        ? this.courseEntityRepository.find({
+            relations: {
+              category: true,
+              user: true,
+            },
+            order: {
+              user: {
+                role: 'DESC',
+              },
+            },
+          })
+        : await this.courseEntityRepository.find({
+            where: { user: { id: user.id } },
+            relations: {
+              category: true,
+            },
+            order: {
+              user: {
+                role: 'DESC',
+              },
+            },
+          });
 
     return courses;
   }
@@ -240,8 +241,8 @@ export class CourseService {
       },
       order: {
         sections: {
-          parentSection: { sort: "ASC" },
-          sort_number: "ASC",
+          parentSection: { sort: 'ASC' },
+          sort_number: 'ASC',
         },
       },
     });
@@ -264,11 +265,11 @@ export class CourseService {
         user: { id: user.id },
         section: { id: In(sectionIds) },
       },
-      relations: ["section"],
+      relations: ['section'],
     });
 
     const userAnswersMap = new Map(
-      userAnswers.map((answer) => [answer.section.id, answer.answer])
+      userAnswers.map((answer) => [answer.section.id, answer.answer]),
     );
 
     // Группируем секции по parentSection
@@ -291,7 +292,7 @@ export class CourseService {
         } else if (Array.isArray(rawUserAnswer)) {
           const totalAnswers = rawUserAnswer.length;
           const correctAnswers = rawUserAnswer.filter(
-            (item) => item.isCorrect
+            (item) => item.isCorrect,
           ).length;
           userAnswer = {
             totalAnswers,
@@ -329,12 +330,9 @@ export class CourseService {
 
     return {
       sections: groupedSections,
-      courseName: course.name
+      courseName: course.name,
     };
   }
-
-
-
 
   async getFullCourseById(courseId: number, user: User) {
     const course = await this.courseEntityRepository.findOne({
@@ -349,14 +347,14 @@ export class CourseService {
       },
       order: {
         sections: {
-          sectionComponents: { sort: "ASC" },
-          parentSection: { sort: "ASC" },
-          sort_number: "ASC",
+          sectionComponents: { sort: 'ASC' },
+          parentSection: { sort: 'ASC' },
+          sort_number: 'ASC',
         },
       },
     });
 
-    console.log(course)
+    console.log(course);
 
     if (!course) {
       throw new Error('Course with ID ${courseId} not found');
@@ -380,12 +378,12 @@ export class CourseService {
         user: { id: user.id },
         section: { id: In(sectionIds) },
       },
-      relations: ["task", "section"],
+      relations: ['task', 'section'],
     });
 
     // Создаем Map по sectionId для быстрого доступа
     const userAnswersMap = new Map(
-      userAnswers.map((answer) => [answer.section.id, answer.answer])
+      userAnswers.map((answer) => [answer.section.id, answer.answer]),
     );
 
     // Группируем секции по parentSection
@@ -440,61 +438,75 @@ export class CourseService {
     };
   }
 
-
   async subscribeCourse(body: SubscribeCourseDto) {
-    const course = await this.courseEntityRepository.findOne({ where: { id: body.courseId } })
+    const course = await this.courseEntityRepository.findOne({
+      where: { id: body.courseId },
+    });
 
     if (!course) {
-      throw new BadRequestException(`Курс с ID ${body.courseId} не найден!`)
+      throw new BadRequestException(`Курс с ID ${body.courseId} не найден!`);
     }
 
-    const user = await this.userRepository.findOne({ where: { id: body.userId } })
+    const user = await this.userRepository.findOne({
+      where: { id: body.userId },
+    });
 
     if (!user) {
-      throw new BadRequestException(`Пользователь с ID ${body.courseId} не найден!`)
+      throw new BadRequestException(
+        `Пользователь с ID ${body.courseId} не найден!`,
+      );
     }
 
     return await this.courseUserRepository.save({
       user: user,
-      course: course
-    })
+      course: course,
+    });
   }
 
   async leaveCourse(id: number, user: User) {
-    const course = await this.courseEntityRepository.findOne({ where: { id: id } })
+    const course = await this.courseEntityRepository.findOne({
+      where: { id: id },
+    });
     const courseUser = await this.courseUserRepository.findOne({
       where: {
         user: user,
-        course: course
-      }
-    })
-
+        course: course,
+      },
+    });
 
     if (!course) {
-      throw new BadRequestException(`Курс с ID ${id} не найден!`)
+      throw new BadRequestException(`Курс с ID ${id} не найден!`);
     }
 
-    await this.courseUserRepository.delete(courseUser.id)
+    await this.courseUserRepository.delete(courseUser.id);
   }
 
   async updateSectionStep(prevSectionStep: number, user: User) {
     // Найти раздел с указанным ID, включая связанные компоненты.
     const section = await this.sectionRepository.findOne({
       where: { id: prevSectionStep },
-      relations: { sectionComponents: { componentTask: true } }
+      relations: { sectionComponents: { componentTask: true } },
     });
 
     if (!section) {
-      throw new BadRequestException(`Раздел с ID ${prevSectionStep} не существует!`);
+      throw new BadRequestException(
+        `Раздел с ID ${prevSectionStep} не существует!`,
+      );
     }
 
     // Проверить, есть ли в разделе задачи типа Quiz или Matching
-    const hasTasks = section.sectionComponents.some(it =>
-      it.componentTask && [CourseComponentType.Quiz, CourseComponentType.Matching].includes(it.componentTask.type)
+    const hasTasks = section.sectionComponents.some(
+      (it) =>
+        it.componentTask &&
+        [CourseComponentType.Quiz, CourseComponentType.Matching].includes(
+          it.componentTask.type,
+        ),
     );
 
     if (hasTasks) {
-      console.log(`Раздел ${prevSectionStep} содержит задачи. Добавление записи пропущено.`);
+      console.log(
+        `Раздел ${prevSectionStep} содержит задачи. Добавление записи пропущено.`,
+      );
       return; // Если задачи есть, ничего не делать.
     }
 
@@ -502,34 +514,38 @@ export class CourseService {
     const sectionExist = await this.answersComponentUserRepository.findOne({
       where: {
         section: { id: prevSectionStep },
-        user: { id: user.id }
-      }
+        user: { id: user.id },
+      },
     });
 
     if (sectionExist) {
-      console.log(`Запись для пользователя ${user.id} и раздела ${prevSectionStep} уже существует.`);
+      console.log(
+        `Запись для пользователя ${user.id} и раздела ${prevSectionStep} уже существует.`,
+      );
       return; // Если запись существует, ничего не делать.
     }
 
     // Сохранить новую запись в таблице
     try {
-      console.log("here")
+      console.log('here');
 
-      console.log(`Запись успешно добавлена для пользователя ${user.id} и раздела ${prevSectionStep}.`);
+      console.log(
+        `Запись успешно добавлена для пользователя ${user.id} и раздела ${prevSectionStep}.`,
+      );
       return await this.answersComponentUserRepository.save({
         user: user,
         answer: { confirmedStep: prevSectionStep },
-        section: section
+        section: section,
       });
     } catch (error) {
       console.error('Ошибка при сохранении записи:', error);
-      throw new Error('Ошибка при добавлении записи. Пожалуйста, попробуйте снова.');
+      throw new Error(
+        'Ошибка при добавлении записи. Пожалуйста, попробуйте снова.',
+      );
     }
   }
 
-
   async getCurrentSection(courseId: number, sectionId: number, user: User) {
-    console.log(typeof sectionId)
     // Получаем курс с секциями и их компонентами по заданному courseId
     const course = await this.courseEntityRepository.findOne({
       where: { id: courseId },
@@ -547,13 +563,15 @@ export class CourseService {
       throw new Error(`Course with ID ${courseId} not found`);
     }
 
-    console.log(course.sections)
     // Находим нужную секцию по sectionId
-    const currentSection = course.sections.find((section) => section.id === sectionId);
+    const currentSection = course.sections.find(
+      (section) => section.id === sectionId,
+    );
 
-    console.log("-----------", currentSection)
     if (!currentSection) {
-      throw new Error(`Section with ID ${sectionId} not found in course with ID ${courseId}`);
+      throw new Error(
+        `Section with ID ${sectionId} not found in course with ID ${courseId}`,
+      );
     }
 
     // Получаем компоненты текущей секции
@@ -565,12 +583,15 @@ export class CourseService {
         user: { id: user.id },
         section: { id: sectionId },
       },
-      relations: ["task", "section"],
+      relations: ['task', 'section'],
     });
 
     // Создаем Map для быстрого доступа к ответам пользователя
     const userAnswersMap = new Map(
-      userAnswers.map((answer) => [`${answer.task.id}-${answer.section.id}`, answer.answer])
+      userAnswers.map((answer) => [
+        `${answer.task.id}-${answer.section.id}`,
+        answer.answer,
+      ]),
     );
 
     // Применяем ответы к компонентам задач
@@ -578,16 +599,55 @@ export class CourseService {
       if (component.componentTask) {
         const taskId = component.componentTask.id;
         const answerKey = `${taskId}-${sectionId}`;
-        component.componentTask.userAnswer = userAnswersMap.get(answerKey) || null;
+        component.componentTask.userAnswer =
+          userAnswersMap.get(answerKey) || null;
       }
     });
 
-    // Возвращаем только компоненты текущей секции
+    // Функция для определения типа файла по расширению
+    // const getFileType = (fileName: string) => {
+    //   const extension = fileName.split('.').pop()?.toLowerCase();
+    //   switch (extension) {
+    //     case 'jpg':
+    //     case 'jpeg':
+    //     case 'png':
+    //     case 'svg':
+    //     case 'webp':
+    //       return 'Image';
+    //     case 'pdf':
+    //       return 'PDF';
+    //     case 'doc':
+    //     case 'docx':
+    //       return 'Word Document';
+    //     case 'txt':
+    //       return 'Text File';
+    //     case 'xlsx':
+    //     case 'xls':
+    //       return 'Excel Spreadsheet';
+    //     default:
+    //       return 'Unknown';
+    //   }
+    // };
+
+    // Обрабатываем uploadFile и externalLinks для возвращаемого ответа
+    const uploadFilesInfo = currentSection.uploadFile;
+
+    console.log(uploadFilesInfo);
+
+    const externalLinksInfo =
+      [currentSection.externalLinks]?.map((link) => ({
+        link,
+        linkType: 'External Link', // Можно добавить более сложное определение типа, если нужно
+      })) || [];
+
+    // Возвращаем только компоненты текущей секции, включая uploadFile и externalLinks
     return {
       sectionId: currentSection.id,
       name: currentSection.name,
+      small_description: currentSection.description,
       components: sectionComponents,
+      files: uploadFilesInfo,
+      links: externalLinksInfo,
     };
   }
-
 }

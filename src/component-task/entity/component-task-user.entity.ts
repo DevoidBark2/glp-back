@@ -17,10 +17,15 @@ export class AnswersComponentUser {
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => ComponentTask, (task) => task.id, { onDelete: 'CASCADE',nullable: true })
+  @ManyToOne(() => ComponentTask, (task) => task.id, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   task: ComponentTask;
 
-  @ManyToOne(() => SectionEntity, (section) => section.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => SectionEntity, (section) => section.id, {
+    onDelete: 'CASCADE',
+  })
   section: SectionEntity;
 
   @Column({ type: 'json', nullable: false })

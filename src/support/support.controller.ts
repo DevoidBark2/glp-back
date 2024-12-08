@@ -7,7 +7,7 @@ import { UpdateSupportDto } from './dto/update-support.dto';
 @ApiTags('Support')
 @Controller('')
 export class SupportController {
-  constructor(private readonly supportService: SupportService) { }
+  constructor(private readonly supportService: SupportService) {}
 
   @Post('support')
   sendMsgInSupport(@Body() createSupportDto: CreateSupportDto) {

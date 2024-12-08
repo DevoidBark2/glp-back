@@ -10,13 +10,13 @@ export class SupportService {
   constructor(
     @InjectRepository(Support)
     private readonly supportRepository: Repository<Support>,
-  ) { }
+  ) {}
   async sendMsgInSupport(createSupportDto: CreateSupportDto) {
     return await this.supportRepository.save({
       customerName: createSupportDto.customerName,
       customerEmail: createSupportDto.customerEmail,
-      question: createSupportDto.question
-    })
+      question: createSupportDto.question,
+    });
   }
 
   sendMsgFromSupport(updateSupportDto: UpdateSupportDto) {

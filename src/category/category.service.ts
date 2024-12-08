@@ -13,7 +13,7 @@ export class CategoryService {
     private readonly categoryEntityRepository: Repository<CategoryEntity>,
     @InjectRepository(CourseEntity)
     private readonly courseEntityRepository: Repository<CourseEntity>,
-  ) { }
+  ) {}
 
   async getAll() {
     try {
@@ -24,10 +24,14 @@ export class CategoryService {
   }
 
   async create(category: CreateCategoryDto) {
-    const existsCategory = await this.categoryEntityRepository.findOne({ where: { name: category.name } })
+    const existsCategory = await this.categoryEntityRepository.findOne({
+      where: { name: category.name },
+    });
 
     if (existsCategory)
-      throw new BadRequestException("Категория с таким названием уже существует!")
+      throw new BadRequestException(
+        'Категория с таким названием уже существует!',
+      );
 
     return await this.categoryEntityRepository.save(category);
   }
@@ -55,10 +59,14 @@ export class CategoryService {
     if (!category)
       throw new BadRequestException(`Категории с ID ${body.id} не существует!`);
 
-    const existsCategoryByName = await this.categoryEntityRepository.findOne({ where: { name: body.name } })
+    const existsCategoryByName = await this.categoryEntityRepository.findOne({
+      where: { name: body.name },
+    });
 
     if (existsCategoryByName)
-      throw new BadRequestException(`Категория с таким названием уже существует!`);
+      throw new BadRequestException(
+        `Категория с таким названием уже существует!`,
+      );
 
     await this.categoryEntityRepository.update(body.id, body);
   }

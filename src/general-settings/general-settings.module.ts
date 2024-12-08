@@ -10,4 +10,4 @@ import { GeneralSettingsEntity } from './entity/general-settings.entity';
   providers: [GeneralSettingsService],
   exports: [GeneralSettingsService],
 })
-export class GeneralSettingsModule { }
+export class GeneralSettingsModule {}

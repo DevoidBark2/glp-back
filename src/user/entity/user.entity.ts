@@ -61,22 +61,26 @@ export class User {
   posts: PostEntity[];
   @OneToOne(() => SettingsEntity, (settings) => settings.user)
   settings: SettingsEntity;
-  @Column({ type: "varchar", nullable: true })
-  profile_url: string
-  @Column({ type: "numeric", nullable: true, default: 0 })
-  login_attempts: number
-  @Column({ type: "numeric", nullable: true, default: 0 })
-  lock_until: number
+  @Column({ type: 'varchar', nullable: true })
+  profile_url: string;
+  @Column({ type: 'numeric', nullable: true, default: 0 })
+  login_attempts: number;
+  @Column({ type: 'numeric', nullable: true, default: 0 })
+  lock_until: number;
   @Column({ type: 'numeric', nullable: true, default: 5 })
   pagination_size: number;
-  @Column({ type: "enum", enum: TableSize, default: TableSize.MIDDLE })
+  @Column({ type: 'enum', enum: TableSize, default: TableSize.MIDDLE })
   table_size: TableSize;
-  @Column({ type: "boolean", nullable: true, default: false })
+  @Column({ type: 'boolean', nullable: true, default: false })
   show_footer_table: boolean;
-  @Column({ type: "enum", enum: TableFooter, default: TableFooter.TOTAL_ENTRIES })
-  footerContent: TableFooter
-  @OneToMany(() => CourseUser, courseUser => courseUser.user)
+  @Column({
+    type: 'enum',
+    enum: TableFooter,
+    default: TableFooter.TOTAL_ENTRIES,
+  })
+  footerContent: TableFooter;
+  @OneToMany(() => CourseUser, (courseUser) => courseUser.user)
   courseUsers: CourseUser[];
   @Column({ nullable: true })
-  verify_email: Date
+  verify_email: Date;
 }

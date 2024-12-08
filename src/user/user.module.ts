@@ -12,4 +12,4 @@ import { CourseUser } from 'src/course/entity/course-user.entity';
   providers: [UserService],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}
