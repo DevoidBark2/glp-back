@@ -248,7 +248,7 @@ export class CourseService {
     });
 
     if (!course) {
-      throw new Error(`Course with ID ${courseId} not found`);
+      throw new Error(`Курс с ID ${courseId} не найден!`);
     }
 
     const sections = course.sections;
