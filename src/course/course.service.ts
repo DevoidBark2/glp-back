@@ -35,63 +35,99 @@ export class CourseService {
   ) {}
 
   async findAll(req: Request) {
-    const userToken = req.headers['authorization'] as string | undefined;
-
-    if (!userToken) {
-      return await this.courseEntityRepository.find({
-        relations: {
-          category: true,
-          user: true,
-        },
-        select: {
-          user: {
-            id: true,
-            first_name: true,
-            second_name: true,
-            last_name: true,
-          },
-        },
-      });
-    }
-
-    // Get user from token
-    const user = await this.userService.getUserByToken(userToken);
-
-    // If user does not exist (invalid token), return all courses as in the first case
-    if (!user) {
-      return await this.courseEntityRepository.find({
-        relations: {
-          category: true,
-          user: true,
-        },
-        select: {
-          user: {
-            id: true,
-            first_name: true,
-            second_name: true,
-            last_name: true,
-          },
-        },
-      });
-    }
-
-    // Fetch courses related to the specific user in courseUsers, with a conditional check
-    const coursesForUser = await this.courseEntityRepository.find({
+    return await this.courseEntityRepository.find({
+      where: {
+        status: StatusCourseEnum.ACTIVE
+      },
       relations: {
-        category: true,
-        courseUsers: true,
         user: true,
       },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        user: {
+          id: true,
+          first_name: true,
+          second_name: true,
+          last_name: true,
+        },
+      },
+    });
+  }
+
+  async findOneById(courseId: number, req: Request) {
+    const userToken = req.headers['authorization'] as string | undefined;
+
+    // Fetch the course details (exclude courseUsers data for optimization)
+    const course = await this.courseEntityRepository.findOne({
+        where: { id: courseId },
+        relations: {
+            category: true,
+            user: true,
+        },
+        select: {
+            id: true,
+            name: true,
+            image: true,
+            small_description: true,
+            access_right: true,
+            duration: true,
+            level: true,
+            publish_date: true,
+            content_description: true,
+            category: {
+                name: true,
+            },
+            user: {
+                id: true,
+                first_name: true,
+                second_name: true,
+                last_name: true,
+            },
+        },
     });
 
-    coursesForUser.map((it) => {
-      return {
-        ...it,
-        inCourse: it.courseUsers.length > 0,
-      };
-    });
-    return coursesForUser;
-  }
+    // If the course is not found, return null
+    if (!course) {
+        return null;
+    }
+
+    // If no token is provided, return the course without `isUserEnrolled`
+    if (!userToken) {
+        return {
+            ...course,
+            isUserEnrolled: false, // Default value since no user to compare
+        };
+    }
+
+    // Get the user from the token
+    const user = await this.userService.getUserByToken(userToken);
+
+    // If the user is not valid, return the course without `isUserEnrolled`
+    if (!user) {
+        return {
+            ...course,
+            isUserEnrolled: false,
+        };
+    }
+
+    // Check if the user is enrolled in the course using a direct query
+    const isUserEnrolled = await this.courseEntityRepository
+        .createQueryBuilder("course")
+        .innerJoin("course.courseUsers", "courseUser")
+        .where("course.id = :courseId", { courseId })
+        .andWhere("courseUser.userId = :userId", { userId: user.id })
+        .getCount() > 0;
+
+    // Return the course with the additional `isUserEnrolled` field
+    return {
+        ...course,
+        isUserEnrolled,
+    };
+}
+
+
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
     const currentUser: User = req['user'];

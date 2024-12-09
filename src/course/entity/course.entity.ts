@@ -17,11 +17,11 @@ import { CourseUser } from './course-user.entity';
 export class CourseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 64 })
   name: string;
   @Column({ type: 'text', nullable: true })
   image: string;
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: 255 })
   small_description: string;
   @ManyToOne(() => CategoryEntity, (category) => category.id, {
     nullable: true,

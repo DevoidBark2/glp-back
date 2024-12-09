@@ -47,6 +47,11 @@ export class CourseController {
     return await this.courseService.findAll(req);
   }
 
+  @Get('/course/:id')
+  async getCourseById(@Param('id') id: number, @Req() req: Request) {
+    return await this.courseService.findOneById(id,req);
+  }
+
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
   @Post('/course')
   @UseInterceptors(FileInterceptor('image', multerOptions))
