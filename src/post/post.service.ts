@@ -71,7 +71,6 @@ export class PostService {
   }
 
   async createPost(post: CreatePostDto, user: User) {
-    console.log(post);
     const newPost = await this.postEntityRepository.save({
       name: post.name,
       content: post.content,

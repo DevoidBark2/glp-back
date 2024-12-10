@@ -173,7 +173,6 @@ export class CourseController {
     @Query('currentSection') currentSection: number,
     @Req() req: Request,
   ) {
-    console.log(courseId, currentSection);
     return await this.courseService.getCurrentSection(
       +courseId,
       +currentSection,

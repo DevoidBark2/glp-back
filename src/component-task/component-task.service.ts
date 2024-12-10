@@ -89,14 +89,11 @@ export class ComponentTaskService {
       where: { id: body.task.id },
     });
 
-    console.log(body.currentSection);
     const section = await this.sectionRepository.findOne({
       where: {
         id: Number(body.currentSection),
       },
     });
-
-    console.log(section);
 
     if (!task) {
       throw new BadRequestException(
@@ -122,11 +119,13 @@ export class ComponentTaskService {
       section: section,
     });
 
-    // console.log("Count corrct", results.filter((res) => res.isCorrect).length)
-    // console.log("all question", task.questions.length)
     return {
       message: 'Ответы успешно сохранены',
-      answers: savedAnswers,
+      answers: {
+        task: savedAnswers.task,
+        answer: results,
+        section: section,
+      },
     };
   }
 }

@@ -37,7 +37,6 @@ export class SectionService {
   }
 
   async createSection(section: CreateSectionCourseDto, user: User) {
-    console.log(section);
     const parentSection = section.parentSection
       ? await this.mainSectionRepository.findOne({
           where: { id: Number(section.parentSection) },
@@ -48,7 +47,6 @@ export class SectionService {
       where: { id: Number(section.course) },
     });
 
-    console.log(parentSection);
     const sectionItem = await this.sectionEntityRepository.save({
       name: section.name,
       description: section.description,
@@ -60,9 +58,6 @@ export class SectionService {
       parentSection: parentSection,
     });
 
-    console.log(typeof section.components);
-    console.log(section.components);
-
     const componentIdsString = section.components; // "20,18"
 
     const componentIdsArray = componentIdsString
@@ -71,7 +66,6 @@ export class SectionService {
 
     await Promise.all(
       componentIdsArray.map(async (componentId, index) => {
-        console.log(componentId);
 
         // Получаем компонент по ID из базы данных
         const componentTask = await this.componentTaskRepository.findOne({
@@ -79,8 +73,6 @@ export class SectionService {
             id: componentId, // Уже преобразовано в число
           },
         });
-
-        console.log(componentTask);
 
         // Сохраняем связанный компонент задачи для секции
         if (componentTask) {

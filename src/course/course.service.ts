@@ -390,7 +390,6 @@ export class CourseService {
       },
     });
 
-    console.log(course);
 
     if (!course) {
       throw new Error('Course with ID ${courseId} not found');
@@ -534,15 +533,12 @@ export class CourseService {
     const hasTasks = section.sectionComponents.some(
       (it) =>
         it.componentTask &&
-        [CourseComponentType.Quiz, CourseComponentType.Matching].includes(
+        [CourseComponentType.Quiz, CourseComponentType.MultiPlayChoice].includes(
           it.componentTask.type,
         ),
     );
 
     if (hasTasks) {
-      console.log(
-        `Раздел ${prevSectionStep} содержит задачи. Добавление записи пропущено.`,
-      );
       return; // Если задачи есть, ничего не делать.
     }
 
@@ -555,19 +551,11 @@ export class CourseService {
     });
 
     if (sectionExist) {
-      console.log(
-        `Запись для пользователя ${user.id} и раздела ${prevSectionStep} уже существует.`,
-      );
       return; // Если запись существует, ничего не делать.
     }
 
     // Сохранить новую запись в таблице
     try {
-      console.log('here');
-
-      console.log(
-        `Запись успешно добавлена для пользователя ${user.id} и раздела ${prevSectionStep}.`,
-      );
       return await this.answersComponentUserRepository.save({
         user: user,
         answer: { confirmedStep: prevSectionStep },
@@ -622,13 +610,17 @@ export class CourseService {
       relations: ['task', 'section'],
     });
 
+   
+
     // Создаем Map для быстрого доступа к ответам пользователя
     const userAnswersMap = new Map(
       userAnswers.map((answer) => [
-        `${answer.task.id}-${answer.section.id}`,
+        `${answer.task ? answer.task.id : 'null'}-${answer.section.id}`,
         answer.answer,
       ]),
     );
+
+    console.log(userAnswersMap)
 
     // Применяем ответы к компонентам задач
     sectionComponents.forEach((component) => {
@@ -640,50 +632,13 @@ export class CourseService {
       }
     });
 
-    // Функция для определения типа файла по расширению
-    // const getFileType = (fileName: string) => {
-    //   const extension = fileName.split('.').pop()?.toLowerCase();
-    //   switch (extension) {
-    //     case 'jpg':
-    //     case 'jpeg':
-    //     case 'png':
-    //     case 'svg':
-    //     case 'webp':
-    //       return 'Image';
-    //     case 'pdf':
-    //       return 'PDF';
-    //     case 'doc':
-    //     case 'docx':
-    //       return 'Word Document';
-    //     case 'txt':
-    //       return 'Text File';
-    //     case 'xlsx':
-    //     case 'xls':
-    //       return 'Excel Spreadsheet';
-    //     default:
-    //       return 'Unknown';
-    //   }
-    // };
-
-    // Обрабатываем uploadFile и externalLinks для возвращаемого ответа
-    const uploadFilesInfo = currentSection.uploadFile;
-
-    console.log(uploadFilesInfo);
-
-    const externalLinksInfo =
-      [currentSection.externalLinks]?.map((link) => ({
-        link,
-        linkType: 'External Link', // Можно добавить более сложное определение типа, если нужно
-      })) || [];
-
-    // Возвращаем только компоненты текущей секции, включая uploadFile и externalLinks
     return {
-      sectionId: currentSection.id,
+      id: currentSection.id,
       name: currentSection.name,
       small_description: currentSection.description,
       components: sectionComponents,
-      files: uploadFilesInfo,
-      links: externalLinksInfo,
+      files: currentSection.uploadFile,
+      links: [currentSection.externalLinks].map(it => it).filter(Boolean),
     };
   }
 }

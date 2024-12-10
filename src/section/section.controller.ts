@@ -51,18 +51,12 @@ export class SectionController {
     if (!newSectionCourse.uploadFile) {
       newSectionCourse.uploadFile = [];
     }
-
-    console.log(images);
     images.forEach((file: Express.Multer.File) => {
-      console.log(file);
-      // Добавляем путь и оригинальное имя файла в массив uploadFile
       newSectionCourse.uploadFile.push({
         filePath: 'uploads/' + file.filename,
         fileName: file.originalname, // Оригинальное имя файла от пользователя
       });
     });
-
-    console.log(newSectionCourse);
     await this.sectionService.createSection(newSectionCourse, req['user']);
   }
 

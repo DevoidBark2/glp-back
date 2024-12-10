@@ -2,14 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CourseEntity } from '../../course/entity/course.entity';
-import { ComponentTask } from '../../component-task/entity/component-task.entity';
 import { User } from '../../user/entity/user.entity';
 import { StatusSectionEnum } from '../enum/status_section.enum';
 import { MainSection } from './main-section.entity';
@@ -20,9 +17,9 @@ import { FileType } from '../dto/create_section_course.dto';
 export class SectionEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: 64 })
   name: string;
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   description: string;
   @Column({ type: 'json', nullable: true })
   externalLinks: string[];
@@ -34,16 +31,6 @@ export class SectionEntity {
     default: StatusSectionEnum.ACTIVE,
   })
   status: StatusSectionEnum;
-  // @ManyToMany(() => ComponentTask, { cascade: true, onDelete: 'CASCADE' })
-  // @JoinTable({
-  //   name: 'section_component_task',
-  //   joinColumn: { name: 'section_id', referencedColumnName: 'id' },
-  //   inverseJoinColumn: {
-  //     name: 'component_task_id',
-  //     referencedColumnName: 'id',
-  //   },
-  // })
-  //components: ComponentTask[];
   @ManyToOne(() => CourseEntity, (course) => course.sections, {
     onDelete: 'CASCADE',
   })
