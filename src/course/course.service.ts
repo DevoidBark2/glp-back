@@ -231,16 +231,31 @@ export class CourseService {
       },
       relations: {
         category: true,
+        courseUsers: true,
         sections: {
           sectionComponents: true,
         },
       },
+      select: {
+        courseUsers: {
+          id: true,
+          enrolledAt: true,
+          progress: true,
+          user: {
+            id: true,
+            first_name: true,
+            second_name: true,
+            last_name: true,
+          }
+        }
+      }
     });
 
     if (course.status === StatusCourseEnum.IN_PROCESSING) {
       throw 'Курс находится в обработке,получить доступ к нему нельзя';
     }
 
+    console.log(course)
     return course;
   }
 
