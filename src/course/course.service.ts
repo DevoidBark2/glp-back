@@ -37,7 +37,7 @@ export class CourseService {
   async findAll(req: Request) {
     return await this.courseEntityRepository.find({
       where: {
-        status: StatusCourseEnum.ACTIVE
+        status: StatusCourseEnum.ACTIVE,
       },
       relations: {
         user: true,
@@ -61,44 +61,44 @@ export class CourseService {
 
     // Fetch the course details (exclude courseUsers data for optimization)
     const course = await this.courseEntityRepository.findOne({
-        where: { id: courseId },
-        relations: {
-            category: true,
-            user: true,
+      where: { id: courseId },
+      relations: {
+        category: true,
+        user: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        small_description: true,
+        access_right: true,
+        duration: true,
+        level: true,
+        publish_date: true,
+        content_description: true,
+        category: {
+          name: true,
         },
-        select: {
-            id: true,
-            name: true,
-            image: true,
-            small_description: true,
-            access_right: true,
-            duration: true,
-            level: true,
-            publish_date: true,
-            content_description: true,
-            category: {
-                name: true,
-            },
-            user: {
-                id: true,
-                first_name: true,
-                second_name: true,
-                last_name: true,
-            },
+        user: {
+          id: true,
+          first_name: true,
+          second_name: true,
+          last_name: true,
         },
+      },
     });
 
     // If the course is not found, return null
     if (!course) {
-        return null;
+      throw new BadRequestException(`Курс с ID ${courseId} не найден!`);
     }
 
     // If no token is provided, return the course without `isUserEnrolled`
     if (!userToken) {
-        return {
-            ...course,
-            isUserEnrolled: false, // Default value since no user to compare
-        };
+      return {
+        ...course,
+        isUserEnrolled: false, // Default value since no user to compare
+      };
     }
 
     // Get the user from the token
@@ -106,28 +106,27 @@ export class CourseService {
 
     // If the user is not valid, return the course without `isUserEnrolled`
     if (!user) {
-        return {
-            ...course,
-            isUserEnrolled: false,
-        };
+      return {
+        ...course,
+        isUserEnrolled: false,
+      };
     }
 
     // Check if the user is enrolled in the course using a direct query
-    const isUserEnrolled = await this.courseEntityRepository
-        .createQueryBuilder("course")
-        .innerJoin("course.courseUsers", "courseUser")
-        .where("course.id = :courseId", { courseId })
-        .andWhere("courseUser.userId = :userId", { userId: user.id })
-        .getCount() > 0;
+    const isUserEnrolled =
+      (await this.courseEntityRepository
+        .createQueryBuilder('course')
+        .innerJoin('course.courseUsers', 'courseUser')
+        .where('course.id = :courseId', { courseId })
+        .andWhere('courseUser.userId = :userId', { userId: user.id })
+        .getCount()) > 0;
 
     // Return the course with the additional `isUserEnrolled` field
     return {
-        ...course,
-        isUserEnrolled,
+      ...course,
+      isUserEnrolled,
     };
-}
-
-
+  }
 
   async createCourse(createCourse: CreateCourseDto, req: Request) {
     const currentUser: User = req['user'];
@@ -246,16 +245,20 @@ export class CourseService {
             first_name: true,
             second_name: true,
             last_name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
+
+    if (!course) {
+      throw new BadRequestException(`Курс с ID ${id} не найден`);
+    }
 
     if (course.status === StatusCourseEnum.IN_PROCESSING) {
       throw 'Курс находится в обработке,получить доступ к нему нельзя';
     }
 
-    console.log(course)
+    console.log(course);
     return course;
   }
 
@@ -405,7 +408,6 @@ export class CourseService {
       },
     });
 
-
     if (!course) {
       throw new Error('Course with ID ${courseId} not found');
     }
@@ -507,6 +509,17 @@ export class CourseService {
       );
     }
 
+    const isSubscribeCourseByUser = await this.courseUserRepository.findOne({
+      where: {
+        user: user,
+        course: course,
+      },
+    });
+
+    if (isSubscribeCourseByUser) {
+      return null;
+    }
+
     return await this.courseUserRepository.save({
       user: user,
       course: course,
@@ -548,9 +561,10 @@ export class CourseService {
     const hasTasks = section.sectionComponents.some(
       (it) =>
         it.componentTask &&
-        [CourseComponentType.Quiz, CourseComponentType.MultiPlayChoice].includes(
-          it.componentTask.type,
-        ),
+        [
+          CourseComponentType.Quiz,
+          CourseComponentType.MultiPlayChoice,
+        ].includes(it.componentTask.type),
     );
 
     if (hasTasks) {
@@ -625,8 +639,6 @@ export class CourseService {
       relations: ['task', 'section'],
     });
 
-   
-
     // Создаем Map для быстрого доступа к ответам пользователя
     const userAnswersMap = new Map(
       userAnswers.map((answer) => [
@@ -635,7 +647,7 @@ export class CourseService {
       ]),
     );
 
-    console.log(userAnswersMap)
+    console.log(userAnswersMap);
 
     // Применяем ответы к компонентам задач
     sectionComponents.forEach((component) => {
@@ -653,7 +665,7 @@ export class CourseService {
       small_description: currentSection.description,
       components: sectionComponents,
       files: currentSection.uploadFile,
-      links: [currentSection.externalLinks].map(it => it).filter(Boolean),
+      links: [currentSection.externalLinks].map((it) => it).filter(Boolean),
     };
   }
 }

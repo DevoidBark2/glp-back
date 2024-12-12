@@ -49,7 +49,7 @@ export class CourseController {
 
   @Get('/course/:id')
   async getCourseById(@Param('id') id: number, @Req() req: Request) {
-    return await this.courseService.findOneById(id,req);
+    return await this.courseService.findOneById(id, req);
   }
 
   @Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
