@@ -1,4 +1,4 @@
 export enum StatusAvatarIconsEnum {
-  ACTIVE = 'active',
-  DISABLED = 'disabled',
+	ACTIVE = 'active',
+	DISABLED = 'disabled'
 }

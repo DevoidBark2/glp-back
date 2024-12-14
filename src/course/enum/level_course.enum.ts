@@ -1,5 +1,5 @@
 export enum LevelCourseEnum {
-  LIGHT = 1,
-  MIDDLE = 2,
-  HARD = 3,
+	LIGHT = 1,
+	MIDDLE = 2,
+	HARD = 3
 }

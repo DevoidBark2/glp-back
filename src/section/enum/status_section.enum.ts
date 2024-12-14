@@ -1,4 +1,4 @@
 export enum StatusSectionEnum {
-  ACTIVE = 'active',
-  DEACTIVE = 'deactive',
+	ACTIVE = 'active',
+	DEACTIVE = 'deactive'
 }

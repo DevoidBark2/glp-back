@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class MainSectionDto {
-  @ApiProperty()
-  title: string;
+	@ApiProperty()
+	title: string
 }

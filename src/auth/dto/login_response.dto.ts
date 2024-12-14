@@ -1,34 +1,34 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class ResultLoginExampleDto {
-  @ApiProperty()
-  id: number;
-  @ApiProperty()
-  email: string;
-  @ApiProperty()
-  role: string;
-  @ApiProperty()
-  user_name: string;
-  @ApiProperty()
-  token: string;
+	@ApiProperty()
+	id: number
+	@ApiProperty()
+	email: string
+	@ApiProperty()
+	role: string
+	@ApiProperty()
+	user_name: string
+	@ApiProperty()
+	token: string
 }
 
 export class LoginResponseDto {
-  @ApiProperty({ example: false })
-  status: boolean;
+	@ApiProperty({ example: false })
+	status: boolean
 
-  @ApiProperty()
-  path: string;
+	@ApiProperty()
+	path: string
 
-  @ApiProperty()
-  message: string;
+	@ApiProperty()
+	message: string
 
-  @ApiProperty()
-  statusCode: number;
+	@ApiProperty()
+	statusCode: number
 
-  @ApiProperty({ type: ResultLoginExampleDto })
-  data: ResultLoginExampleDto;
+	@ApiProperty({ type: ResultLoginExampleDto })
+	data: ResultLoginExampleDto
 
-  @ApiProperty()
-  timestamp: Date;
+	@ApiProperty()
+	timestamp: Date
 }

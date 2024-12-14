@@ -1,36 +1,40 @@
 import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { User } from '../user/entity/user.entity';
-import { EventsService } from '../events/events.service';
+	CallHandler,
+	ExecutionContext,
+	Injectable,
+	NestInterceptor
+} from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
+import { User } from '../user/entity/user.entity'
+import { EventsService } from '../events/events.service'
 
 @Injectable()
 export class EventLoggingInterceptor implements NestInterceptor {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly eventService: EventsService,
-  ) {}
+	constructor(
+		private readonly reflector: Reflector,
+		private readonly eventService: EventsService
+	) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request: Request = context.switchToHttp().getRequest();
-    const user: User = request['user'];
-    const logAction = this.reflector.get('logAction', context.getHandler());
+	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+		const request: Request = context.switchToHttp().getRequest()
+		const user: User = request['user']
+		const logAction = this.reflector.get('logAction', context.getHandler())
 
-    if (logAction && user) {
-      const { action, description } = logAction;
-      return next.handle().pipe(
-        tap(async () => {
-          await this.eventService.createEvent(user, action, description);
-        }),
-      );
-    }
+		if (logAction && user) {
+			const { action, description } = logAction
+			return next.handle().pipe(
+				tap(async () => {
+					await this.eventService.createEvent(
+						user,
+						action,
+						description
+					)
+				})
+			)
+		}
 
-    return next.handle();
-  }
+		return next.handle()
+	}
 }

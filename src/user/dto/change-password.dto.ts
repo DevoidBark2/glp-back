@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class ChangePasswordDto {
-  @ApiProperty()
-  currentPassword: string;
-  @ApiProperty()
-  newPassword: string;
+	@ApiProperty()
+	currentPassword: string
+	@ApiProperty()
+	newPassword: string
 }

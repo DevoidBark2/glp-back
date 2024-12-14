@@ -1,4 +1,4 @@
 export enum StatusComponentTaskEnum {
-  ACTIVATED = 'activated',
-  DEACTIVATED = 'deactivated',
+	ACTIVATED = 'activated',
+	DEACTIVATED = 'deactivated'
 }

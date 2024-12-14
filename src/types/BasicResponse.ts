@@ -1,4 +1,4 @@
 export interface BasicResponse {
-  success: boolean;
-  message: string;
+	success: boolean
+	message: string
 }
