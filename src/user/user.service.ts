@@ -1,6 +1,7 @@
 import {
 	BadRequestException,
 	Injectable,
+	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -8,7 +9,7 @@ import { User } from './entity/user.entity'
 import { Brackets, Not, Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { CreateUserDto } from './dto/create_user.dto'
-import * as argon2 from 'argon2'
+import { hash, verify } from 'argon2'
 import { UserRole } from '../constants/contants'
 import { GlobalActionDto } from './dto/global-action.dto'
 import { ChangeUserProfileDto } from './dto/change-user-profile.dto'
@@ -17,6 +18,8 @@ import { ChangePasswordDto } from './dto/change-password.dto'
 import { ChangeUserRoleDto } from './dto/change-user-role.dto'
 import { BlockUserDto } from './dto/block-user.dto'
 import { StatusUserEnum } from './enum/user-status.enum'
+import { AuthMethodEnum } from '../auth/enum/auth-method.enum'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UserService {
@@ -35,26 +38,57 @@ export class UserService {
 		})
 	}
 
-	async findOne(email: string) {
-		return this.userRepository.findOne({ where: { email: email } })
-	}
-
-	async findOneById(id: number) {
-		const user = await this.userRepository.findOne({
-			where: { id },
+	async findByEmail(email: string) {
+		return this.userRepository.findOne({
+			where: { email: email },
 			relations: {
 				courses: true,
-				posts: true
+				posts: true,
+				accounts: true
+			}
+		})
+	}
+
+	async findById(id: string) {
+		const user = await this.userRepository.findOne({
+			where: { id: id },
+			relations: {
+				courses: true,
+				posts: true,
+				accounts: true
 			}
 		})
 
 		if (!user) {
-			throw new BadRequestException(`Пользователя с ID ${id} не найден!`)
+			throw new NotFoundException(`Пользователя с ID ${id} не найден!`)
 		}
 
 		return user
 	}
 
+	public async create(
+		email: string,
+		password: string,
+		displayName: string,
+		picture: string,
+		method: AuthMethodEnum,
+		isVerified: boolean
+	) {
+		console.log(email, password, displayName, picture, method, isVerified)
+
+		return this.userRepository.save({
+			id: uuidv4(),
+			email: email,
+			password: password ? await hash(password) : '',
+			first_name: displayName,
+			profile_url: picture,
+			method_auth: method,
+			role: UserRole.STUDENT,
+			isVerified: isVerified
+		})
+	}
+
+	// ---------------------------------
 	async getUserByToken(token: string) {
 		const decodedToken = await this.jwtService.decode(token.split(' ')[1])
 
@@ -68,24 +102,7 @@ export class UserService {
 		})
 	}
 
-	async create(newUser: CreateUserDto) {
-		const existUser = await this.userRepository.findOne({
-			where: {
-				email: newUser.email
-			}
-		})
-
-		if (existUser) {
-			throw `Пользователь с email: ${newUser.email} уже существует!`
-		}
-
-		newUser.password = await argon2.hash(newUser.password)
-		await this.userRepository.save(newUser)
-
-		return newUser
-	}
-
-	async delete(id: number) {
+	async delete(id: string) {
 		const deletedUser = await this.userRepository.findOne({ where: { id } })
 
 		if (!deletedUser) {
@@ -206,7 +223,7 @@ export class UserService {
 			}
 		})
 
-		const passwordIsMatch = await argon2.verify(
+		const passwordIsMatch = await verify(
 			currentUser.password,
 			body.currentPassword
 		)
@@ -224,7 +241,7 @@ export class UserService {
 		}
 
 		await this.userRepository.update(currentUser.id, {
-			password: await argon2.hash(body.newPassword)
+			password: await hash(body.newPassword)
 		})
 	}
 

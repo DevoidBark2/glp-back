@@ -3,6 +3,8 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpCode,
+	HttpStatus,
 	Param,
 	Post,
 	Put,
@@ -16,9 +18,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create_user.dto'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
-import { DeleteUserDto } from './dto/delete-user.dto'
 import { Serialize } from '../decorators/serialize.decorator'
-import { UserDetailsByIdDto } from './dto/user_details_by_id.dto'
 import { UsersResponseDto } from './dto/users_response_dto'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { GlobalActionDto } from './dto/global-action.dto'
@@ -28,6 +28,8 @@ import { multerOptions } from 'src/config/multerConfig'
 import { ChangePasswordDto } from './dto/change-password.dto'
 import { ChangeUserRoleDto } from './dto/change-user-role.dto'
 import { BlockUserDto } from './dto/block-user.dto'
+import { Authorized } from '../auth/decorators/authorized.decorator'
+import { Authorization } from '../auth/decorators/auth.decorator'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -46,25 +48,25 @@ export class UserController {
 	@Delete('user/:id')
 	@ApiOperation({ summary: 'Delete user' })
 	@ResponseMessage('Пользователь успешно удален!')
-	async deleteUser(@Param('id') id: number) {
+	async deleteUser(@Param('id') id: string) {
 		return await this.userService.delete(id)
 	}
 
-	@Roles(UserRole.SUPER_ADMIN)
-	@Post('user')
-	@ApiOperation({ summary: 'Create new user' })
-	@ApiBody({ type: CreateUserDto })
-	@Serialize(UsersResponseDto)
-	@ResponseMessage('Пользователь успешно создан!')
-	async createUser(@Body() body: CreateUserDto) {
-		return await this.userService.create(body)
-	}
+	// @Roles(UserRole.SUPER_ADMIN)
+	// @Post('user')
+	// @ApiOperation({ summary: 'Create new user' })
+	// @ApiBody({ type: CreateUserDto })
+	// @Serialize(UsersResponseDto)
+	// @ResponseMessage('Пользователь успешно создан!')
+	// async createUser(@Body() body: CreateUserDto) {
+	// 	return await this.userService.create(body)
+	// }
 
 	@Get('users/:id')
 	@ApiOperation({ summary: 'Get ' })
 	// @Serialize(UserDetailsByIdDto)
-	async getUserById(@Param('id') id: number) {
-		return await this.userService.findOneById(id)
+	async getUserById(@Param('id') id: string) {
+		return await this.userService.findById(id)
 	}
 
 	@Put('/user/:id')
@@ -158,5 +160,19 @@ export class UserController {
 	@Put('/block-user')
 	async blockUser(@Body() body: BlockUserDto) {
 		return await this.userService.blockUser(body)
+	}
+
+	@Authorization()
+	@HttpCode(HttpStatus.OK)
+	@Get('profile')
+	async findProfile(@Authorized('id') id: string) {
+		return this.userService.findById(id)
+	}
+
+	@Authorization()
+	@HttpCode(HttpStatus.OK)
+	@Get('by-id/:id')
+	async findById(@Param('id') id: string) {
+		return this.userService.findById(id)
 	}
 }

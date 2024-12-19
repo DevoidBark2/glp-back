@@ -4,5 +4,5 @@ export class SubscribeCourseDto {
 	@ApiProperty()
 	courseId: number
 	@ApiProperty()
-	userId: number
+	userId: string
 }

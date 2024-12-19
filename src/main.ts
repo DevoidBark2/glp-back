@@ -9,21 +9,67 @@ import * as express from 'express'
 import * as compression from 'compression'
 import * as cookieParser from 'cookie-parser'
 import { join } from 'path'
+import { ConfigService } from '@nestjs/config'
+import IORedis from 'ioredis'
+import * as session from 'express-session'
+import { ms, StringValue } from './libs/common/utils/ms.util'
+import { parseBoolean } from './libs/common/utils/pasrse-boolean.util'
+import { RedisStore } from 'connect-redis'
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
-	const PORT = process.env.PORT_SERVER || 4000
-
-	app.setGlobalPrefix('api')
 	const reflector = app.get(Reflector)
-	app.useGlobalPipes(new ValidationPipe())
+
+	const config = app.get(ConfigService)
+	const redis = new IORedis(config.getOrThrow('REDIS_URI'))
+
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true
+		})
+	)
+
+	app.use(cookieParser(config.getOrThrow('COOKIES_SECRET')))
+
+	app.enableCors({
+		origin: config.getOrThrow<string>('CLIENT_URL'),
+		credentials: true,
+		exposedHeaders: ['set-cookie']
+	})
+
+	app.use(
+		session({
+			secret: config.getOrThrow('SESSION_SECRET'),
+			name: config.getOrThrow('SESSION_NAME'),
+			resave: true,
+			saveUninitialized: false,
+			cookie: {
+				domain: config.getOrThrow('SESSION_DOMAIN'),
+				maxAge: ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE')),
+				httpOnly: parseBoolean(
+					config.getOrThrow<string>('SESSION_HTTP_ONLY')
+				),
+				secure: parseBoolean(
+					config.getOrThrow<string>('SESSION_SECURE')
+				),
+				sameSite: 'lax'
+			},
+			store: new RedisStore({
+				client: redis,
+				prefix: config.getOrThrow('SESSION_FOLDER')
+			})
+		})
+	)
+
+	// app.setGlobalPrefix('api')
+
 	app.useGlobalInterceptors(new ResponseInterceptor(reflector))
 
-	// app.use(helmet());
-	// app.use(compression());
+	app.use(helmet())
+	app.use(compression())
 	app.use(cookieParser())
 
-	const config = new DocumentBuilder()
+	const swaggerConfig = new DocumentBuilder()
 		.setTitle('GLP')
 		.setDescription('Graph Learning Platform')
 		.setVersion('1.0')
@@ -37,13 +83,8 @@ async function bootstrap() {
 		)
 		.build()
 
-	const document = SwaggerModule.createDocument(app, config)
+	const document = SwaggerModule.createDocument(app, swaggerConfig)
 	SwaggerModule.setup('api/docs', app, document)
-
-	app.enableCors({
-		origin: process.env.CLIENT_URL,
-		credentials: true
-	})
 
 	app.use(
 		'/uploads',
@@ -55,7 +96,7 @@ async function bootstrap() {
 		express.static(join(__dirname, '..', 'uploads'))
 	)
 
-	await app.listen(PORT)
+	await app.listen(config.getOrThrow('PORT_SERVER'))
 	console.log(`Application is running on: ${await app.getUrl()}`)
 }
 

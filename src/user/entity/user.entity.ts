@@ -5,7 +5,7 @@ import {
 	JoinColumn,
 	OneToMany,
 	OneToOne,
-	PrimaryGeneratedColumn,
+	PrimaryColumn,
 	UpdateDateColumn
 } from 'typeorm'
 import { CourseEntity } from '../../course/entity/course.entity'
@@ -16,18 +16,20 @@ import { StatusUserEnum } from '../enum/user-status.enum'
 import { TableSize } from '../enum/table-size.enum'
 import { TableFooter } from '../enum/table-footer.enum'
 import { CourseUser } from 'src/course/entity/course-user.entity'
+import { AuthMethodEnum } from '../../auth/enum/auth-method.enum'
+import { Account } from './account.entity'
 
 @Entity('users')
 export class User {
-	@PrimaryGeneratedColumn()
-	id: number
+	@PrimaryColumn({ type: 'uuid' })
+	id: string
 	@Column()
 	first_name: string
 	@Column({ nullable: true })
 	second_name: string
 	@Column({ nullable: true })
 	last_name: string
-	@Column()
+	@Column({ unique: true, nullable: false })
 	email: string
 	@Column({ nullable: true })
 	phone: string
@@ -35,8 +37,6 @@ export class User {
 	password: string
 	@Column({ nullable: true })
 	city: string
-	@Column({ nullable: true })
-	university: string
 	@Column({ nullable: true })
 	about_me: string
 	@Column({
@@ -81,6 +81,12 @@ export class User {
 	footerContent: TableFooter
 	@OneToMany(() => CourseUser, courseUser => courseUser.user)
 	courseUsers: CourseUser[]
-	@Column({ nullable: true })
-	verify_email: Date
+	@Column()
+	isVerified: boolean
+	@Column({ default: false })
+	is_two_factor_enabled: boolean
+	@Column({ type: 'enum', enum: AuthMethodEnum, nullable: true })
+	method_auth: AuthMethodEnum
+	@OneToMany(() => Account, account => account.user)
+	accounts: Account[]
 }

@@ -3,7 +3,7 @@ import { StatusUserEnum } from '../enum/user-status.enum'
 
 export class BlockUserDto {
 	@ApiProperty()
-	userId: number
+	userId: string
 	@ApiProperty()
 	status: StatusUserEnum
 }

@@ -3,7 +3,7 @@ import { UserRole } from 'src/constants/contants'
 
 export class ChangeUserRoleDto {
 	@ApiProperty()
-	userId: number
+	userId: string
 	@ApiProperty()
 	role: UserRole
 }
