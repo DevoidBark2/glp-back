@@ -53,11 +53,11 @@ export class User {
 	created_at: Date
 	@UpdateDateColumn()
 	updated_at: Date
-	@OneToMany(() => CourseEntity, course => course.user)
-	@JoinColumn()
+	@OneToMany(() => CourseEntity, course => course.user, {
+		onDelete: 'CASCADE'
+	})
 	courses: CourseEntity[]
 	@OneToMany(() => PostEntity, post => post.user)
-	@JoinColumn()
 	posts: PostEntity[]
 	@OneToOne(() => SettingsEntity, settings => settings.user)
 	settings: SettingsEntity
@@ -81,7 +81,7 @@ export class User {
 	footerContent: TableFooter
 	@OneToMany(() => CourseUser, courseUser => courseUser.user)
 	courseUsers: CourseUser[]
-	@Column()
+	@Column({ nullable: true })
 	isVerified: boolean
 	@Column({ default: false })
 	is_two_factor_enabled: boolean

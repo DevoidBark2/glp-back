@@ -24,6 +24,8 @@ import { IS_DEV_ENV } from './libs/common/utils/is-dev.util'
 import { ProviderModule } from './auth/provider/provider.module'
 import { MailModule } from './libs/mail/mail.module'
 import { MailConfirmationModule } from './auth/mail-confirmation/mail-confirmation.module'
+import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module'
+import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
 
 @Module({
 	imports: [
@@ -68,7 +70,9 @@ import { MailConfirmationModule } from './auth/mail-confirmation/mail-confirmati
 		SupportModule,
 		ProviderModule,
 		MailModule,
-		MailConfirmationModule
+		MailConfirmationModule,
+		PasswordRecoveryModule,
+		TwoFactorAuthModule
 	]
 	// providers: [
 	// 	WebsocketGateway,

@@ -104,7 +104,7 @@ export class AuthController {
 		await this.authService.extractProfileFromCode(req, provider, code)
 
 		return res.redirect(
-			`${this.configService.getOrThrow<string>('CLIENT_URL')}/platform/profile`
+			`${this.configService.get<string>('CLIENT_URL')}/platform/profile`
 		)
 	}
 

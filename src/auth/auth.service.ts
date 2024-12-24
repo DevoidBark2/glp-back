@@ -27,6 +27,7 @@ import { ConfigService } from '@nestjs/config'
 import { ProviderService } from './provider/provider.service'
 import { Account } from '../user/entity/account.entity'
 import { MailConfirmationService } from './mail-confirmation/mail-confirmation.service'
+import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,8 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 		private readonly providerService: ProviderService,
 		@InjectRepository(Account)
-		private readonly accountRepository: Repository<Account>
+		private readonly accountRepository: Repository<Account>,
+		private readonly twoFactorService: TwoFactorAuthService
 	) {}
 
 	// Метод для точного соответствия требованиям каждого уровня
@@ -272,6 +274,21 @@ export class AuthService {
 		// 	maxAge: 3600000
 		// })
 
+		if (userData.is_two_factor_enabled) {
+			if (!user.code) {
+				await this.twoFactorService.sendTwoFactorToken(userData.email)
+
+				return {
+					message: 'Проверьте почсту, оптрален двухфакторный код'
+				}
+			}
+
+			await this.twoFactorService.validateTwoFactorToken(
+				userData.email,
+				user.code
+			)
+		}
+
 		return await this.saveSession(req, userData)
 		// return {
 		// 	id: userData.id,
@@ -306,8 +323,8 @@ export class AuthService {
 
 		console.log(account)
 
-		let user = account?.userId
-			? await this.userService.findById(account.userId)
+		let user = account?.user.id
+			? await this.userService.findById(account.user.id)
 			: null
 
 		console.log('sds', user)
@@ -355,7 +372,7 @@ export class AuthService {
 					)
 				}
 
-				res.clearCookie(this.configService.getOrThrow('SESSION_NAME'))
+				res.clearCookie(this.configService.get('SESSION_NAME'))
 				resolve()
 			})
 		})

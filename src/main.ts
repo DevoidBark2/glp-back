@@ -21,7 +21,7 @@ async function bootstrap() {
 	const reflector = app.get(Reflector)
 
 	const config = app.get(ConfigService)
-	const redis = new IORedis(config.getOrThrow('REDIS_URI'))
+	const redis = new IORedis(config.get('REDIS_URI'))
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -29,39 +29,35 @@ async function bootstrap() {
 		})
 	)
 
-	app.use(cookieParser(config.getOrThrow('COOKIES_SECRET')))
+	app.use(cookieParser(config.get('COOKIES_SECRET')))
 
 	app.enableCors({
-		origin: config.getOrThrow<string>('CLIENT_URL'),
+		origin: config.get<string>('CLIENT_URL'),
 		credentials: true,
 		exposedHeaders: ['set-cookie']
 	})
 
-	app.use(
-		session({
-			secret: config.getOrThrow('SESSION_SECRET'),
-			name: config.getOrThrow('SESSION_NAME'),
-			resave: true,
-			saveUninitialized: false,
-			cookie: {
-				domain: config.getOrThrow('SESSION_DOMAIN'),
-				maxAge: ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE')),
-				httpOnly: parseBoolean(
-					config.getOrThrow<string>('SESSION_HTTP_ONLY')
-				),
-				secure: parseBoolean(
-					config.getOrThrow<string>('SESSION_SECURE')
-				),
-				sameSite: 'lax'
-			},
-			store: new RedisStore({
-				client: redis,
-				prefix: config.getOrThrow('SESSION_FOLDER')
-			})
-		})
-	)
+	// app.use(
+	// 	session({
+	// 		secret: config.get('SESSION_SECRET'),
+	// 		name: config.get('SESSION_NAME'),
+	// 		resave: true,
+	// 		saveUninitialized: false,
+	// 		cookie: {
+	// 			domain: config.get('SESSION_DOMAIN'),
+	// 			maxAge: ms(config.get<StringValue>('SESSION_MAX_AGE')),
+	// 			httpOnly: parseBoolean(config.get<string>('SESSION_HTTP_ONLY')),
+	// 			secure: parseBoolean(config.get<string>('SESSION_SECURE')),
+	// 			sameSite: 'lax'
+	// 		},
+	// 		store: new RedisStore({
+	// 			client: redis,
+	// 			prefix: config.get('SESSION_FOLDER')
+	// 		})
+	// 	})
+	// )
 
-	// app.setGlobalPrefix('api')
+	app.setGlobalPrefix('api')
 
 	app.useGlobalInterceptors(new ResponseInterceptor(reflector))
 
@@ -96,7 +92,7 @@ async function bootstrap() {
 		express.static(join(__dirname, '..', 'uploads'))
 	)
 
-	await app.listen(config.getOrThrow('PORT_SERVER'))
+	await app.listen(config.get('PORT_SERVER'))
 	console.log(`Application is running on: ${await app.getUrl()}`)
 }
 

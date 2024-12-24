@@ -20,6 +20,8 @@ import { MailConfirmationModule } from './mail-confirmation/mail-confirmation.mo
 import { MailService } from '../libs/mail/mail.service'
 import { UserService } from '../user/user.service'
 import { CourseUser } from '../course/entity/course-user.entity'
+import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
+import { Token } from './entity/token.entity'
 
 @Module({
 	imports: [
@@ -30,7 +32,8 @@ import { CourseUser } from '../course/entity/course-user.entity'
 			SettingsEntity,
 			GeneralSettingsEntity,
 			Account,
-			CourseUser
+			CourseUser,
+			Token
 		]),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
@@ -56,7 +59,13 @@ import { CourseUser } from '../course/entity/course-user.entity'
 		forwardRef(() => MailConfirmationModule)
 	],
 	controllers: [AuthController],
-	providers: [AuthService, LocalStrategy, MailService, UserService],
+	providers: [
+		AuthService,
+		LocalStrategy,
+		MailService,
+		UserService,
+		TwoFactorAuthService
+	],
 	exports: [AuthService]
 })
 export class AuthModule {}

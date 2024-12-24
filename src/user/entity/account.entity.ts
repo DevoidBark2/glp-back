@@ -29,12 +29,9 @@ export class Account {
 	expires_at: number
 
 	@ManyToOne(() => User, user => user.accounts, {
-		onDelete: 'CASCADE',
-		nullable: true
+		onDelete: 'CASCADE'
 	})
 	user: User
-	@Column({ type: 'varchar' })
-	userId: string
 
 	@CreateDateColumn()
 	createdAt: Date
