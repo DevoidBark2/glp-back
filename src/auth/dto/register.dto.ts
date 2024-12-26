@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-	IsEmail,
-	IsNotEmpty,
-	IsString,
-	MinLength,
-	Validate
-} from 'class-validator'
-import { IsPasswordsMatchingConstraint } from '../../libs/common/decorators/is-passwords-matching-constraint.decorator'
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator'
 import { IsOptional } from 'class-validator'
 
 export class RegisterUserDto {
@@ -33,14 +26,4 @@ export class RegisterUserDto {
 		message: 'Пароль должен содержать минимум 8 символов.'
 	})
 	password: string
-
-	@IsString({ message: 'Пароль подтверждения должен быть строкой.' })
-	@IsNotEmpty({ message: 'Поле подтверждения пароля не может быть пустым.' })
-	@MinLength(8, {
-		message: 'Пароль подтверждения должен содержать не менее 8 символов.'
-	})
-	@Validate(IsPasswordsMatchingConstraint, {
-		message: 'Пароли не совпадают.'
-	})
-	passwordRepeat: string
 }

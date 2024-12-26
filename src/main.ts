@@ -37,25 +37,25 @@ async function bootstrap() {
 		exposedHeaders: ['set-cookie']
 	})
 
-	// app.use(
-	// 	session({
-	// 		secret: config.get('SESSION_SECRET'),
-	// 		name: config.get('SESSION_NAME'),
-	// 		resave: true,
-	// 		saveUninitialized: false,
-	// 		cookie: {
-	// 			domain: config.get('SESSION_DOMAIN'),
-	// 			maxAge: ms(config.get<StringValue>('SESSION_MAX_AGE')),
-	// 			httpOnly: parseBoolean(config.get<string>('SESSION_HTTP_ONLY')),
-	// 			secure: parseBoolean(config.get<string>('SESSION_SECURE')),
-	// 			sameSite: 'lax'
-	// 		},
-	// 		store: new RedisStore({
-	// 			client: redis,
-	// 			prefix: config.get('SESSION_FOLDER')
-	// 		})
-	// 	})
-	// )
+	app.use(
+		session({
+			secret: config.get('SESSION_SECRET'),
+			name: config.get('SESSION_NAME'),
+			resave: true,
+			saveUninitialized: false,
+			cookie: {
+				domain: config.get('SESSION_DOMAIN'),
+				maxAge: ms(config.get<StringValue>('SESSION_MAX_AGE')),
+				httpOnly: parseBoolean(config.get<string>('SESSION_HTTP_ONLY')),
+				secure: parseBoolean(config.get<string>('SESSION_SECURE')),
+				sameSite: 'lax'
+			},
+			store: new RedisStore({
+				client: redis,
+				prefix: config.get('SESSION_FOLDER')
+			})
+		})
+	)
 
 	app.setGlobalPrefix('api')
 

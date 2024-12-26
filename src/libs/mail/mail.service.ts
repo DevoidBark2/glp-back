@@ -18,7 +18,7 @@ export class MailService {
 
 		const html = await render(ConfirmationTemplate({ domain, token }))
 
-		return this.sendMail(email, 'Подвтерждение почты', html)
+		return this.sendMail(email, 'Подтверждение почты', html)
 	}
 
 	public async sendPasswordResetEmail(email: string, token: string) {

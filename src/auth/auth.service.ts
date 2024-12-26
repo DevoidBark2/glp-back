@@ -380,7 +380,6 @@ export class AuthService {
 
 	public async saveSession(req: Request, user: User) {
 		return new Promise((resolve, reject) => {
-			console.log('HERE', user)
 			req.session.userId = user.id
 
 			req.session.save(err => {

@@ -65,9 +65,7 @@ export class AuthController {
 	@ApiOperation({ summary: 'Log in in system' })
 	@ApiBadRequestResponse({
 		status: HttpStatus.BAD_REQUEST,
-
 		type: BadRequestResponseDto,
-
 		description: 'Error log in in system'
 	})
 	@ApiOkResponse({
