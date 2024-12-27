@@ -17,7 +17,7 @@ export class Token {
 	token: string
 	@Column({ type: 'enum', enum: TokenType })
 	type: TokenType
-	@Column({ type: 'date' })
+	@Column({ type: 'timestamp' })
 	expiresIn: Date
 	@CreateDateColumn()
 	createdAt: Date

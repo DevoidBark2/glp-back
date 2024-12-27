@@ -10,7 +10,7 @@ import { MailConfirmationService } from './mail-confirmation.service'
 import { ConfirmationDTO } from './dto/confirmation.dto'
 import { Request } from 'express'
 
-@Controller('mail-confirmation')
+@Controller('email-confirmation')
 export class MailConfirmationController {
 	constructor(
 		private readonly mailConfirmationService: MailConfirmationService

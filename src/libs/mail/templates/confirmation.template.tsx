@@ -9,7 +9,7 @@ export function ConfirmationTemplate({
 	domain,
 	token
 }: ConfirmationTemplateProps) {
-	const confirmLink = `${domain}/auth/new-verification?token=${token}`
+	const confirmLink = `${domain}/platform/auth/new-verification?token=${token}`
 
 	return (
 		<Html>
