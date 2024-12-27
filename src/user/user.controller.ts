@@ -88,15 +88,10 @@ export class UserController {
 		await this.userService.setGlobalAction(body)
 	}
 
-	@Roles(
-		UserRole.SUPER_ADMIN,
-		UserRole.TEACHER,
-		UserRole.MODERATOR,
-		UserRole.STUDENT
-	)
+	@Authorization()
 	@Get('/profile-user')
-	async getUserProfileInfo(@Req() req: Request) {
-		return await this.userService.getUserProfileInfo(req['user'])
+	async getUserProfileInfo(@Authorized('id') userId: string) {
+		return await this.userService.getUserProfileInfo(userId)
 	}
 
 	@Roles(

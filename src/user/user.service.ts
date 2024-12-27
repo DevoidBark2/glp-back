@@ -152,15 +152,20 @@ export class UserService {
 		await this.userRepository.update(body.usersIds, { status: body.action })
 	}
 
-	async getUserProfileInfo(user: User) {
+	async getUserProfileInfo(userId: string) {
+		const user = await this.userRepository.findOne({
+			where: {
+				id: userId
+			}
+		})
 		const userCourses = await this.courseUserRepository.find({
 			where: {
-				user: { id: user.id }
+				user: { id: userId }
 			}
 		})
 
 		return {
-			id: user.id,
+			id: userId,
 			first_name: user.first_name,
 			second_name: user.second_name,
 			last_name: user.last_name,
@@ -168,6 +173,7 @@ export class UserService {
 			email: user.email,
 			phone: user.phone,
 			city: user.city,
+			role: user.role,
 			birth_day: user.birth_day,
 			about_me: user.about_me,
 			pagination_size: user.pagination_size,
