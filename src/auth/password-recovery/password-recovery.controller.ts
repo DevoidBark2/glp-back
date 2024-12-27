@@ -10,8 +10,10 @@ import { PasswordRecoveryService } from './password-recovery.service'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { Recaptcha } from '@nestlab/google-recaptcha'
 import { NewPasswordDto } from './dto/new-password.dto'
+import { ApiTags } from '@nestjs/swagger'
 
-@Controller('password-recovery')
+@ApiTags('Авторизация')
+@Controller('')
 export class PasswordRecoveryController {
 	constructor(
 		private readonly passwordRecoveryService: PasswordRecoveryService
