@@ -31,5 +31,5 @@ export class CreateCourseDto {
 	})
 	@ApiProperty()
 	content_description: string
-	publish_date: Date
+	has_certificate: string
 }

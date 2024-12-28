@@ -27,4 +27,7 @@ export class UsersResponseDto {
 	@ApiProperty()
 	@Expose()
 	created_at: Date
+	@ApiProperty()
+	@Expose()
+	isVerified: boolean
 }

@@ -18,13 +18,14 @@ import { UserRole } from '../constants/contants'
 import { ResponseComponentTaskInterceptor } from '../interceptors/response-component-task.interceptor'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
+import { Authorization } from 'src/auth/decorators/auth.decorator'
 
 @ApiTags('Компоненты раздела')
 @Controller('')
 export class ComponentTaskController {
 	constructor(private readonly componentTaskService: ComponentTaskService) {}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/component-task')
 	async getComponentTask(@Req() req: Request) {
 		return await this.componentTaskService.getAll(req['user'])

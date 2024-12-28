@@ -75,9 +75,12 @@ export class CourseService {
 				access_right: true,
 				duration: true,
 				level: true,
+				status: true,
 				publish_date: true,
+				has_certificate: true,
 				content_description: true,
 				category: {
+					id: true,
 					name: true
 				},
 				user: {
@@ -129,29 +132,19 @@ export class CourseService {
 		}
 	}
 
-	async createCourse(createCourse: CreateCourseDto, req: Request) {
-		const currentUser: User = req['user']
-
+	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
 					where: { id: createCourse.category }
 				})
 			: null
 
-		const newCourse = new CourseEntity()
-		newCourse.name = createCourse.name
-		newCourse.small_description = createCourse.small_description
-		newCourse.content_description = createCourse.content_description
-		newCourse.category = category
-		newCourse.access_right = createCourse.access_right
-		newCourse.duration = createCourse.duration
-		newCourse.level = createCourse.level
-		newCourse.publish_date = createCourse.publish_date
-		newCourse.image = createCourse.image
-		newCourse.user = currentUser
-		newCourse.status = StatusCourseEnum.NEW
-
-		return await this.courseEntityRepository.save(newCourse)
+		return await this.courseEntityRepository.save({
+			...createCourse, 
+			user: currentUser,
+			category: category,
+			has_certificate:  createCourse.has_certificate === 'true'
+		})	
 	}
 
 	async getAllUserCourses(user: User) {
@@ -159,23 +152,52 @@ export class CourseService {
 			user.role === UserRole.SUPER_ADMIN
 				? this.courseEntityRepository.find({
 						relations: {
-							category: true,
 							user: true
 						},
 						order: {
 							user: {
 								role: 'DESC'
 							}
+						},
+						select: {
+							id: true,
+							name: true,
+							created_at: true,
+							status: true,
+							duration: true,
+							user: {
+								id: true,
+								first_name: true,
+								second_name: true,
+								last_name: true,
+								phone: true,
+								role: true
+							}
 						}
 					})
 				: await this.courseEntityRepository.find({
 						where: { user: { id: user.id } },
 						relations: {
-							category: true
+							user: true
 						},
 						order: {
 							user: {
 								role: 'DESC'
+							}
+						},
+						select: {
+							id: true,
+							name: true,
+							created_at: true,
+							status: true,
+							duration: true,
+							user: {
+								id: true,
+								first_name: true,
+								second_name: true,
+								last_name: true,
+								phone: true,
+								role: true
 							}
 						}
 					})
@@ -206,18 +228,18 @@ export class CourseService {
 	}
 
 	async publishCourse(courseId: number, req: Request) {
-		const course = await this.courseEntityRepository.findOne({
-			where: { id: courseId },
-			relations: {
-				sections: true
-			}
-		})
+		// const course = await this.courseEntityRepository.findOne({
+		// 	where: { id: courseId },
+		// 	relations: {
+		// 		sections: true
+		// 	}
+		// })
 
-		if (course.sections.length < 1) {
-			throw new BadRequestException(
-				'Данный курс нельзя отправить,так как в нем нет,как минимум 1 раздела'
-			)
-		}
+		// if (course.sections.length < 1) {
+		// 	throw new BadRequestException(
+		// 		'Данный курс нельзя отправить,так как в нем нет,как минимум 1 раздела'
+		// 	)
+		// }
 
 		await this.courseEntityRepository.update(courseId, {
 			status: StatusCourseEnum.IN_PROCESSING

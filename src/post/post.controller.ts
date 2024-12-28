@@ -37,6 +37,7 @@ import { PostsResponseDto } from './dto/posts-response.dto'
 import { PublishPostDto } from './dto/publish-post.dro'
 import { ChangePostDto } from './dto/change-post.dto'
 import { UpdatePostStatus } from './dto/update-post-status.dto'
+import { Authorization } from 'src/auth/decorators/auth.decorator'
 
 @ApiTags('Посты')
 @Controller()
@@ -58,7 +59,7 @@ export class PostController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/posts-user')
 	@ApiOperation({ summary: 'Get all posts user' })
 	@ApiOkResponse({
@@ -71,7 +72,7 @@ export class PostController {
 	}
 
 	@ApiBearerAuth('access-token')
-	@Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Post('/posts')
 	@UseInterceptors(FileInterceptor('image', multerOptions))
 	@ApiConsumes('multipart/form-data')

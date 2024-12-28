@@ -1,5 +1,6 @@
 import {
 	Column,
+	CreateDateColumn,
 	Entity,
 	ManyToOne,
 	OneToMany,
@@ -34,22 +35,26 @@ export class CourseEntity {
 	duration: number
 	@Column({ type: 'enum', enum: LevelCourseEnum })
 	level: number
-	@Column({ type: 'timestamp' })
+	@Column({ type: 'timestamp', nullable: true })
 	publish_date: Date
-	@Column({ type: 'text' })
+	@Column({ type: 'text', nullable: true })
 	content_description: string
 	@Column({ type: 'varchar', length: 255, nullable: true })
 	secret_key: string
 	@Column({
 		type: 'enum',
 		enum: StatusCourseEnum,
-		default: StatusCourseEnum.ACTIVE
+		default: StatusCourseEnum.NEW
 	})
 	status: StatusCourseEnum
+	@Column({type: "bool", nullable: false})
+	has_certificate: boolean
 	@ManyToOne(() => User)
 	user: User
 	@OneToMany(() => SectionEntity, sections => sections.course)
 	sections: SectionEntity[]
 	@OneToMany(() => CourseUser, courseUser => courseUser.course)
 	courseUsers: CourseUser[]
+	@CreateDateColumn()
+	created_at: Date
 }

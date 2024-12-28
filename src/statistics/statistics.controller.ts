@@ -3,6 +3,8 @@ import { StatisticsService } from './statistics.service'
 import { ApiTags } from '@nestjs/swagger'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
+import { Authorization } from 'src/auth/decorators/auth.decorator'
+import { Authorized } from 'src/auth/decorators/authorized.decorator'
 
 @ApiTags('Статистика')
 @Controller()
@@ -15,9 +17,9 @@ export class StatisticsController {
 		return await this.statisticsService.globalSearch(text, req['user'])
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization()
 	@Get('statistics')
-	async getStatistics(@Req() req: Request) {
-		return await this.statisticsService.getStatistics(req['user'])
+	async getStatistics(@Authorized('id') userId: string) {
+		return await this.statisticsService.getStatistics(userId)
 	}
 }

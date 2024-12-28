@@ -33,6 +33,7 @@ import { ActionEvent } from '../events/enum/action-event.enum'
 import { ChangeCourseDto } from './dto/change-course.dto'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SubscribeCourseDto } from './dto/subsribe-course.dto'
+import { Authorization } from 'src/auth/decorators/auth.decorator'
 
 @ApiTags('Курсы')
 @UseInterceptors(EventLoggingInterceptor)
@@ -52,7 +53,7 @@ export class CourseController {
 		return await this.courseService.findOneById(id, req)
 	}
 
-	@Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Post('/course')
 	@UseInterceptors(FileInterceptor('image', multerOptions))
 	@ApiConsumes('multipart/form-data')
@@ -72,7 +73,7 @@ export class CourseController {
 		if (image) {
 			course.image = 'uploads/' + image?.filename
 		}
-		const newCourse = await this.courseService.createCourse(course, req)
+		const newCourse = await this.courseService.createCourse(course, req['user'])
 
 		return {
 			course: newCourse,
@@ -80,7 +81,7 @@ export class CourseController {
 		}
 	}
 
-	@Roles(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
+	@Authorization(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Get('/get-user-courses')
 	@LogAction(ActionEvent.ENROLL_STUDENT, 'view details of course')
 	async getUserCourses(@Req() req: Request) {
@@ -105,9 +106,7 @@ export class CourseController {
 	}
 
 	@Post('publish-course')
-	@ResponseMessage(
-		'Курс отправлен на проверку, ожидайте ответа от модератора'
-	)
+	@ResponseMessage('Курс отправлен на проверку, ожидайте ответа от модератора')
 	async publishCourse(
 		@Body() body: { courseId: number },
 		@Req() req: Request

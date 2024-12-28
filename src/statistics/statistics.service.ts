@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import PostEntity from '../post/entity/post.entity'
 import { ILike, Not, Repository } from 'typeorm'
@@ -57,23 +57,30 @@ export class StatisticsService {
 		}
 	}
 
-	async getStatistics(user: User) {
+	async getStatistics(userId: string) {
+
+		const currentUser = await this.userRepository.findOne({where:{id: userId}})
+
+		if(!currentUser) {
+			throw new BadRequestException("Пользователь не найден!")
+		}
+
 		const courseCount =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.courseEntityRepository.count()
 				: await this.courseEntityRepository.count({
-						where: { user: { id: user.id } }
+						where: { user: { id: userId } }
 					})
 
 		const postCount =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.postEntityRepository.count()
 				: await this.postEntityRepository.count({
-						where: { user: { id: user.id } }
+						where: { user: { id: userId } }
 					})
 
 		const publishPosts =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.postEntityRepository.count({
 						where: {
 							is_publish: true
@@ -82,12 +89,12 @@ export class StatisticsService {
 				: await this.postEntityRepository.count({
 						where: {
 							is_publish: true,
-							user: { id: user.id }
+							user: { id: userId }
 						}
 					})
 
 		const newPosts =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.postEntityRepository.count({
 						where: {
 							status: PostStatusEnum.NEW
@@ -95,13 +102,13 @@ export class StatisticsService {
 					})
 				: await this.postEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: PostStatusEnum.NEW
 						}
 					})
 
 		const inProcessingPosts =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.postEntityRepository.count({
 						where: {
 							status: PostStatusEnum.IN_PROCESSING
@@ -109,13 +116,13 @@ export class StatisticsService {
 					})
 				: await this.postEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: PostStatusEnum.IN_PROCESSING
 						}
 					})
 
 		const rejectPosts =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.postEntityRepository.count({
 						where: {
 							status: PostStatusEnum.REJECT
@@ -123,13 +130,13 @@ export class StatisticsService {
 					})
 				: await this.postEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: PostStatusEnum.REJECT
 						}
 					})
 
 		const publishCourse =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.courseEntityRepository.count({
 						where: {
 							status: StatusCourseEnum.ACTIVE
@@ -138,12 +145,12 @@ export class StatisticsService {
 				: await this.courseEntityRepository.count({
 						where: {
 							status: StatusCourseEnum.ACTIVE,
-							user: { id: user.id }
+							user: { id: userId }
 						}
 					})
 
 		const newCourse =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.courseEntityRepository.count({
 						where: {
 							status: StatusCourseEnum.NEW
@@ -151,13 +158,13 @@ export class StatisticsService {
 					})
 				: await this.courseEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: StatusCourseEnum.NEW
 						}
 					})
 
 		const inProcessingCourse =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.courseEntityRepository.count({
 						where: {
 							status: StatusCourseEnum.IN_PROCESSING
@@ -165,13 +172,13 @@ export class StatisticsService {
 					})
 				: await this.courseEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: StatusCourseEnum.IN_PROCESSING
 						}
 					})
 
 		const rejectCourse =
-			user.role === UserRole.SUPER_ADMIN
+		currentUser.role === UserRole.SUPER_ADMIN
 				? await this.courseEntityRepository.count({
 						where: {
 							status: StatusCourseEnum.REJECTED
@@ -179,7 +186,7 @@ export class StatisticsService {
 					})
 				: await this.courseEntityRepository.count({
 						where: {
-							user: { id: user.id },
+							user: { id: userId },
 							status: StatusCourseEnum.REJECTED
 						}
 					})
@@ -190,9 +197,7 @@ export class StatisticsService {
 			}
 		})
 
-		return {
-			countUsers: countUsers,
-			courseCount: courseCount,
+		const resData = {
 			courseCountPublish:
 				courseCount !== 0
 					? ((publishCourse / courseCount) * 100).toFixed(2)
@@ -225,5 +230,11 @@ export class StatisticsService {
 					? ((rejectPosts / postCount) * 100).toFixed(2)
 					: 0
 		}
+
+		if(currentUser.role === UserRole.SUPER_ADMIN) {
+			resData['countUser'] = countUsers
+		}
+
+		return resData
 	}
 }
