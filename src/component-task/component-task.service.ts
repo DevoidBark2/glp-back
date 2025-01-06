@@ -10,6 +10,7 @@ import { SaveTaskUserDto } from './dto/save-task-user.dto'
 import { CourseComponentType } from './enum/course-component-type.enum'
 import { SectionComponentTask } from 'src/section/entity/section-component-task.entity'
 import { SectionEntity } from 'src/section/entity/section.entity'
+import { UserRole } from 'src/constants/contants'
 
 @Injectable()
 export class ComponentTaskService {
@@ -30,14 +31,39 @@ export class ComponentTaskService {
 	}
 
 	async getAll(user: User) {
-		return this.componentTaskRepository.find({
+		return user.role !== UserRole.SUPER_ADMIN ? this.componentTaskRepository.find({
 			where: {
-				user: { id: user.id }
+				user: user
+			},
+			relations: {
+				user: true
+			},
+			select: {
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true,
+					role: true
+				}
 			},
 			order: {
 				id: 'ASC'
 			}
-		})
+		}) : this.componentTaskRepository.find({relations: {
+			user: true
+		},
+		select: {
+			user: {
+				id: true,
+				first_name: true,
+				second_name: true,
+				last_name: true,
+				role: true
+			}
+		},order: {
+			id: 'ASC'
+		}})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {

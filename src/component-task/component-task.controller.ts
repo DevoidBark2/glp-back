@@ -37,7 +37,7 @@ export class ComponentTaskController {
 		return await this.componentTaskService.getComponentById(id)
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('/component-task')
 	@UseInterceptors(ResponseComponentTaskInterceptor)
 	async createComponentTask(
@@ -61,13 +61,13 @@ export class ComponentTaskController {
 		@Req() req: Request,
 		@Body() body: CreateComponentTaskDto
 	) {
-		await this.componentTaskService.change(body, req['user'])
+		return await this.componentTaskService.change(body, req['user'])
 	}
 
 	@ResponseMessage('Компонент успешно удален!')
 	@Delete('/component-task/:id')
 	async deleteComponentTask(@Param('id') id: number, @Req() req: Request) {
-		await this.componentTaskService.delete(id, req['user'])
+		return await this.componentTaskService.delete(id, req['user'])
 	}
 
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
