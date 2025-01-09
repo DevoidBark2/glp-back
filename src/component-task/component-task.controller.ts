@@ -70,7 +70,7 @@ export class ComponentTaskController {
 		return await this.componentTaskService.delete(id, req['user'])
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/search-components')
 	async getSearchComponents(
 		@Query('query') query: string,

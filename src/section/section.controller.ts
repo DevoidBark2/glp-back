@@ -6,7 +6,6 @@ import {
 	Param,
 	Post,
 	Req,
-	UploadedFile,
 	UploadedFiles,
 	UseInterceptors
 } from '@nestjs/common'
@@ -19,13 +18,14 @@ import { ResponseMessage } from '../decorators/response-message.decorator'
 import { MainSectionDto } from './dto/create-main-section.dto'
 import { FilesInterceptor } from '@nestjs/platform-express'
 import { fileOptions } from '../config/fileOption'
+import { Authorization } from '../auth/decorators/auth.decorator'
 
 @ApiTags('Разделы курсов')
 @Controller()
 export class SectionController {
 	constructor(private readonly sectionService: SectionService) {}
 
-	@Roles(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Get('/sections')
 	async getAllSectionCourse(@Req() req: Request) {
 		return await this.sectionService.findAll(req['user'])
@@ -37,7 +37,7 @@ export class SectionController {
 		return await this.sectionService.findById(id)
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('/sections')
 	@UseInterceptors(FilesInterceptor('uploadFile', 10, fileOptions))
 	@ApiConsumes('multipart/form-data')
@@ -67,13 +67,13 @@ export class SectionController {
 		await this.sectionService.deleteSection(id)
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('main-section')
 	async getMainSections(@Req() req: Request) {
 		return await this.sectionService.getMainSection(req['user'])
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('main-section')
 	async createMainSections(
 		@Body() body: MainSectionDto,

@@ -10,6 +10,7 @@ import { MainSectionDto } from './dto/create-main-section.dto'
 import { SectionComponentTask } from './entity/section-component-task.entity'
 import { CourseEntity } from '../course/entity/course.entity'
 import { ComponentTask } from '../component-task/entity/component-task.entity'
+import { UserRole } from '../constants/contants'
 
 @Injectable()
 export class SectionService {
@@ -116,11 +117,13 @@ export class SectionService {
 	}
 
 	async getMainSection(user: User) {
-		return await this.mainSectionRepository.find({
-			where: {
-				user: { id: user.id }
-			}
-		})
+		return user.role === UserRole.SUPER_ADMIN
+			? await this.mainSectionRepository.find()
+			: await this.mainSectionRepository.find({
+					where: {
+						user: user
+					}
+				})
 	}
 
 	async createMainSections(body: MainSectionDto, user: User) {

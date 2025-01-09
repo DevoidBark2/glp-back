@@ -10,7 +10,7 @@ export class FaqService {
 	constructor(
 		@InjectRepository(FaqEntity)
 		private readonly faqEntityRepository: Repository<FaqEntity>
-	) { }
+	) {}
 	async create(createFaqDto: CreateFaqDto) {
 		const existingFaq = await this.faqEntityRepository.findOne({
 			where: { question: createFaqDto.question }
@@ -29,7 +29,7 @@ export class FaqService {
 	async findAll() {
 		return await this.faqEntityRepository.find({
 			order: {
-				id: "ASC"
+				id: 'ASC'
 			}
 		})
 	}
@@ -38,7 +38,7 @@ export class FaqService {
 		const faq = await this.faqEntityRepository.findOneBy({ id })
 
 		if (!faq) {
-			throw new BadRequestException("Запись не найдена!")
+			throw new BadRequestException('Запись не найдена!')
 		}
 
 		return faq

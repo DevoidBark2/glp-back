@@ -140,69 +140,66 @@ export class CourseService {
 			: null
 
 		return await this.courseEntityRepository.save({
-			...createCourse, 
+			...createCourse,
 			user: currentUser,
 			category: category,
-			has_certificate:  createCourse.has_certificate === 'true'
-		})	
+			has_certificate: createCourse.has_certificate === 'true'
+		})
 	}
 
 	async getAllUserCourses(user: User) {
-		const courses =
-			user.role === UserRole.SUPER_ADMIN
-				? this.courseEntityRepository.find({
-						relations: {
-							user: true
-						},
-						order: {
-							user: {
-								role: 'DESC'
-							}
-						},
-						select: {
-							id: true,
-							name: true,
-							created_at: true,
-							status: true,
-							duration: true,
-							user: {
-								id: true,
-								first_name: true,
-								second_name: true,
-								last_name: true,
-								phone: true,
-								role: true
-							}
+		return user.role === UserRole.SUPER_ADMIN
+			? this.courseEntityRepository.find({
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
 						}
-					})
-				: await this.courseEntityRepository.find({
-						where: { user: { id: user.id } },
-						relations: {
-							user: true
-						},
-						order: {
-							user: {
-								role: 'DESC'
-							}
-						},
-						select: {
+					},
+					select: {
+						id: true,
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						user: {
 							id: true,
-							name: true,
-							created_at: true,
-							status: true,
-							duration: true,
-							user: {
-								id: true,
-								first_name: true,
-								second_name: true,
-								last_name: true,
-								phone: true,
-								role: true
-							}
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
 						}
-					})
-
-		return courses
+					}
+				})
+			: await this.courseEntityRepository.find({
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
+						id: true,
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
+					}
+				})
 	}
 
 	async delete(courseId: number) {
@@ -283,6 +280,20 @@ export class CourseService {
 
 		console.log(course)
 		return course
+	}
+
+	async getCourseSections(id: number) {
+		return await this.sectionRepository.find({
+			where: {
+				course: { id: id }
+			},
+			relations: {
+				sectionComponents: {
+					section: true,
+					componentTask: true
+				}
+			}
+		})
 	}
 
 	async changeCourse(course: ChangeCourseDto, user: User) {

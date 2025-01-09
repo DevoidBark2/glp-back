@@ -1,14 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Brackets, ILike, Repository } from 'typeorm'
+import { Brackets, Repository } from 'typeorm'
 import { ComponentTask } from './entity/component-task.entity'
 import { CreateComponentTaskDto } from './dto/create-component-task.dto'
 import { User } from '../user/entity/user.entity'
 import { StatusComponentTaskEnum } from './enum/status-component-task.enum'
 import { AnswersComponentUser } from './entity/component-task-user.entity'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
-import { CourseComponentType } from './enum/course-component-type.enum'
-import { SectionComponentTask } from 'src/section/entity/section-component-task.entity'
 import { SectionEntity } from 'src/section/entity/section.entity'
 import { UserRole } from 'src/constants/contants'
 
@@ -31,39 +29,54 @@ export class ComponentTaskService {
 	}
 
 	async getAll(user: User) {
-		return user.role !== UserRole.SUPER_ADMIN ? this.componentTaskRepository.find({
-			where: {
-				user: user
-			},
-			relations: {
-				user: true
-			},
-			select: {
-				user: {
-					id: true,
-					first_name: true,
-					second_name: true,
-					last_name: true,
-					role: true
-				}
-			},
-			order: {
-				id: 'ASC'
-			}
-		}) : this.componentTaskRepository.find({relations: {
-			user: true
-		},
-		select: {
-			user: {
-				id: true,
-				first_name: true,
-				second_name: true,
-				last_name: true,
-				role: true
-			}
-		},order: {
-			id: 'ASC'
-		}})
+		return user.role !== UserRole.SUPER_ADMIN
+			? this.componentTaskRepository.find({
+					where: {
+						user: user
+					},
+					relations: {
+						user: true
+					},
+					select: {
+						id: true,
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							role: true
+						}
+					},
+					order: {
+						id: 'ASC'
+					}
+				})
+			: this.componentTaskRepository.find({
+					relations: {
+						user: true
+					},
+					select: {
+						id: true,
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							role: true
+						}
+					},
+					order: {
+						id: 'ASC'
+					}
+				})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {

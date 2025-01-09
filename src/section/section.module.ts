@@ -8,6 +8,9 @@ import { MainSection } from './entity/main-section.entity'
 import { SectionComponentTask } from './entity/section-component-task.entity'
 import { CourseEntity } from '../course/entity/course.entity'
 import { ComponentTask } from '../component-task/entity/component-task.entity'
+import { UserService } from '../user/user.service'
+import { CourseUser } from '../course/entity/course-user.entity'
+import { JwtService } from '@nestjs/jwt'
 
 @Module({
 	imports: [
@@ -17,10 +20,11 @@ import { ComponentTask } from '../component-task/entity/component-task.entity'
 			MainSection,
 			SectionComponentTask,
 			CourseEntity,
-			ComponentTask
+			ComponentTask,
+			CourseUser
 		])
 	],
 	controllers: [SectionController],
-	providers: [SectionService]
+	providers: [SectionService, UserService, JwtService]
 })
 export class SectionModule {}

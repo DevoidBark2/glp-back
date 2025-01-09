@@ -73,7 +73,10 @@ export class CourseController {
 		if (image) {
 			course.image = 'uploads/' + image?.filename
 		}
-		const newCourse = await this.courseService.createCourse(course, req['user'])
+		const newCourse = await this.courseService.createCourse(
+			course,
+			req['user']
+		)
 
 		return {
 			course: newCourse,
@@ -106,7 +109,9 @@ export class CourseController {
 	}
 
 	@Post('publish-course')
-	@ResponseMessage('Курс отправлен на проверку, ожидайте ответа от модератора')
+	@ResponseMessage(
+		'Курс отправлен на проверку, ожидайте ответа от модератора'
+	)
 	async publishCourse(
 		@Body() body: { courseId: number },
 		@Req() req: Request
@@ -117,6 +122,11 @@ export class CourseController {
 	@Get('course-details/:id')
 	async getCourseDetail(@Param('id') id: number) {
 		return await this.courseService.getCourseDetails(id)
+	}
+
+	@Get('course-sections/:id')
+	async getCourseSections(@Param('id') id: number) {
+		return await this.courseService.getCourseSections(id)
 	}
 
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)

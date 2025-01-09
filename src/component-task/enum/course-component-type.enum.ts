@@ -4,5 +4,6 @@ export enum CourseComponentType {
 	Coding = 'coding',
 	MultiPlayChoice = 'multiple-choice',
 	Matching = 'matching',
-	Sequencing = 'sequencing'
+	Sequencing = 'sequencing',
+	SimpleTask = 'simple-task'
 }

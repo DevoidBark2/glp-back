@@ -2,7 +2,6 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn
@@ -10,7 +9,6 @@ import {
 import { CourseComponentType } from '../enum/course-component-type.enum'
 import { User } from '../../user/entity/user.entity'
 import { StatusComponentTaskEnum } from '../enum/status-component-task.enum'
-import { SectionEntity } from '../../section/entity/section.entity'
 import { SectionComponentTask } from 'src/section/entity/section-component-task.entity'
 import { AnswersComponentUser } from './component-task-user.entity'
 
@@ -59,4 +57,6 @@ export class ComponentTask {
 		onDelete: 'CASCADE'
 	})
 	userAnswer: AnswersComponentUser
+	@Column({ type: 'varchar', nullable: true })
+	answer: string
 }
