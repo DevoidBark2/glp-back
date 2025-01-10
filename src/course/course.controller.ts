@@ -136,7 +136,7 @@ export class CourseController {
 		return this.courseService.changeCourse(body, req['user'])
 	}
 
-	@Roles(
+	@Authorization(
 		UserRole.MODERATOR,
 		UserRole.STUDENT,
 		UserRole.SUPER_ADMIN,
@@ -177,7 +177,7 @@ export class CourseController {
 		)
 	}
 
-	@Roles(
+	@Authorization(
 		UserRole.STUDENT,
 		UserRole.TEACHER,
 		UserRole.SUPER_ADMIN,

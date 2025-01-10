@@ -33,7 +33,17 @@ export class SectionService {
 			where: { user: { id: user.id } },
 			relations: {
 				course: true,
+				user: true,
 				sectionComponents: true
+			},
+			select: {
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true,
+					role: true
+				}
 			}
 		})
 	}
@@ -127,6 +137,14 @@ export class SectionService {
 	}
 
 	async createMainSections(body: MainSectionDto, user: User) {
-		return await this.mainSectionRepository.save({ ...body, user: user })
+		const section = await this.mainSectionRepository.save({
+			...body,
+			user: user
+		})
+
+		return {
+			id: section.id,
+			title: section.title
+		}
 	}
 }

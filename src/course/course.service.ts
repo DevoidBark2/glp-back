@@ -164,6 +164,7 @@ export class CourseService {
 						created_at: true,
 						status: true,
 						duration: true,
+						level: true,
 						user: {
 							id: true,
 							first_name: true,
@@ -190,6 +191,7 @@ export class CourseService {
 						created_at: true,
 						status: true,
 						duration: true,
+						level: true,
 						user: {
 							id: true,
 							first_name: true,

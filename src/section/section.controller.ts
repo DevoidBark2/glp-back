@@ -75,6 +75,7 @@ export class SectionController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('main-section')
+	@ResponseMessage('Раздел успешно создан!')
 	async createMainSections(
 		@Body() body: MainSectionDto,
 		@Req() req: Request

@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Brackets, Repository } from 'typeorm'
+import { ILike, Repository } from 'typeorm'
 import { ComponentTask } from './entity/component-task.entity'
 import { CreateComponentTaskDto } from './dto/create-component-task.dto'
 import { User } from '../user/entity/user.entity'
-import { StatusComponentTaskEnum } from './enum/status-component-task.enum'
 import { AnswersComponentUser } from './entity/component-task-user.entity'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
 import { SectionEntity } from 'src/section/entity/section.entity'
@@ -100,23 +99,14 @@ export class ComponentTaskService {
 	async searchComponent(query: string, user: User) {
 		const queryString = `%${query}%`
 
-		return await this.componentTaskRepository
-			.createQueryBuilder('component_task')
-			.where('component_task.userId = :userId', { userId: user.id })
-			.andWhere(
-				new Brackets(qb => {
-					qb.where('component_task.title ILIKE :queryString', {
-						queryString
-					})
-						.orWhere('component_task.status = :status', {
-							status: StatusComponentTaskEnum.ACTIVATED
-						})
-						.orWhere('component_task.tags::jsonb @> :tagQuery', {
-							tagQuery: JSON.stringify([query])
-						})
-				})
-			)
-			.getMany()
+		return await this.componentTaskRepository.find({
+			where: [
+				{
+					user: { id: user.id },
+					title: ILike(queryString)
+				}
+			]
+		})
 	}
 
 	async getComponentById(id: number) {
