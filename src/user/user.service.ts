@@ -29,12 +29,12 @@ export class UserService {
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private readonly jwtService: JwtService
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.userRepository.find({
 			where: { role: Not(UserRole.SUPER_ADMIN) },
-			order: { id: 'ASC' }
+			order: { created_at: 'DESC' }
 		})
 	}
 

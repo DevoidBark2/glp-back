@@ -34,7 +34,7 @@ import { Authorization } from '../auth/decorators/auth.decorator'
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) { }
 
 	@Get('users')
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -94,7 +94,7 @@ export class UserController {
 		return await this.userService.getUserProfileInfo(userId)
 	}
 
-	@Roles(
+	@Authorization(
 		UserRole.SUPER_ADMIN,
 		UserRole.TEACHER,
 		UserRole.MODERATOR,
