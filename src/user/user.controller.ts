@@ -14,7 +14,7 @@ import {
 	UseInterceptors
 } from '@nestjs/common'
 import { UserService } from './user.service'
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateUserDto } from './dto/create_user.dto'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
@@ -34,7 +34,7 @@ import { Authorization } from '../auth/decorators/auth.decorator'
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-	constructor(private readonly userService: UserService) { }
+	constructor(private readonly userService: UserService) {}
 
 	@Get('users')
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -109,7 +109,7 @@ export class UserController {
 		return await this.userService.updateProfile(body, req['user'])
 	}
 
-	@Roles(
+	@Authorization(
 		UserRole.SUPER_ADMIN,
 		UserRole.TEACHER,
 		UserRole.MODERATOR,

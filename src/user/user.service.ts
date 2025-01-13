@@ -29,7 +29,7 @@ export class UserService {
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private readonly jwtService: JwtService
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.userRepository.find({
