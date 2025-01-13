@@ -18,7 +18,7 @@ export class ComponentTaskService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(AnswersComponentUser)
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>
-	) { }
+	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
 		return await this.componentTaskRepository.save({
@@ -30,54 +30,54 @@ export class ComponentTaskService {
 	async getAll(user: User) {
 		return user.role !== UserRole.SUPER_ADMIN
 			? this.componentTaskRepository.find({
-				where: {
-					user: user
-				},
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					where: {
+						user: { id: user.id }
+					},
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						id: 'ASC'
 					}
-				},
-				order: {
-					id: 'ASC'
-				}
-			})
+				})
 			: this.componentTaskRepository.find({
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						id: 'ASC'
 					}
-				},
-				order: {
-					id: 'ASC'
-				}
-			})
+				})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {

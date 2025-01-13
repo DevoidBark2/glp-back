@@ -47,7 +47,7 @@ export class CourseEntity {
 		default: StatusCourseEnum.NEW
 	})
 	status: StatusCourseEnum
-	@Column({type: "bool", nullable: false})
+	@Column({ type: 'bool', nullable: false })
 	has_certificate: boolean
 	@ManyToOne(() => User)
 	user: User
