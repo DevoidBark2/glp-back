@@ -23,7 +23,7 @@ export class PostService {
 		@InjectRepository(ModeratorsPost)
 		private readonly moderatorPostRepository: Repository<ModeratorsPost>,
 		private readonly jwtService: JwtService
-	) {}
+	) { }
 
 	async getAllPosts() {
 		return this.postEntityRepository.find({
@@ -57,18 +57,12 @@ export class PostService {
 				}
 			})
 		}
-		return await this.postEntityRepository
-			.createQueryBuilder('post')
-			.leftJoinAndSelect('post.user', 'user') // Присоединяем таблицу пользователя
-			.leftJoinAndMapOne(
-				'post.moderatorFeedBack', // Маппим новое поле `moderatorsPost` на сущность поста
-				'moderators_posts', // Имя таблицы `moderators_posts`
-				'mp', // Алиас для таблицы `moderators_posts`
-				'mp.post_id = post.id' // Условие соединения по post_id
-			)
-			.addSelect(['mp.comment', 'mp.comments']) // Включаем нужные поля из `moderators_posts`
-			.where('user.id = :userId', { userId: user.id }) // Фильтрация по пользователю
-			.getMany()
+		return await this.postEntityRepository.find({
+			where: {
+				user: { id: user.id }
+			},
+			order: { created_at: "DESC" }
+		})
 	}
 
 	async createPost(post: CreatePostDto, user: User) {
