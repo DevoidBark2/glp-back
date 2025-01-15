@@ -133,6 +133,7 @@ export class CourseService {
 	}
 
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
+		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
 					where: { id: createCourse.category }

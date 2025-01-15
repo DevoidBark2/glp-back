@@ -235,7 +235,7 @@ export class AuthService {
 		}
 	}
 
-	async login(req: Request, user: LoginDto) {
+	async login(req: Request, user: LoginDto, res: Response) {
 		const userData = await this.userService.findByEmail(user.email)
 
 		if (!userData || !userData.password) {
@@ -255,32 +255,17 @@ export class AuthService {
 				userData.email
 			)
 			throw new UnauthorizedException(
-				'Ваш email not confirmed, chek yout email'
+				'Ваш email не подтверждён, проверьте почту.'
 			)
 		}
-
-		// await this.validateUser(user.email, user.password)
-		//
-		// const token = this.jwtService.sign({
-		// 	id: userData.id,
-		// 	email: user.email,
-		// 	role: userData.role
-		// })
-		//
-		// // Устанавливаем куки с флагами безопасности
-		// res.cookie('token', token, {
-		// 	httpOnly: true, // Запрещает доступ к куки через JS
-		// 	secure: process.env.NODE_ENV === 'production', // Использовать Secure только в production
-		// 	maxAge: 3600000
-		// })
 
 		if (userData.is_two_factor_enabled) {
 			if (!user.code) {
 				await this.twoFactorService.sendTwoFactorToken(userData.email)
 
-				return {
-					message: 'Проверьте почсту, оптрален двухфакторный код'
-				}
+				return res.status(200).send({
+					message: 'Проверьте почту, отправлен двухфакторный код.'
+				})
 			}
 
 			await this.twoFactorService.validateTwoFactorToken(
@@ -289,19 +274,16 @@ export class AuthService {
 			)
 		}
 
-		return await this.saveSession(req, userData)
-		// return {
-		// 	id: userData.id,
-		// 	email: userData.email,
-		// 	role: userData.role,
-		// 	token: token,
-		// 	user_name: `${userData.second_name} ${userData.first_name} ${userData.last_name}`,
-		// 	userAvatar: userData.profile_url,
-		// 	pagination_size: userData.pagination_size,
-		// 	table_size: userData.table_size,
-		// 	show_footer_table: userData.show_footer_table,
-		// 	footerContent: userData.footerContent
-		// }
+		// Устанавливаем куки с флагами безопасности
+		res.cookie('userRole', userData.role, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			maxAge: 3600000
+		})
+
+		// Возвращаем успешный ответ с сессией
+		const session = await this.saveSession(req, userData)
+		return res.status(200).send(session) // Завершаем ответ
 	}
 
 	public async extractProfileFromCode(
@@ -323,8 +305,8 @@ export class AuthService {
 
 		console.log(account)
 
-		let user = account?.user.id
-			? await this.userService.findById(account.user.id)
+		let user = account?.id
+			? await this.userService.findById(account.id)
 			: null
 
 		console.log('sds', user)

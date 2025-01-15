@@ -32,7 +32,7 @@ class PostEntity {
 	@ManyToMany(() => EmojiEntity, { onDelete: 'CASCADE' })
 	@JoinTable()
 	emoji: EmojiEntity[]
-	@ManyToOne(() => User, user => user.posts)
+	@ManyToOne(() => User, user => user.posts, { onDelete: 'CASCADE' })
 	user: User
 }
 

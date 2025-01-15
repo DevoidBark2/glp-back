@@ -35,7 +35,7 @@ export class SectionEntity {
 		onDelete: 'CASCADE'
 	})
 	course: CourseEntity
-	@ManyToOne(() => User, user => user.id)
+	@ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
 	user: User
 	@CreateDateColumn()
 	created_at: Date

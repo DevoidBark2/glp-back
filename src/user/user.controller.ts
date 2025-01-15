@@ -170,4 +170,11 @@ export class UserController {
 	async findById(@Param('id') id: string) {
 		return this.userService.findById(id)
 	}
+
+	@Authorization()
+	@HttpCode(HttpStatus.OK)
+	@Delete('/delete-account')
+	async deleteAccount(@Authorized('id') id: string) {
+		return await this.userService.deleteAccount(id)
+	}
 }

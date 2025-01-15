@@ -25,7 +25,7 @@ import { Token } from './entity/token.entity'
 
 @Module({
 	imports: [
-		UserModule,
+		forwardRef(() => UserModule),
 		PassportModule,
 		TypeOrmModule.forFeature([
 			User,
@@ -66,6 +66,6 @@ import { Token } from './entity/token.entity'
 		UserService,
 		TwoFactorAuthService
 	],
-	exports: [AuthService]
+	exports: [AuthService, TwoFactorAuthService]
 })
 export class AuthModule {}

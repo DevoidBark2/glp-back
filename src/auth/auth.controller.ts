@@ -73,8 +73,12 @@ export class AuthController {
 		type: LoginResponseDto,
 		description: ''
 	})
-	async login(@Body() userDto: LoginDto, @Req() req: Request) {
-		return await this.authService.login(req, userDto)
+	async login(
+		@Body() userDto: LoginDto,
+		@Req() req: Request,
+		@Res() res: Response
+	) {
+		return await this.authService.login(req, userDto, res)
 	}
 
 	@Post('logout')

@@ -52,7 +52,9 @@ export class ComponentTaskService {
 						}
 					},
 					order: {
-						id: 'ASC'
+						user: {
+							role: 'DESC'
+						}
 					}
 				})
 			: this.componentTaskRepository.find({
@@ -75,7 +77,9 @@ export class ComponentTaskService {
 						}
 					},
 					order: {
-						id: 'ASC'
+						user: {
+							role: 'DESC'
+						}
 					}
 				})
 	}

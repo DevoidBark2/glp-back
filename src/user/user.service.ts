@@ -1,5 +1,7 @@
 import {
 	BadRequestException,
+	forwardRef,
+	Inject,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
@@ -20,6 +22,7 @@ import { BlockUserDto } from './dto/block-user.dto'
 import { StatusUserEnum } from './enum/user-status.enum'
 import { AuthMethodEnum } from '../auth/enum/auth-method.enum'
 import { v4 as uuidv4 } from 'uuid'
+import { AuthService } from '../auth/auth.service'
 
 @Injectable()
 export class UserService {
@@ -29,6 +32,8 @@ export class UserService {
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private readonly jwtService: JwtService
+		// @Inject(forwardRef(() => AuthService)) // Используем forwardRef для инжекции
+		// private readonly authService: AuthService
 	) {}
 
 	async findAll() {
@@ -74,8 +79,6 @@ export class UserService {
 		method: AuthMethodEnum,
 		isVerified: boolean
 	) {
-		console.log(email, password, displayName, picture, method, isVerified)
-
 		return this.userRepository.save({
 			id: uuidv4(),
 			email: email,
@@ -180,6 +183,8 @@ export class UserService {
 			table_size: user.table_size,
 			show_footer_table: user.show_footer_table,
 			footerContent: user.footerContent,
+			is_two_factor_enabled: user.is_two_factor_enabled,
+			method_auth: user.method_auth,
 			userCourses: userCourses.map(courseUser => {
 				return {
 					id: courseUser.id,
@@ -288,5 +293,17 @@ export class UserService {
 					? 'Пользователь успешно разблокирован!'
 					: 'Пользователь успешно заблокирован!'
 		}
+	}
+
+	async deleteAccount(id: string) {
+		const user = await this.userRepository.findOneBy({ id })
+
+		if (!user) {
+			throw new BadRequestException(
+				`Пользователя с ID ${id} не существует!`
+			)
+		}
+
+		await this.userRepository.delete(id)
 	}
 }

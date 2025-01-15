@@ -29,26 +29,34 @@ export class SectionService {
 		private readonly componentTaskRepository: Repository<ComponentTask>
 	) {}
 	async findAll(user: User) {
-		return this.sectionEntityRepository.find({
-			where: { user: { id: user.id } },
-			relations: {
-				course: true,
-				user: true,
-				sectionComponents: true
-			},
-			select: {
-				user: {
-					id: true,
-					first_name: true,
-					second_name: true,
-					last_name: true,
-					role: true
-				}
-			}
-		})
+		return user.role === UserRole.SUPER_ADMIN
+			? this.sectionEntityRepository.find({
+					relations: {
+						course: true,
+						user: true,
+						sectionComponents: true
+					},
+					select: {
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							role: true
+						}
+					}
+				})
+			: this.sectionEntityRepository.find({
+					where: { user: { id: user.id } },
+					relations: {
+						course: true,
+						sectionComponents: true
+					}
+				})
 	}
 
 	async createSection(section: CreateSectionCourseDto, user: User) {
+		console.log(section)
 		const parentSection = section.parentSection
 			? await this.mainSectionRepository.findOne({
 					where: { id: Number(section.parentSection) }

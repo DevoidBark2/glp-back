@@ -49,7 +49,7 @@ export class CourseEntity {
 	status: StatusCourseEnum
 	@Column({ type: 'bool', nullable: false })
 	has_certificate: boolean
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	user: User
 	@OneToMany(() => SectionEntity, sections => sections.course)
 	sections: SectionEntity[]
