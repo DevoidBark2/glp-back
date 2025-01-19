@@ -18,70 +18,85 @@ export class ComponentTaskService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(AnswersComponentUser)
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>
-	) {}
+	) { }
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
-		return await this.componentTaskRepository.save({
+		const newComponent = await this.componentTaskRepository.save({
 			user,
 			...componentTask
 		})
+
+		const newComponentUser = newComponent.user;
+
+		return {
+			...newComponent,
+			user: {
+				id: newComponentUser.id,
+				first_name: newComponentUser.first_name,
+				s: newComponentUser.second_name,
+				l: newComponentUser.last_name,
+				role: newComponentUser.role,
+				email: newComponentUser.email,
+				phone: newComponentUser.phone
+			}
+		}
 	}
 
 	async getAll(user: User) {
 		return user.role !== UserRole.SUPER_ADMIN
 			? this.componentTaskRepository.find({
-					where: {
-						user: { id: user.id }
-					},
-					relations: {
-						user: true
-					},
-					select: {
+				where: {
+					user: { id: user.id }
+				},
+				relations: {
+					user: true
+				},
+				select: {
+					id: true,
+					title: true,
+					type: true,
+					created_at: true,
+					status: true,
+					user: {
 						id: true,
-						title: true,
-						type: true,
-						created_at: true,
-						status: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							email: true,
-							role: true
-						}
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						email: true,
+						role: true
 					}
-				})
+				},
+				order: {
+					user: {
+						role: 'DESC'
+					}
+				}
+			})
 			: this.componentTaskRepository.find({
-					relations: {
-						user: true
-					},
-					select: {
+				relations: {
+					user: true
+				},
+				select: {
+					id: true,
+					title: true,
+					type: true,
+					created_at: true,
+					status: true,
+					user: {
 						id: true,
-						title: true,
-						type: true,
-						created_at: true,
-						status: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							email: true,
-							role: true
-						}
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						email: true,
+						role: true
 					}
-				})
+				},
+				order: {
+					user: {
+						role: 'DESC'
+					}
+				}
+			})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {

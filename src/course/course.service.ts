@@ -33,7 +33,7 @@ export class CourseService {
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
 		@InjectRepository(SectionEntity)
 		private readonly sectionRepository: Repository<SectionEntity>
-	) {}
+	) { }
 
 	async findAll(req: Request) {
 		return await this.courseEntityRepository.find({
@@ -57,8 +57,7 @@ export class CourseService {
 		})
 	}
 
-	async findOneById(courseId: number, req: Request) {
-		const userToken = req.headers['authorization'] as string | undefined
+	async findOneById(courseId: number, user: User) {
 
 		// Fetch the course details (exclude courseUsers data for optimization)
 		const course = await this.courseEntityRepository.findOne({
@@ -98,21 +97,10 @@ export class CourseService {
 		}
 
 		// If no token is provided, return the course without `isUserEnrolled`
-		if (!userToken) {
-			return {
-				...course,
-				isUserEnrolled: false // Default value since no user to compare
-			}
-		}
-
-		// Get the user from the token
-		const user = await this.userService.getUserByToken(userToken)
-
-		// If the user is not valid, return the course without `isUserEnrolled`
 		if (!user) {
 			return {
 				...course,
-				isUserEnrolled: false
+				isUserEnrolled: false // Default value since no user to compare
 			}
 		}
 
@@ -136,8 +124,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -151,58 +139,58 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -652,6 +640,8 @@ export class CourseService {
 			}
 		})
 
+		console.log(course)
+
 		// Если курс не найден, выбрасываем ошибку
 		if (!course) {
 			throw new Error(`Course with ID ${courseId} not found`)
@@ -697,6 +687,11 @@ export class CourseService {
 				const answerKey = `${taskId}-${sectionId}`
 				component.componentTask.userAnswer =
 					userAnswersMap.get(answerKey) || null
+				// Удаляем correctAnswer у каждого вопроса
+				component.componentTask.questions = component.componentTask.questions.map(question => {
+					const { correctOption, ...rest } = question; // Деструктурируем и исключаем correctAnswer
+					return rest; // Возвращаем объект без correctAnswer
+				});
 			}
 		})
 

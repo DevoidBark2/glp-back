@@ -15,7 +15,6 @@ import { ApiTags } from '@nestjs/swagger'
 import { CreateComponentTaskDto } from './dto/create-component-task.dto'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
-import { ResponseComponentTaskInterceptor } from '../interceptors/response-component-task.interceptor'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
 import { Authorization } from 'src/auth/decorators/auth.decorator'
@@ -23,7 +22,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @ApiTags('Компоненты раздела')
 @Controller('')
 export class ComponentTaskController {
-	constructor(private readonly componentTaskService: ComponentTaskService) {}
+	constructor(private readonly componentTaskService: ComponentTaskService) { }
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/component-task')
@@ -39,7 +38,7 @@ export class ComponentTaskController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('/component-task')
-	@UseInterceptors(ResponseComponentTaskInterceptor)
+	// @UseInterceptors(ResponseComponentTaskInterceptor)
 	async createComponentTask(
 		@Body() body: CreateComponentTaskDto,
 		@Req() req: Request
@@ -48,6 +47,8 @@ export class ComponentTaskController {
 			body,
 			req['user']
 		)
+
+		console.log(component)
 
 		return {
 			message: 'Компонент успешно создан!',

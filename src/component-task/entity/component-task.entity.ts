@@ -16,7 +16,7 @@ export type QuestionsType = {
 	id: string
 	question: string
 	options: string[]
-	correctOption: number
+	correctOption?: number
 }
 @Entity('component_task')
 export class ComponentTask {

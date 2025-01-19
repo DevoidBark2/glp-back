@@ -42,7 +42,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @ApiTags('Посты')
 @Controller()
 export class PostController {
-	constructor(private readonly postService: PostService) {}
+	constructor(private readonly postService: PostService) { }
 
 	@Get('/posts')
 	@ApiOperation({ summary: 'Get all posts' })
@@ -96,7 +96,7 @@ export class PostController {
 		}
 	}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.MODERATOR)
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.MODERATOR)
 	@ApiBearerAuth('access-token')
 	@Put('/post')
 	@ApiOperation({ summary: 'Change post by ID' })

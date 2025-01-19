@@ -39,7 +39,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
 	@UseInterceptors(ResponseCoursesInterceptor)
@@ -48,9 +48,10 @@ export class CourseController {
 		return await this.courseService.findAll(req)
 	}
 
+	@Authorization()
 	@Get('/course/:id')
 	async getCourseById(@Param('id') id: number, @Req() req: Request) {
-		return await this.courseService.findOneById(id, req)
+		return await this.courseService.findOneById(id, req['user'])
 	}
 
 	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
@@ -160,12 +161,7 @@ export class CourseController {
 		return await this.courseService.leaveCourse(id, req['user'])
 	}
 
-	@Roles(
-		UserRole.STUDENT,
-		UserRole.TEACHER,
-		UserRole.SUPER_ADMIN,
-		UserRole.MODERATOR
-	)
+	@Authorization()
 	@Post('/update-step')
 	async updateSectionStep(
 		@Body() body: { prevSection: number },
