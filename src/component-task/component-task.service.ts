@@ -33,8 +33,8 @@ export class ComponentTaskService {
 			user: {
 				id: newComponentUser.id,
 				first_name: newComponentUser.first_name,
-				s: newComponentUser.second_name,
-				l: newComponentUser.last_name,
+				second_name: newComponentUser.second_name,
+				last_name: newComponentUser.last_name,
 				role: newComponentUser.role,
 				email: newComponentUser.email,
 				phone: newComponentUser.phone
@@ -177,6 +177,10 @@ export class ComponentTaskService {
 				task: savedAnswers.task,
 				answer: results,
 				section: section
+			},
+			userAnswer: {
+				correctAnswers: results.filter(it => it.userAnswer === it.correctAnswer).length,
+				totalAnswers: results.length
 			}
 		}
 	}

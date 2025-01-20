@@ -10,7 +10,7 @@ export class GeneralSettingsService {
 	constructor(
 		@InjectRepository(GeneralSettingsEntity)
 		private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>
-	) {}
+	) { }
 	public determinePasswordComplexity(
 		password: string
 	): ComplexityPasswordEnum {
@@ -50,5 +50,16 @@ export class GeneralSettingsService {
 
 	async change(settings: ChangeGeneralSettingsDto) {
 		await this.generalSettingsEntityRepository.update(settings.id, settings)
+	}
+
+	async getFooterInfo() {
+		const data = await this.generalSettingsEntityRepository.find()
+
+		return {
+			subscription_platform: data[0].subscription_platform,
+			support_email: data[0].support_email,
+			contact_phone: data[0].contact_phone,
+			platform_name: data[0].platform_name
+		}
 	}
 }

@@ -24,11 +24,16 @@ import { multerOptions } from 'src/config/multerConfig'
 export class GeneralSettingsController {
 	constructor(
 		private readonly generalSettingsService: GeneralSettingsService
-	) {}
+	) { }
 
 	@Get('/general-settings')
 	async getGeneralSettings() {
 		return this.generalSettingsService.getAll()
+	}
+
+	@Get('footer')
+	async getFooterInfo() {
+		return this.generalSettingsService.getFooterInfo();
 	}
 
 	@Roles(UserRole.SUPER_ADMIN)
