@@ -42,7 +42,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @ApiTags('Посты')
 @Controller()
 export class PostController {
-	constructor(private readonly postService: PostService) { }
+	constructor(private readonly postService: PostService) {}
 
 	@Get('/posts')
 	@ApiOperation({ summary: 'Get all posts' })
@@ -98,11 +98,20 @@ export class PostController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER, UserRole.MODERATOR)
 	@ApiBearerAuth('access-token')
+	@UseInterceptors(FileInterceptor('image', multerOptions))
+	@ApiConsumes('multipart/form-data')
 	@Put('/post')
 	@ApiOperation({ summary: 'Change post by ID' })
 	@ResponseMessage('Пост успешно обновлен!')
-	async changePost(@Body() body: ChangePostDto, @Req() req: Request) {
-		return await this.postService.changePost(body, req['user'])
+	async changePost(
+		@Body() post: ChangePostDto,
+		@Req() req: Request,
+		@UploadedFile() image: Express.Multer.File
+	) {
+		if (image) {
+			post.image = 'uploads/' + image?.filename
+		}
+		return await this.postService.changePost(post, req['user'])
 	}
 
 	@ApiBearerAuth('access-token')

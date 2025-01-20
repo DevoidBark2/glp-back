@@ -39,7 +39,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) { }
+	constructor(private readonly courseService: CourseService) {}
 
 	@Get('/courses')
 	@UseInterceptors(ResponseCoursesInterceptor)
@@ -137,12 +137,7 @@ export class CourseController {
 		return this.courseService.changeCourse(body, req['user'])
 	}
 
-	@Authorization(
-		UserRole.MODERATOR,
-		UserRole.STUDENT,
-		UserRole.SUPER_ADMIN,
-		UserRole.TEACHER
-	)
+	@Authorization()
 	@Get('/full-course')
 	async getFullCourse(
 		@Query('courseId') courseId: number,

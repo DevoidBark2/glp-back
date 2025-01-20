@@ -33,7 +33,7 @@ export class CourseService {
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
 		@InjectRepository(SectionEntity)
 		private readonly sectionRepository: Repository<SectionEntity>
-	) { }
+	) {}
 
 	async findAll(req: Request) {
 		return await this.courseEntityRepository.find({
@@ -58,7 +58,6 @@ export class CourseService {
 	}
 
 	async findOneById(courseId: number, user: User) {
-
 		// Fetch the course details (exclude courseUsers data for optimization)
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
@@ -124,8 +123,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -139,58 +138,58 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -332,9 +331,9 @@ export class CourseService {
 
 		const sections = course.sections
 
-		if (!sections || sections.length === 0) {
-			return []
-		}
+		// if (!sections || sections.length === 0) {
+		// 	return []
+		// }
 
 		const sectionIds = sections.map(section => section.id)
 
@@ -688,10 +687,11 @@ export class CourseService {
 				component.componentTask.userAnswer =
 					userAnswersMap.get(answerKey) || null
 				// Удаляем correctAnswer у каждого вопроса
-				component.componentTask.questions = component.componentTask.questions.map(question => {
-					const { correctOption, ...rest } = question; // Деструктурируем и исключаем correctAnswer
-					return rest; // Возвращаем объект без correctAnswer
-				});
+				component.componentTask.questions =
+					component.componentTask.questions.map(question => {
+						const { correctOption, ...rest } = question // Деструктурируем и исключаем correctAnswer
+						return rest // Возвращаем объект без correctAnswer
+					})
 			}
 		})
 
