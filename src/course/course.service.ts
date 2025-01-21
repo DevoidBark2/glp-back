@@ -585,13 +585,14 @@ export class CourseService {
 			)
 		}
 
-		// Проверить, есть ли в разделе задачи типа Quiz или Matching
+		// Проверить, есть ли в разделе задачи типа Quiz или Matching или SimpleTask
 		const hasTasks = section.sectionComponents.some(
 			it =>
 				it.componentTask &&
 				[
 					CourseComponentType.Quiz,
-					CourseComponentType.MultiPlayChoice
+					CourseComponentType.MultiPlayChoice,
+					CourseComponentType.SimpleTask
 				].includes(it.componentTask.type)
 		)
 
@@ -690,7 +691,6 @@ export class CourseService {
 				console.log("HERE", component.componentTask.questions);
 
 				if (component.componentTask.type === CourseComponentType.Text) {
-					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } = component.componentTask;
 					component.componentTask = {
 						id,
@@ -708,7 +708,7 @@ export class CourseService {
 						user: undefined,
 						answer: undefined,
 					};
-				} else if (component.componentTask.type === CourseComponentType.Quiz || component.componentTask.type === CourseComponentType.MultiPlayChoice) {
+				} else if (component.componentTask.type === CourseComponentType.Quiz || component.componentTask.type === CourseComponentType.MultiPlayChoice || component.componentTask.type === CourseComponentType.SimpleTask) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } = component.componentTask;
 					component.componentTask = {

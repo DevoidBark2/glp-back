@@ -8,6 +8,7 @@ import { AnswersComponentUser } from './entity/component-task-user.entity'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
 import { SectionEntity } from 'src/section/entity/section.entity'
 import { UserRole } from 'src/constants/contants'
+import { CourseComponentType } from './enum/course-component-type.enum'
 
 @Injectable()
 export class ComponentTaskService {
@@ -139,29 +140,35 @@ export class ComponentTaskService {
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
 		const task = await this.componentTaskRepository.findOne({
 			where: { id: body.task.id }
-		})
+		});
+
+		console.log(body);
 
 		const section = await this.sectionRepository.findOne({
 			where: {
 				id: Number(body.currentSection)
 			}
-		})
+		});
 
 		if (!task) {
 			throw new BadRequestException(
 				`Задачи с ID ${body.task.id} не существует`
-			)
+			);
 		}
 
+		// Проверяем, является ли `answers` массивом чисел или строкой
+		const isAnswersArray = Array.isArray(body.answers);
+
 		const results = task.questions.map((question, index) => {
-			const isCorrect = question.correctOption === body.answers[index]
+			const userAnswer = isAnswersArray ? body.answers[index] : body.answers; // Если массив, берём по индексу
+			const isCorrect = question.correctOption === userAnswer;
 			return {
 				id: question.id,
 				question: question.question,
-				userAnswer: body.answers[index],
+				userAnswer,
 				correctAnswer: question.correctOption,
 				isCorrect
-			}
+			};
 		})
 
 		const savedAnswers = await this.answersComponentUserRepository.save({
@@ -169,19 +176,24 @@ export class ComponentTaskService {
 			task,
 			answer: results,
 			section: section
-		})
+		});
 
-		return {
+		const resBody = {
 			message: 'Ответы успешно сохранены',
 			answers: {
 				task: savedAnswers.task,
 				answer: results,
 				section: section
 			},
-			userAnswer: {
-				correctAnswers: results.filter(it => it.userAnswer === it.correctAnswer).length,
+		};
+
+		if (CourseComponentType.MultiPlayChoice === body.task.type || CourseComponentType.Quiz === body.task.type) {
+			resBody['userAnswer'] = {
+				correctAnswers: results.filter(it => typeof it === 'object' && it.userAnswer === it.correctAnswer).length,
 				totalAnswers: results.length
-			}
+			};
 		}
+
+		return resBody;
 	}
 }
