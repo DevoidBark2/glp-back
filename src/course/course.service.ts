@@ -33,7 +33,7 @@ export class CourseService {
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
 		@InjectRepository(SectionEntity)
 		private readonly sectionRepository: Repository<SectionEntity>
-	) { }
+	) {}
 
 	async findAll(req: Request) {
 		return await this.courseEntityRepository.find({
@@ -123,8 +123,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -138,58 +138,58 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -678,27 +678,29 @@ export class CourseService {
 			])
 		)
 
-		console.log("!!!!!!!!!!!!", userAnswersMap)
+		console.log('!!!!!!!!!!!!', userAnswersMap)
 
 		// Применяем ответы к компонентам задач
 		sectionComponents.forEach(component => {
 			if (component.componentTask) {
-				const taskId = component.componentTask.id;
-				const answerKey = `${taskId}-${sectionId}`;
+				const taskId = component.componentTask.id
+				const answerKey = `${taskId}-${sectionId}`
 				component.componentTask.userAnswer =
-					userAnswersMap.get(answerKey) || null;
+					userAnswersMap.get(answerKey) || null
 
-				console.log("HERE", component.componentTask.questions);
+				console.log('HERE', component.componentTask.questions)
 
 				if (component.componentTask.type === CourseComponentType.Text) {
-					const { id, title, description, type } = component.componentTask;
+					const { id, title, description, type } =
+						component.componentTask
 					component.componentTask = {
 						id,
 						title,
 						description,
 						type,
 						userAnswer: component.componentTask.userAnswer,
-						content_description: component.componentTask.content_description,
+						content_description:
+							component.componentTask.content_description,
 						questions: undefined,
 						created_at: undefined,
 						status: undefined,
@@ -706,18 +708,26 @@ export class CourseService {
 						sort: undefined,
 						sectionComponents: undefined,
 						user: undefined,
-						answer: undefined,
-					};
-				} else if (component.componentTask.type === CourseComponentType.Quiz || component.componentTask.type === CourseComponentType.MultiPlayChoice || component.componentTask.type === CourseComponentType.SimpleTask) {
+						answer: undefined
+					}
+				} else if (
+					component.componentTask.type === CourseComponentType.Quiz ||
+					component.componentTask.type ===
+						CourseComponentType.MultiPlayChoice ||
+					component.componentTask.type ===
+						CourseComponentType.SimpleTask
+				) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
-					const { id, title, description, type } = component.componentTask;
+					const { id, title, description, type } =
+						component.componentTask
 					component.componentTask = {
 						id,
 						title,
 						description,
 						type,
 						userAnswer: component.componentTask.userAnswer,
-						content_description: component.componentTask.content_description,
+						content_description:
+							component.componentTask.content_description,
 						questions: component.componentTask.questions,
 						created_at: undefined,
 						status: undefined,
@@ -725,23 +735,22 @@ export class CourseService {
 						sort: undefined,
 						sectionComponents: undefined,
 						user: undefined,
-						answer: undefined,
-					};
+						answer: undefined
+					}
 				}
 
 				if (Array.isArray(component.componentTask.questions)) {
 					// Удаляем correctAnswer у каждого вопроса
 					component.componentTask.questions =
 						component.componentTask.questions.map(question => {
-							const { correctOption, ...rest } = question; // Деструктурируем и исключаем correctAnswer
-							return rest; // Возвращаем объект без correctAnswer
-						});
+							const { correctOption, ...rest } = question // Деструктурируем и исключаем correctAnswer
+							return rest // Возвращаем объект без correctAnswer
+						})
 				}
 			}
-		});
+		})
 
-
-		console.log("!!!!!!!!!!!!", userAnswersMap)
+		console.log('!!!!!!!!!!!!', userAnswersMap)
 
 		return {
 			id: currentSection.id,

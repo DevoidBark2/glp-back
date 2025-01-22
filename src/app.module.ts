@@ -26,6 +26,7 @@ import { MailModule } from './libs/mail/mail.module'
 import { MailConfirmationModule } from './auth/mail-confirmation/mail-confirmation.module'
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module'
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
 	imports: [
@@ -72,7 +73,8 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
 		MailModule,
 		MailConfirmationModule,
 		PasswordRecoveryModule,
-		TwoFactorAuthModule
+		TwoFactorAuthModule,
+		CommentsModule
 	]
 	// providers: [
 	// 	WebsocketGateway,

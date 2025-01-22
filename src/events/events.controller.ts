@@ -1,15 +1,15 @@
 import { Controller, Get } from '@nestjs/common'
 import { EventsService } from './events.service'
 import { ApiTags } from '@nestjs/swagger'
-import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
+import { Authorization } from '../auth/decorators/auth.decorator'
 
 @ApiTags('События')
 @Controller()
 export class EventsController {
 	constructor(private readonly eventsService: EventsService) {}
 
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN)
 	@Get('events')
 	async getAll() {
 		return await this.eventsService.getAll()
