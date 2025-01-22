@@ -39,7 +39,7 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
 	@UseInterceptors(ResponseCoursesInterceptor)
@@ -181,8 +181,8 @@ export class CourseController {
 		@Req() req: Request
 	) {
 		return await this.courseService.getCurrentSection(
-			+courseId,
-			+currentSection,
+			courseId,
+			currentSection,
 			req['user']
 		)
 	}

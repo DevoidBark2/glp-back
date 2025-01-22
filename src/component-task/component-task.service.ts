@@ -142,8 +142,6 @@ export class ComponentTaskService {
 			where: { id: body.task.id }
 		});
 
-		console.log(body);
-
 		const section = await this.sectionRepository.findOne({
 			where: {
 				id: Number(body.currentSection)
@@ -159,17 +157,41 @@ export class ComponentTaskService {
 		// Проверяем, является ли `answers` массивом чисел или строкой
 		const isAnswersArray = Array.isArray(body.answers);
 
-		const results = task.questions.map((question, index) => {
-			const userAnswer = isAnswersArray ? body.answers[index] : body.answers; // Если массив, берём по индексу
-			const isCorrect = question.correctOption === userAnswer;
+		console.log("Ответ", body.answers)
+
+		console.log("ЗАДАЧА", task)
+		const results = task.questions ? task.questions.map((question, index) => {
+			console.log("Вопрос", question);
+			const userAnswer = isAnswersArray && task.type === CourseComponentType.Quiz ? body.answers[index] : task.type === CourseComponentType.MultiPlayChoice ? body.answers : body.answers; // Если массив, берём по индексу
+			const taskType = task.type;
+
+			// Проверяем корректность ответа в зависимости от типа задачи
+			let isCorrect;
+			if (taskType === CourseComponentType.MultiPlayChoice) {
+				// Сравниваем массивы для MultiPlayChoice
+				isCorrect = Array.isArray(userAnswer) &&
+					Array.isArray(question.correctOption) &&
+					userAnswer.length === question.correctOption.length &&
+					userAnswer.every(answer => Array.isArray(question.correctOption) && question.correctOption.includes(answer));
+			} else {
+				// Для остальных типов задач
+				isCorrect = question.correctOption === userAnswer;
+			}
+
 			return {
 				id: question.id,
 				question: question.question,
 				userAnswer,
 				correctAnswer: question.correctOption,
-				isCorrect
+				isCorrect,
 			};
-		})
+		}) : {
+			id: task.id,
+			question: task.title,
+			userAnswer: body.answers,
+			correctAnswer: task.answer,
+			isCorrect: String(body.answers) === task.answer,
+		};
 
 		const savedAnswers = await this.answersComponentUserRepository.save({
 			user,
@@ -187,12 +209,12 @@ export class ComponentTaskService {
 			},
 		};
 
-		if (CourseComponentType.MultiPlayChoice === body.task.type || CourseComponentType.Quiz === body.task.type) {
-			resBody['userAnswer'] = {
-				correctAnswers: results.filter(it => typeof it === 'object' && it.userAnswer === it.correctAnswer).length,
-				totalAnswers: results.length
-			};
-		}
+		// if (CourseComponentType.MultiPlayChoice === body.task.type || CourseComponentType.Quiz === body.task.type) {
+		// 	resBody['userAnswer'] = {
+		// 		correctAnswers: results.filter(it => typeof it === 'object' && it.userAnswer === it.correctAnswer).length,
+		// 		totalAnswers: results.length
+		// 	};
+		// }
 
 		return resBody;
 	}
