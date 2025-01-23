@@ -9,6 +9,7 @@ import { TokenType } from '../enum/token-type.enum'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Token } from '../entity/token.entity'
 import { Repository } from 'typeorm'
+import { ActionEvent } from '../../events/enum/action-event.enum'
 
 @Injectable()
 export class TwoFactorAuthService {

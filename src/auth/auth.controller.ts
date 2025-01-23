@@ -30,6 +30,7 @@ import { Recaptcha } from '@nestlab/google-recaptcha'
 import { AuthProviderGuard } from './guards/provider.guard'
 import { ProviderService } from './provider/provider.service'
 import { ConfigService } from '@nestjs/config'
+import { Authorization } from './decorators/auth.decorator'
 
 @ApiTags('Авторизация')
 @Controller()
@@ -81,6 +82,7 @@ export class AuthController {
 		return await this.authService.login(req, userDto, res)
 	}
 
+	@Authorization()
 	@Post('logout')
 	@HttpCode(HttpStatus.OK)
 	async logout(
@@ -98,7 +100,6 @@ export class AuthController {
 		@Query('code') code: string,
 		@Param('provider') provider: string
 	): Promise<void> {
-		console.log('addf')
 		if (!code) {
 			throw new BadRequestException('Не был предоставлен код авторизации')
 		}

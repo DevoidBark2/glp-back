@@ -33,7 +33,7 @@ export class CourseService {
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
 		@InjectRepository(SectionEntity)
 		private readonly sectionRepository: Repository<SectionEntity>
-	) { }
+	) {}
 
 	async findAll(req: Request) {
 		return await this.courseEntityRepository.find({
@@ -123,8 +123,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -138,58 +138,58 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -357,7 +357,6 @@ export class CourseService {
 
 		const totalUserCount = this.calculateTotalUserPoints(userAnswers)
 
-
 		const userAnswersMap = new Map(
 			userAnswers.map(answer => [answer.section.id, answer.answer])
 		)
@@ -421,41 +420,43 @@ export class CourseService {
 		return {
 			sections: groupedSections,
 			courseName: course.name,
-			progress: (totalUserCount / totalCount) * 100
+			progress: Math.floor((totalUserCount / totalCount) * 100)
 		}
 	}
 
-
 	private calculateTotalPoints(sections: SectionEntity[]) {
-		let totalPoints = 0;
+		let totalPoints = 0
 
 		sections.forEach(section => {
 			section.sectionComponents.forEach(it => {
 				// Проверка для Quiz задачи
 				if (it.componentTask.type === CourseComponentType.Quiz) {
-					const count = it.componentTask.questions.length;  // Количество вопросов — это максимальные очки
-					totalPoints += count;
+					const count = it.componentTask.questions.length // Количество вопросов — это максимальные очки
+					totalPoints += count
 				}
 
 				// Проверка для MultiPlayChoice задачи
-				if (it.componentTask.type === CourseComponentType.MultiPlayChoice) {
-					const count = 3;  // Максимальные очки для MultiPlayChoice
-					totalPoints += count;
+				if (
+					it.componentTask.type ===
+					CourseComponentType.MultiPlayChoice
+				) {
+					const count = 3 // Максимальные очки для MultiPlayChoice
+					totalPoints += count
 				}
 
 				// Проверка для SimpleTask задачи
 				if (it.componentTask.type === CourseComponentType.SimpleTask) {
-					const count = 4;  // Максимальные очки для SimpleTask
-					totalPoints += count;
+					const count = 4 // Максимальные очки для SimpleTask
+					totalPoints += count
 				}
-			});
-		});
+			})
+		})
 
-		return totalPoints;
+		return totalPoints
 	}
 
 	private calculateTotalUserPoints(userAnswers: AnswersComponentUser[]) {
-		let total = 0;
+		let total = 0
 
 		userAnswers.map(it => {
 			console.log(it)
@@ -464,17 +465,18 @@ export class CourseService {
 				if (it.task.type === CourseComponentType.Quiz) {
 					it.answer.map(it => {
 						if (it.isCorrect) {
-							total++;
+							total++
 						}
 					})
-				} else if (it.task.type === CourseComponentType.MultiPlayChoice) {
+				} else if (
+					it.task.type === CourseComponentType.MultiPlayChoice
+				) {
 					it.answer.map(it => {
 						if (it.isCorrect) {
-							total += 3;
+							total += 3
 						}
 					})
 				} else {
-
 				}
 			}
 		})
@@ -643,7 +645,6 @@ export class CourseService {
 	}
 
 	async updateSectionStep(prevSectionStep: number, user: User) {
-
 		if (prevSectionStep === -1) {
 			return
 		}
@@ -702,28 +703,26 @@ export class CourseService {
 	}
 
 	async getCurrentSection(courseId: number, sectionId: number, user: User) {
-
 		if (Number(sectionId) === -1) {
-			const courseUser = await this.courseUserRepository.findOne(
-				{
-					where: {
-						user: { id: user.id },
-						course: { id: courseId }
-					}
+			const courseUser = await this.courseUserRepository.findOne({
+				where: {
+					user: { id: user.id },
+					course: { id: courseId }
 				}
-			)
+			})
 
 			const userProgress = courseUser.progress
 
 			if (userProgress < 90) {
 				return {
-					message: "Экзамен сейчас не доступен, Вы не достигли минимального балла по прохождению курса"
+					message:
+						'Экзамен сейчас не доступен, Вы не достигли минимального балла по прохождению курса'
 				}
 			}
 
-			return "Содержимое экзамена"
+			return 'Содержимое экзамена'
 		}
-		console.log("SectionID", sectionId)
+		console.log('SectionID', sectionId)
 		// Получаем курс с секциями и их компонентами по заданному courseId
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
@@ -809,9 +808,9 @@ export class CourseService {
 				} else if (
 					component.componentTask.type === CourseComponentType.Quiz ||
 					component.componentTask.type ===
-					CourseComponentType.MultiPlayChoice ||
+						CourseComponentType.MultiPlayChoice ||
 					component.componentTask.type ===
-					CourseComponentType.SimpleTask
+						CourseComponentType.SimpleTask
 				) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } =

@@ -28,6 +28,8 @@ import { ProviderService } from './provider/provider.service'
 import { Account } from '../user/entity/account.entity'
 import { MailConfirmationService } from './mail-confirmation/mail-confirmation.service'
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
+import { EventEntity } from '../events/entity/event.entity'
+import { ActionEvent } from '../events/enum/action-event.enum'
 
 @Injectable()
 export class AuthService {
@@ -46,7 +48,9 @@ export class AuthService {
 		private readonly providerService: ProviderService,
 		@InjectRepository(Account)
 		private readonly accountRepository: Repository<Account>,
-		private readonly twoFactorService: TwoFactorAuthService
+		private readonly twoFactorService: TwoFactorAuthService,
+		@InjectRepository(EventEntity)
+		private readonly eventEntityRepository: Repository<EventEntity>
 	) {}
 
 	// Метод для точного соответствия требованиям каждого уровня
@@ -245,6 +249,12 @@ export class AuthService {
 		const isValidPassword = await verify(userData.password, user.password)
 
 		if (!isValidPassword) {
+			await this.eventEntityRepository.save({
+				user: userData,
+				description: 'Попытка входа, неверный пароль.',
+				action: ActionEvent.LOGIN,
+				success: false
+			})
 			throw new UnauthorizedException(
 				'Неверный пароль. Попробуйте другой пароль!'
 			)
@@ -254,6 +264,13 @@ export class AuthService {
 			await this.mailConfirmationService.sendVerificationToken(
 				userData.email
 			)
+
+			await this.eventEntityRepository.save({
+				user: userData,
+				description: 'Попытка входа, почта неподтверждена.',
+				action: ActionEvent.LOGIN,
+				success: false
+			})
 			throw new UnauthorizedException(
 				'Ваш email не подтверждён, проверьте почту.'
 			)
@@ -279,6 +296,13 @@ export class AuthService {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
 			maxAge: 3600000
+		})
+
+		await this.eventEntityRepository.save({
+			user: userData,
+			description: 'Попытка входа',
+			action: ActionEvent.LOGIN,
+			success: true
 		})
 
 		// Возвращаем успешный ответ с сессией
@@ -345,7 +369,7 @@ export class AuthService {
 
 	async logout(req: Request, res: Response): Promise<void> {
 		return new Promise((resolve, reject) => {
-			req.session.destroy(err => {
+			req.session.destroy(async err => {
 				if (err) {
 					return reject(
 						new InternalServerErrorException(
@@ -353,6 +377,13 @@ export class AuthService {
 						)
 					)
 				}
+
+				await this.eventEntityRepository.save({
+					user: req['user'],
+					description: 'Попытка выхода',
+					action: ActionEvent.LOGOUT,
+					success: true
+				})
 
 				res.clearCookie(this.configService.get('SESSION_NAME'))
 				resolve()

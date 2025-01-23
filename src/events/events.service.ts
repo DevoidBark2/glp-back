@@ -12,7 +12,12 @@ export class EventsService {
 	) {}
 
 	async getAll() {
-		return this.eventRepository.find({ relations: { user: true } })
+		return this.eventRepository.find({
+			relations: { user: true },
+			order: {
+				created_at: 'DESC'
+			}
+		})
 	}
 
 	async createEvent(user: User, action: string, description: string) {

@@ -22,6 +22,7 @@ import { UserService } from '../user/user.service'
 import { CourseUser } from '../course/entity/course-user.entity'
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 import { Token } from './entity/token.entity'
+import { EventEntity } from '../events/entity/event.entity'
 
 @Module({
 	imports: [
@@ -33,7 +34,8 @@ import { Token } from './entity/token.entity'
 			GeneralSettingsEntity,
 			Account,
 			CourseUser,
-			Token
+			Token,
+			EventEntity
 		]),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],

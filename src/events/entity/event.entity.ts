@@ -22,6 +22,9 @@ export class EventEntity {
 	@Column()
 	description: string
 
+	@Column()
+	success: boolean
+
 	@CreateDateColumn()
 	created_at: Date
 }
