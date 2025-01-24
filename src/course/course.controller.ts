@@ -85,6 +85,16 @@ export class CourseController {
 		}
 	}
 
+	@Get('get-courses')
+	async getCoursesByCategory(@Query('categoryId') categoryId: number) {
+		return await this.courseService.getCoursesByCategory(+categoryId)
+	}
+
+	@Get('search-courses')
+	async getCoursesBySearch(@Query('search') search: string) {
+		return await this.courseService.getCoursesBySearch(search)
+	}
+
 	@Authorization(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Get('/get-user-courses')
 	// @LogAction(ActionEvent.ENROLL_STUDENT, 'view details of course')

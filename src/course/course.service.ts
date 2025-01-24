@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CourseEntity } from './entity/course.entity'
-import { In, Repository } from 'typeorm'
+import { ILike, In, Like, Repository } from 'typeorm'
 import { CreateCourseDto } from './dto/create_course.dto'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entity/user.entity'
@@ -42,6 +42,89 @@ export class CourseService {
 			},
 			relations: {
 				user: true
+			},
+			select: {
+				id: true,
+				name: true,
+				image: true,
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true
+				}
+			}
+		})
+	}
+
+	async getCoursesByCategory(categoryId: number) {
+		if (categoryId === -1) {
+			return await this.courseEntityRepository.find({
+				where: {
+					status: StatusCourseEnum.ACTIVE
+				},
+				relations: {
+					user: true,
+					category: true
+				},
+				select: {
+					id: true,
+					name: true,
+					image: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true
+					}
+				}
+			})
+		}
+		const category = await this.categoryEntityRepository.findOne({
+			where: { id: categoryId }
+		})
+		return await this.courseEntityRepository.find({
+			where: {
+				status: StatusCourseEnum.ACTIVE,
+				category: category
+			},
+			relations: {
+				user: true,
+				category: true
+			},
+			select: {
+				id: true,
+				name: true,
+				image: true,
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true
+				}
+			}
+		})
+	}
+
+	async getCoursesBySearch(value: string) {
+		const searchKeywords = value
+			.split(' ')
+			.map(word => word.trim())
+			.filter(word => word.length > 0)
+
+		return await this.courseEntityRepository.find({
+			where: {
+				status: StatusCourseEnum.ACTIVE,
+				name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по названию курса
+				user: {
+					first_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по имени пользователя
+					last_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по фамилии пользователя
+					second_name: ILike(`%${searchKeywords.join('%')}%`) // Ищем по отчеству пользователя
+				}
+			},
+			relations: {
+				user: true,
+				category: true
 			},
 			select: {
 				id: true,
@@ -144,7 +227,8 @@ export class CourseService {
 					order: {
 						user: {
 							role: 'DESC'
-						}
+						},
+						created_at: 'DESC'
 					},
 					select: {
 						id: true,
