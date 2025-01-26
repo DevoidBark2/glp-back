@@ -54,13 +54,20 @@ export class CourseController {
 		return await this.courseService.findOneById(id, req['user'])
 	}
 
+	@Authorization()
+	@Delete('delete-course-member')
+	@ResponseMessage("Участник успешно удален!")
+	async deleteCoursMember(@Query('id') id: number) {
+		await this.courseService.deleteCourseMember(id);
+	}
+
 	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Post('/course')
 	@UseInterceptors(FileInterceptor('image', multerOptions))
 	@ApiConsumes('multipart/form-data')
 	@ApiOperation({ summary: 'Create new post' })
 	@ApiBody({ type: CreateCourseDto })
-	@LogAction(ActionEvent.CREATE_COURSE, 'A new course was created')
+	// @LogAction(ActionEvent.CREATE_COURSE, 'A new course was created')
 	@ApiHeader({
 		name: 'authorization',
 		description: 'Bearer Token',

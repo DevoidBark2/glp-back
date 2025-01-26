@@ -220,6 +220,20 @@ export class CourseService {
 		})
 	}
 
+	async deleteCourseMember(id: number) {
+		const data = await this.courseUserRepository.findOne({
+			where: {
+				id: id
+			}, relations: {
+				user: true
+			}
+		})
+
+
+		await this.answersComponentUserRepository.delete({ user: data.user })
+		await this.courseUserRepository.delete({ id: data.id })
+	}
+
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		console.log(createCourse)
 		const category = createCourse.category
@@ -301,17 +315,17 @@ export class CourseService {
 			}
 		})
 
-		if (course.status === StatusCourseEnum.IN_PROCESSING) {
-			throw new BadRequestException(
-				'В данный момент курс в обработке, ожидайте ответа от модератора'
-			)
-		}
+		// if (course.status === StatusCourseEnum.IN_PROCESSING) {
+		// 	throw new BadRequestException(
+		// 		'В данный момент курс в обработке, ожидайте ответа от модератора'
+		// 	)
+		// }
 
-		if (course.status === StatusCourseEnum.ACTIVE) {
-			throw new BadRequestException(
-				'Курс сейчас опубликован, его нельзя удалить!'
-			)
-		}
+		// if (course.status === StatusCourseEnum.ACTIVE) {
+		// 	throw new BadRequestException(
+		// 		'Курс сейчас опубликован, его нельзя удалить!'
+		// 	)
+		// }
 
 		await this.courseEntityRepository.delete(courseId)
 	}

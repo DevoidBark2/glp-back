@@ -16,12 +16,12 @@ export class CourseUser {
 	@PrimaryGeneratedColumn()
 	id: number
 	@ManyToOne(() => User, user => user.id, {
-		eager: true,
+		// eager: true,
 		onDelete: 'CASCADE'
 	})
 	user: User
 	@ManyToOne(() => CourseEntity, course => course.id, {
-		eager: true,
+		// eager: true,
 		onDelete: 'CASCADE'
 	})
 	course: CourseEntity
