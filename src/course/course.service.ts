@@ -33,9 +33,9 @@ export class CourseService {
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
 		@InjectRepository(SectionEntity)
 		private readonly sectionRepository: Repository<SectionEntity>
-	) {}
+	) { }
 
-	async findAll(req: Request) {
+	async findAll() {
 		return await this.courseEntityRepository.find({
 			where: {
 				status: StatusCourseEnum.ACTIVE
@@ -202,12 +202,30 @@ export class CourseService {
 		}
 	}
 
+	async getCourseMembers(courseId: number) {
+		return await this.courseUserRepository.find({
+			where: { course: { id: courseId } },
+			relations: {
+				course: false,
+				user: true
+			},
+			select: {
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true
+				}
+			}
+		})
+	}
+
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -221,59 +239,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -892,9 +910,9 @@ export class CourseService {
 				} else if (
 					component.componentTask.type === CourseComponentType.Quiz ||
 					component.componentTask.type ===
-						CourseComponentType.MultiPlayChoice ||
+					CourseComponentType.MultiPlayChoice ||
 					component.componentTask.type ===
-						CourseComponentType.SimpleTask
+					CourseComponentType.SimpleTask
 				) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } =

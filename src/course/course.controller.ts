@@ -39,13 +39,13 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
 	@UseInterceptors(ResponseCoursesInterceptor)
 	@ApiOperation({ summary: 'Get all courses' })
-	async findAll(@Req() req: Request): Promise<CourseEntity[]> {
-		return await this.courseService.findAll(req)
+	async findAll(): Promise<CourseEntity[]> {
+		return await this.courseService.findAll()
 	}
 
 	@Authorization()
@@ -195,5 +195,11 @@ export class CourseController {
 			currentSection,
 			req['user']
 		)
+	}
+
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
+	@Get('get-course-members')
+	async getCourseMembers(@Query('courseId') courseId: number) {
+		return await this.courseService.getCourseMembers(courseId)
 	}
 }
