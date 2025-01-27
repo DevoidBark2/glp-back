@@ -13,6 +13,7 @@ import { AccessRightEnum } from '../enum/access_right.enum'
 import { LevelCourseEnum } from '../enum/level_course.enum'
 import { StatusCourseEnum } from '../enum/status_course.enum'
 import { CourseUser } from './course-user.entity'
+import { ExamEntity } from 'src/exams/entity/exam.entity'
 
 @Entity('courses')
 export class CourseEntity {
@@ -55,6 +56,11 @@ export class CourseEntity {
 	sections: SectionEntity[]
 	@OneToMany(() => CourseUser, courseUser => courseUser.course)
 	courseUsers: CourseUser[]
+	@ManyToOne(() => ExamEntity, exam => exam.id, {
+		nullable: true,
+		onDelete: 'CASCADE'
+	})
+	exam: ExamEntity
 	@CreateDateColumn()
 	created_at: Date
 }

@@ -9,7 +9,6 @@ import {
 import { ExamStatus } from '../enums/status-exam.enum'
 import { User } from '../../user/entity/user.entity'
 import { ExamsComponent } from './exams-components.entity'
-import { CourseEntity } from '../../course/entity/course.entity'
 
 @Entity('exams')
 export class ExamEntity {
@@ -27,9 +26,4 @@ export class ExamEntity {
 	components: ExamsComponent[]
 	@CreateDateColumn()
 	created_at: Date
-	@ManyToOne(() => CourseEntity, course => course.id, {
-		nullable: true,
-		onDelete: 'CASCADE'
-	})
-	course: CourseEntity
 }

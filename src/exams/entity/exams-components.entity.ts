@@ -19,7 +19,6 @@ export class ExamsComponent {
 	@ManyToOne(() => ComponentTask, component => component.id, {
 		onDelete: 'CASCADE'
 	})
-	@JoinColumn()
 	component: ComponentTask
 
 	@Column({ type: 'int' })

@@ -5,6 +5,8 @@ import { ExamEntity } from './entity/exam.entity'
 import { User } from '../user/entity/user.entity'
 import { CreateExamDto } from './dto/create-exam.dto'
 import { ExamsComponent } from './entity/exams-components.entity'
+import { SetExamForCourseDto } from './dto/set-exam-for-course.dto'
+import { CourseEntity } from 'src/course/entity/course.entity'
 
 @Injectable()
 export class ExamsService {
@@ -12,8 +14,10 @@ export class ExamsService {
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>,
 		@InjectRepository(ExamsComponent)
-		private readonly examsComponentRepository: Repository<ExamsComponent>
-	) {}
+		private readonly examsComponentRepository: Repository<ExamsComponent>,
+		@InjectRepository(CourseEntity)
+		private readonly courseRepository: Repository<CourseEntity>
+	) { }
 
 	async findAll(user: User) {
 		return await this.examEntityRepository.find({
@@ -21,7 +25,7 @@ export class ExamsService {
 				user: { id: user.id }
 			},
 			relations: {
-				user: true
+				user: true,
 			},
 			select: {
 				user: {
@@ -39,6 +43,7 @@ export class ExamsService {
 				created_at: 'DESC'
 			}
 		})
+
 	}
 
 	async createExam(components: CreateExamDto, user: User) {
@@ -73,5 +78,23 @@ export class ExamsService {
 		}
 
 		await this.examEntityRepository.delete(id)
+	}
+
+	async setExamForCourse(body: SetExamForCourseDto) {
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				id: body.examId
+			}
+		})
+
+		const course = await this.courseRepository.findOne({
+			where: {
+				id: body.courseId
+			}
+		})
+
+		await this.courseRepository.update(course.id, {
+			exam: exam
+		})
 	}
 }
