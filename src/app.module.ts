@@ -27,6 +27,7 @@ import { MailConfirmationModule } from './auth/mail-confirmation/mail-confirmati
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module'
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
 import { CommentsModule } from './comments/comments.module';
+import { ExamsModule } from './exams/exams.module';
 
 @Module({
 	imports: [
@@ -74,7 +75,8 @@ import { CommentsModule } from './comments/comments.module';
 		MailConfirmationModule,
 		PasswordRecoveryModule,
 		TwoFactorAuthModule,
-		CommentsModule
+		CommentsModule,
+		ExamsModule
 	]
 	// providers: [
 	// 	WebsocketGateway,

@@ -11,6 +11,7 @@ import { CourseUser } from './entity/course-user.entity'
 import { UserModule } from 'src/user/user.module'
 import { AnswersComponentUser } from 'src/component-task/entity/component-task-user.entity'
 import { SectionEntity } from 'src/section/entity/section.entity'
+import { ExamEntity } from '../exams/entity/exam.entity'
 
 @Module({
 	imports: [
@@ -20,7 +21,8 @@ import { SectionEntity } from 'src/section/entity/section.entity'
 			CategoryEntity,
 			CourseUser,
 			AnswersComponentUser,
-			SectionEntity
+			SectionEntity,
+			ExamEntity
 		]),
 		JwtModule,
 		EventsModule,
