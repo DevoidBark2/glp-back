@@ -34,7 +34,7 @@ import { Authorization } from '../auth/decorators/auth.decorator'
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) { }
 
 	@Get('users')
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -176,5 +176,11 @@ export class UserController {
 	@Delete('/delete-account')
 	async deleteAccount(@Authorized('id') id: string) {
 		return await this.userService.deleteAccount(id)
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Get('/get-teachers')
+	async getTeachers() {
+		return await this.userService.getAllTeachers()
 	}
 }

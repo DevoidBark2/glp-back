@@ -34,6 +34,7 @@ import { ChangeCourseDto } from './dto/change-course.dto'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SubscribeCourseDto } from './dto/subsribe-course.dto'
 import { Authorization } from 'src/auth/decorators/auth.decorator'
+import { FilterValuesDto } from './dto/filter-options.dto'
 
 @ApiTags('Курсы')
 @UseInterceptors(EventLoggingInterceptor)
@@ -42,9 +43,9 @@ export class CourseController {
 	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
-	@UseInterceptors(ResponseCoursesInterceptor)
+	// @UseInterceptors(ResponseCoursesInterceptor)
 	@ApiOperation({ summary: 'Get all courses' })
-	async findAll(): Promise<CourseEntity[]> {
+	async findAll() {
 		return await this.courseService.findAll()
 	}
 
@@ -102,9 +103,15 @@ export class CourseController {
 		return await this.courseService.getCoursesBySearch(search)
 	}
 
+	@Post('search-course-by-filter')
+	async getCoursesByFilter(@Body() body: FilterValuesDto) {
+		console.log(body.categories)
+		console.log(body.durations)
+		return await this.courseService.searchCoursesByFilter(body)
+	}
+
 	@Authorization(UserRole.STUDENT, UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Get('/get-user-courses')
-	// @LogAction(ActionEvent.ENROLL_STUDENT, 'view details of course')
 	async getUserCourses(@Req() req: Request) {
 		try {
 			const courses = await this.courseService.getAllUserCourses(

@@ -58,9 +58,13 @@ export class UserService {
 		const user = await this.userRepository.findOne({
 			where: { id: id },
 			relations: {
-				courses: true,
+				courses: {
+					category: true
+				},
 				posts: true,
 				accounts: true
+			}, select: {
+				password: false
 			}
 		})
 
@@ -308,5 +312,22 @@ export class UserService {
 		}
 
 		await this.userRepository.delete(id)
+	}
+
+	async getAllTeachers() {
+		return this.userRepository.find({
+			where: {
+				role: UserRole.TEACHER
+			},
+			select: {
+				id: true,
+				first_name: true,
+				second_name: true,
+				last_name: true,
+				profile_url: true,
+				method_auth: true,
+				about_me: true
+			}
+		})
 	}
 }

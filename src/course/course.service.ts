@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CourseEntity } from './entity/course.entity'
-import { ILike, In, Like, Repository } from 'typeorm'
+import { Between, ILike, In, LessThan, Like, MoreThan, Repository } from 'typeorm'
 import { CreateCourseDto } from './dto/create_course.dto'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entity/user.entity'
@@ -16,6 +16,7 @@ import { AnswersComponentUser } from 'src/component-task/entity/component-task-u
 import { SectionEntity } from 'src/section/entity/section.entity'
 import { CourseComponentType } from 'src/component-task/enum/course-component-type.enum'
 import { ExamEntity } from '../exams/entity/exam.entity'
+import { FilterType, FilterValuesDto } from './dto/filter-options.dto'
 
 @Injectable()
 export class CourseService {
@@ -36,7 +37,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -44,18 +45,7 @@ export class CourseService {
 				status: StatusCourseEnum.ACTIVE
 			},
 			relations: {
-				user: true
-			},
-			select: {
-				id: true,
-				name: true,
-				image: true,
-				user: {
-					id: true,
-					first_name: true,
-					second_name: true,
-					last_name: true
-				}
+				category: true
 			}
 		})
 	}
@@ -115,15 +105,17 @@ export class CourseService {
 			.map(word => word.trim())
 			.filter(word => word.length > 0)
 
+		console.log(searchKeywords.join('%'))
+
 		return await this.courseEntityRepository.find({
 			where: {
 				status: StatusCourseEnum.ACTIVE,
 				name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по названию курса
-				user: {
-					first_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по имени пользователя
-					last_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по фамилии пользователя
-					second_name: ILike(`%${searchKeywords.join('%')}%`) // Ищем по отчеству пользователя
-				}
+				// user: {
+				// 	first_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по имени пользователя
+				// 	last_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по фамилии пользователя
+				// 	second_name: ILike(`%${searchKeywords.join('%')}%`) // Ищем по отчеству пользователя
+				// }
 			},
 			relations: {
 				user: true,
@@ -141,6 +133,68 @@ export class CourseService {
 				}
 			}
 		})
+	}
+
+	async searchCoursesByFilter(filters: FilterValuesDto) {
+		// Начинаем с пустых параметров для where
+		const whereConditions: any = {};
+
+		// Фильтрация по категориям
+		if (filters.categories && filters.categories.length > 0) {
+			whereConditions['category.id'] = In(filters.categories);
+		}
+
+		// Фильтрация по уровням сложности
+		if (filters.levels && filters.levels.length > 0) {
+			const levelValues = filters.levels.map((level) => level.value);
+			whereConditions['level'] = In(levelValues);
+		}
+
+		// Фильтрация по продолжительности
+		if (filters.durations && filters.durations.length > 0) {
+			filters.durations.forEach((duration) => {
+				if (duration.type === FilterType.LESS && typeof duration.value === 'number') {
+					whereConditions['duration'] = LessThan(duration.value);
+				} else if (duration.type === FilterType.RANGE && typeof duration.value === 'object') {
+					whereConditions['duration'] = Between(duration.value.min, duration.value.max);
+				} else if (duration.type === FilterType.GREATER && typeof duration.value === 'number') {
+					whereConditions['duration'] = MoreThan(duration.value);
+				}
+			});
+		}
+
+		// Сортировка по заданным условиям
+		const orderConditions: any = {};
+		if (filters.sortOption) {
+			const sortOption = filters.sortOption.value;
+			if (sortOption === 'newest') {
+				orderConditions['publish_date'] = 'DESC';
+			}
+			// Пример для сортировки по рейтингу
+			// else if (sortOption === 'rating') {
+			//   orderConditions['rating'] = 'DESC';
+			// }
+		}
+
+		// Запрос с фильтрацией и сортировкой
+		const courses = await this.courseEntityRepository.find({
+			where: whereConditions,
+			order: orderConditions,
+			relations: {
+				category: true,
+				user: true
+			},
+			select: {
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true
+				}
+			}
+		});
+
+		return courses;
 	}
 
 	async findOneById(courseId: number, user: User) {
@@ -171,7 +225,9 @@ export class CourseService {
 					id: true,
 					first_name: true,
 					second_name: true,
-					last_name: true
+					last_name: true,
+					profile_url: true,
+					method_auth: true
 				}
 			}
 		})
@@ -241,8 +297,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -256,59 +312,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -942,9 +998,9 @@ export class CourseService {
 				} else if (
 					component.componentTask.type === CourseComponentType.Quiz ||
 					component.componentTask.type ===
-						CourseComponentType.MultiPlayChoice ||
+					CourseComponentType.MultiPlayChoice ||
 					component.componentTask.type ===
-						CourseComponentType.SimpleTask
+					CourseComponentType.SimpleTask
 				) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } =
