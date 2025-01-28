@@ -36,7 +36,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -241,8 +241,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -256,59 +256,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
+					relations: {
+						user: true
 					},
-					created_at: 'DESC'
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					order: {
+						user: {
+							role: 'DESC'
+						},
+						created_at: 'DESC'
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -845,18 +845,18 @@ export class CourseService {
 				}
 			}
 
-			return await this.courseEntityRepository.findOne({
+			return await this.examEntityRepository.findOne({
 				where: {
-					id: courseId
+					course: { id: courseId }
 				},
 				relations: {
-					exam: {
-						components: true
+					components: {
+						component: true
 					}
 				}
 			})
 		}
-		console.log('SectionID', sectionId)
+
 		// Получаем курс с секциями и их компонентами по заданному courseId
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
@@ -868,8 +868,8 @@ export class CourseService {
 				}
 			}
 		})
-
-		console.log(course)
+		//
+		// console.log(course)
 
 		// Если курс не найден, выбрасываем ошибку
 		if (!course) {
@@ -906,8 +906,8 @@ export class CourseService {
 				answer.answer
 			])
 		)
-
-		console.log('!!!!!!!!!!!!', userAnswersMap)
+		//
+		// console.log('!!!!!!!!!!!!', userAnswersMap)
 
 		// Применяем ответы к компонентам задач
 		sectionComponents.forEach(component => {
@@ -942,9 +942,9 @@ export class CourseService {
 				} else if (
 					component.componentTask.type === CourseComponentType.Quiz ||
 					component.componentTask.type ===
-					CourseComponentType.MultiPlayChoice ||
+						CourseComponentType.MultiPlayChoice ||
 					component.componentTask.type ===
-					CourseComponentType.SimpleTask
+						CourseComponentType.SimpleTask
 				) {
 					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
 					const { id, title, description, type } =
@@ -978,8 +978,8 @@ export class CourseService {
 				}
 			}
 		})
-
-		console.log('!!!!!!!!!!!!', userAnswersMap)
+		//
+		// console.log('!!!!!!!!!!!!', userAnswersMap)
 
 		return {
 			id: currentSection.id,
