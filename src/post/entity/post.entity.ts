@@ -1,13 +1,10 @@
 import {
 	Column,
 	Entity,
-	ManyToMany,
-	JoinTable,
 	ManyToOne,
 	CreateDateColumn,
 	PrimaryGeneratedColumn
 } from 'typeorm'
-import { EmojiEntity } from './emoji.entity'
 import { User } from '../../user/entity/user.entity'
 import { PostStatusEnum } from '../enum/PostStatus.enum'
 
@@ -29,9 +26,6 @@ class PostEntity {
 	is_publish: boolean
 	@CreateDateColumn()
 	created_at: Date
-	@ManyToMany(() => EmojiEntity, { onDelete: 'CASCADE' })
-	@JoinTable()
-	emoji: EmojiEntity[]
 	@ManyToOne(() => User, user => user.posts, { onDelete: 'CASCADE' })
 	user: User
 }

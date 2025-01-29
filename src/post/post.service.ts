@@ -6,11 +6,9 @@ import { Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entity/user.entity'
 import { PostStatusEnum } from './enum/PostStatus.enum'
-import { v4 as uuidv4 } from 'uuid'
 import { UserRole } from 'src/constants/contants'
 import { PublishPostDto } from './dto/publish-post.dro'
 import { ChangePostDto } from './dto/change-post.dto'
-import { ModeratorsPost } from './entity/moderators-post.entity'
 import { UpdatePostStatus } from './dto/update-post-status.dto'
 
 @Injectable()
@@ -20,8 +18,6 @@ export class PostService {
 		private readonly postEntityRepository: Repository<PostEntity>,
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
-		@InjectRepository(ModeratorsPost)
-		private readonly moderatorPostRepository: Repository<ModeratorsPost>,
 		private readonly jwtService: JwtService
 	) { }
 
@@ -116,40 +112,40 @@ export class PostService {
 	}
 
 	async getPostForModerators(user: User) {
-		const moderatorPosts = await this.moderatorPostRepository.find({
-			where: {
-				user: { id: user.id },
-				post: { status: PostStatusEnum.IN_PROCESSING }
-			},
-			relations: {
-				post: {
-					user: true
-				}
-			}
-		})
+		// const moderatorPosts = await this.moderatorPostRepository.find({
+		// 	where: {
+		// 		user: { id: user.id },
+		// 		post: { status: PostStatusEnum.IN_PROCESSING }
+		// 	},
+		// 	relations: {
+		// 		post: {
+		// 			user: true
+		// 		}
+		// 	}
+		// })
 
-		// Форматируем данные вручную под структуру postMapper
-		return moderatorPosts.map(moderatorPost => ({
-			id: moderatorPost.post.id,
-			name: moderatorPost.post.name,
-			image: moderatorPost.post.image,
-			description: moderatorPost.post.description,
-			content: moderatorPost.post.content,
-			status: moderatorPost.post.status,
-			is_publish: moderatorPost.post.is_publish,
-			created_at: moderatorPost.post.created_at,
-			user: {
-				id: moderatorPost.post.user.id,
-				first_name: moderatorPost.post.user.first_name,
-				second_name: moderatorPost.post.user.second_name,
-				last_name: moderatorPost.post.user.last_name,
-				phone: moderatorPost.post.user.last_name,
-				role: moderatorPost.post.user.role,
-				status: moderatorPost.post.user.status,
-				email: moderatorPost.post.user.email,
-				created_at: moderatorPost.post.user.created_at
-			}
-		}))
+		// // Форматируем данные вручную под структуру postMapper
+		// return moderatorPosts.map(moderatorPost => ({
+		// 	id: moderatorPost.post.id,
+		// 	name: moderatorPost.post.name,
+		// 	image: moderatorPost.post.image,
+		// 	description: moderatorPost.post.description,
+		// 	content: moderatorPost.post.content,
+		// 	status: moderatorPost.post.status,
+		// 	is_publish: moderatorPost.post.is_publish,
+		// 	created_at: moderatorPost.post.created_at,
+		// 	user: {
+		// 		id: moderatorPost.post.user.id,
+		// 		first_name: moderatorPost.post.user.first_name,
+		// 		second_name: moderatorPost.post.user.second_name,
+		// 		last_name: moderatorPost.post.user.last_name,
+		// 		phone: moderatorPost.post.user.last_name,
+		// 		role: moderatorPost.post.user.role,
+		// 		status: moderatorPost.post.user.status,
+		// 		email: moderatorPost.post.user.email,
+		// 		created_at: moderatorPost.post.user.created_at
+		// 	}
+		// }))
 
 		// return await this.postEntityRepository.find({
 		//   where: {
@@ -229,29 +225,29 @@ export class PostService {
 		await this.postEntityRepository.update(body.postId, {
 			status: body.status
 		})
-		const moderatorPost = await this.moderatorPostRepository.findOne({
-			where: {
-				post: { id: body.postId }
-			}
-		})
-		await this.moderatorPostRepository.update(moderatorPost.id, {
-			comment: body.comment,
-			comments: body.comments
-		})
+		// const moderatorPost = await this.moderatorPostRepository.findOne({
+		// 	where: {
+		// 		post: { id: body.postId }
+		// 	}
+		// })
+		// await this.moderatorPostRepository.update(moderatorPost.id, {
+		// 	comment: body.comment,
+		// 	comments: body.comments
+		// })
 	}
 
 	private async randomAssignPost(postId: number) {
-		const moderators = await this.userRepository.find({
-			where: {
-				role: UserRole.MODERATOR
-			}
-		})
+		// const moderators = await this.userRepository.find({
+		// 	where: {
+		// 		role: UserRole.MODERATOR
+		// 	}
+		// })
 
-		const randomModerator =
-			moderators[Math.floor(Math.random() * moderators.length)]
-		await this.moderatorPostRepository.save({
-			user: randomModerator,
-			post: { id: postId } as PostEntity
-		})
+		// const randomModerator =
+		// 	moderators[Math.floor(Math.random() * moderators.length)]
+		// await this.moderatorPostRepository.save({
+		// 	user: randomModerator,
+		// 	post: { id: postId } as PostEntity
+		// })
 	}
 }

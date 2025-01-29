@@ -10,12 +10,10 @@ import { SettingsModule } from './settings/settings.module'
 import { CourseModule } from './course/course.module'
 import { SectionModule } from './section/section.module'
 import { CategoryModule } from './category/category.module'
-import { BannersModule } from './banners/banners.module'
 import { EventsModule } from './events/events.module'
 import { GeneralSettingsModule } from './general-settings/general-settings.module'
 import { ComponentTaskModule } from './component-task/component-task.module'
 import { StatisticsModule } from './statistics/statistics.module'
-import { AvatarIconsModule } from './avatar-icons/avatar-icons.module'
 import { FeedbacksModule } from './feedbacks/feedbacks.module'
 import { AchievementsModule } from './achievements/achievements.module'
 import { FaqModule } from './faq/faq.module'
@@ -28,6 +26,7 @@ import { PasswordRecoveryModule } from './auth/password-recovery/password-recove
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
 import { CommentsModule } from './comments/comments.module';
 import { ExamsModule } from './exams/exams.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
 	imports: [
@@ -60,12 +59,10 @@ import { ExamsModule } from './exams/exams.module';
 		CourseModule,
 		SectionModule,
 		CategoryModule,
-		BannersModule,
 		EventsModule,
 		GeneralSettingsModule,
 		ComponentTaskModule,
 		StatisticsModule,
-		AvatarIconsModule,
 		FeedbacksModule,
 		AchievementsModule,
 		FaqModule,
@@ -76,7 +73,8 @@ import { ExamsModule } from './exams/exams.module';
 		PasswordRecoveryModule,
 		TwoFactorAuthModule,
 		CommentsModule,
-		ExamsModule
+		ExamsModule,
+		ReviewModule
 	]
 	// providers: [
 	// 	WebsocketGateway,
@@ -86,4 +84,4 @@ import { ExamsModule } from './exams/exams.module';
 	// 	}
 	// ]
 })
-export class AppModule {}
+export class AppModule { }
