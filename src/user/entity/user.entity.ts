@@ -18,6 +18,7 @@ import { TableFooter } from '../enum/table-footer.enum'
 import { CourseUser } from 'src/course/entity/course-user.entity'
 import { AuthMethodEnum } from '../../auth/enum/auth-method.enum'
 import { Account } from './account.entity'
+import ReviewCourse from 'src/review/entity/review.entity'
 
 @Entity('users')
 export class User {
@@ -89,4 +90,6 @@ export class User {
 	method_auth: AuthMethodEnum
 	@OneToMany(() => Account, account => account.user)
 	accounts: Account[]
+	@OneToMany(() => ReviewCourse, (review) => review.user, { cascade: true })
+	reviews: ReviewCourse[];
 }

@@ -14,6 +14,7 @@ import { LevelCourseEnum } from '../enum/level_course.enum'
 import { StatusCourseEnum } from '../enum/status_course.enum'
 import { CourseUser } from './course-user.entity'
 import { ExamEntity } from 'src/exams/entity/exam.entity'
+import ReviewCourse from 'src/review/entity/review.entity'
 
 @Entity('courses')
 export class CourseEntity {
@@ -63,4 +64,6 @@ export class CourseEntity {
 	exam: ExamEntity
 	@CreateDateColumn()
 	created_at: Date
+	@OneToMany(() => ReviewCourse, (review) => review.course, { cascade: true })
+	reviews: ReviewCourse[];
 }
