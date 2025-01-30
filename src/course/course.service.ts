@@ -938,7 +938,7 @@ export class CourseService {
 		)
 
 		if (!currentSection) {
-			throw new Error(
+			throw new BadRequestException(
 				`Section with ID ${sectionId} not found in course with ID ${courseId}`
 			)
 		}
