@@ -40,7 +40,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) { }
+	constructor(private readonly courseService: CourseService) {}
 
 	@Get('/courses')
 	// @UseInterceptors(ResponseCoursesInterceptor)
@@ -57,9 +57,9 @@ export class CourseController {
 
 	@Authorization()
 	@Delete('delete-course-member')
-	@ResponseMessage("Участник успешно удален!")
+	@ResponseMessage('Участник успешно удален!')
 	async deleteCoursMember(@Query('id') id: number) {
-		await this.courseService.deleteCourseMember(id);
+		await this.courseService.deleteCourseMember(id)
 	}
 
 	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)

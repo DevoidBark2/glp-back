@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CourseEntity } from './entity/course.entity'
-import { Between, ILike, In, LessThan, Like, MoreThan, Repository } from 'typeorm'
+import { Between, ILike, In, LessThan, MoreThan, Repository } from 'typeorm'
 import { CreateCourseDto } from './dto/create_course.dto'
 import { JwtService } from '@nestjs/jwt'
 import { User } from '../user/entity/user.entity'
@@ -37,7 +37,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -110,7 +110,7 @@ export class CourseService {
 		return await this.courseEntityRepository.find({
 			where: {
 				status: StatusCourseEnum.ACTIVE,
-				name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по названию курса
+				name: ILike(`%${searchKeywords.join('%')}%`) // Ищем по названию курса
 				// user: {
 				// 	first_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по имени пользователя
 				// 	last_name: ILike(`%${searchKeywords.join('%')}%`), // Ищем по фамилии пользователя
@@ -137,38 +137,50 @@ export class CourseService {
 
 	async searchCoursesByFilter(filters: FilterValuesDto) {
 		// Начинаем с пустых параметров для where
-		const whereConditions: any = {};
+		const whereConditions: any = {}
 
 		// Фильтрация по категориям
 		if (filters.categories && filters.categories.length > 0) {
-			whereConditions['category.id'] = In(filters.categories);
+			whereConditions['category.id'] = In(filters.categories)
 		}
 
 		// Фильтрация по уровням сложности
 		if (filters.levels && filters.levels.length > 0) {
-			const levelValues = filters.levels.map((level) => level.value);
-			whereConditions['level'] = In(levelValues);
+			const levelValues = filters.levels.map(level => level.value)
+			whereConditions['level'] = In(levelValues)
 		}
 
 		// Фильтрация по продолжительности
 		if (filters.durations && filters.durations.length > 0) {
-			filters.durations.forEach((duration) => {
-				if (duration.type === FilterType.LESS && typeof duration.value === 'number') {
-					whereConditions['duration'] = LessThan(duration.value);
-				} else if (duration.type === FilterType.RANGE && typeof duration.value === 'object') {
-					whereConditions['duration'] = Between(duration.value.min, duration.value.max);
-				} else if (duration.type === FilterType.GREATER && typeof duration.value === 'number') {
-					whereConditions['duration'] = MoreThan(duration.value);
+			filters.durations.forEach(duration => {
+				if (
+					duration.type === FilterType.LESS &&
+					typeof duration.value === 'number'
+				) {
+					whereConditions['duration'] = LessThan(duration.value)
+				} else if (
+					duration.type === FilterType.RANGE &&
+					typeof duration.value === 'object'
+				) {
+					whereConditions['duration'] = Between(
+						duration.value.min,
+						duration.value.max
+					)
+				} else if (
+					duration.type === FilterType.GREATER &&
+					typeof duration.value === 'number'
+				) {
+					whereConditions['duration'] = MoreThan(duration.value)
 				}
-			});
+			})
 		}
 
 		// Сортировка по заданным условиям
-		const orderConditions: any = {};
+		const orderConditions: any = {}
 		if (filters.sortOption) {
-			const sortOption = filters.sortOption.value;
+			const sortOption = filters.sortOption.value
 			if (sortOption === 'newest') {
-				orderConditions['publish_date'] = 'DESC';
+				orderConditions['publish_date'] = 'DESC'
 			}
 			// Пример для сортировки по рейтингу
 			// else if (sortOption === 'rating') {
@@ -192,9 +204,9 @@ export class CourseService {
 					last_name: true
 				}
 			}
-		});
+		})
 
-		return courses;
+		return courses
 	}
 
 	async findOneById(courseId: number, user: User) {
@@ -297,8 +309,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -312,59 +324,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
+					relations: {
+						user: true
 					},
-					created_at: 'DESC'
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					order: {
+						user: {
+							role: 'DESC'
+						},
+						created_at: 'DESC'
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -561,6 +573,11 @@ export class CourseService {
 					userAnswer = {
 						totalAnswers,
 						correctAnswers
+					}
+				} else {
+					userAnswer = {
+						value: rawUserAnswer.userAnswer,
+						isCorrect: rawUserAnswer.isCorrect
 					}
 				}
 			}
@@ -878,7 +895,9 @@ export class CourseService {
 	}
 
 	async getCurrentSection(courseId: number, sectionId: number, user: User) {
+		// Проверяем, если sectionId равен -1 (для проверки экзамена)
 		if (Number(sectionId) === -1) {
+			// Ищем пользователя в курсе
 			const courseUser = await this.courseUserRepository.findOne({
 				where: {
 					user: { id: user.id },
@@ -886,57 +905,43 @@ export class CourseService {
 				}
 			})
 
-			const userProgress = courseUser.progress
+			// Получаем прогресс пользователя
+			const userProgress = courseUser?.progress ?? -1
 
-			// TODO заменить на реальный процент
+			// Проверяем, если прогресс недостаточен для доступа к экзамену
 			if (userProgress < 0) {
-				// return await this.examEntityRepository.findOne({
-				// 	where: {
-				//
-				// 	}
-				// })
 				return {
 					message:
 						'Экзамен сейчас не доступен, Вы не достигли минимального балла по прохождению курса'
 				}
 			}
 
+			// Ищем экзамен по courseId
 			return await this.examEntityRepository.findOne({
-				where: {
-					course: { id: courseId }
-				},
-				relations: {
-					components: {
-						component: true
-					}
-				}
+				where: { course: { id: courseId } },
+				relations: { components: { component: true } }
 			})
 		}
 
-		// Получаем курс с секциями и их компонентами по заданному courseId
+		// Получаем курс с секциями и компонентами для данного courseId
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
 			relations: {
-				sections: {
-					sectionComponents: {
-						componentTask: true
-					}
-				}
+				sections: { sectionComponents: { componentTask: true } }
 			}
 		})
-		//
-		// console.log(course)
 
 		// Если курс не найден, выбрасываем ошибку
 		if (!course) {
 			throw new Error(`Course with ID ${courseId} not found`)
 		}
 
-		// Находим нужную секцию по sectionId
+		// Ищем нужную секцию по sectionId
 		const currentSection = course.sections.find(
 			section => section.id === sectionId
 		)
 
+		// Если секция не найдена, выбрасываем ошибку
 		if (!currentSection) {
 			throw new BadRequestException(
 				`Section with ID ${sectionId} not found in course with ID ${courseId}`
@@ -946,7 +951,7 @@ export class CourseService {
 		// Получаем компоненты текущей секции
 		const sectionComponents = currentSection.sectionComponents
 
-		// Создаем структуру ответа, добавляя ответы пользователя к компонентам, если они есть
+		// Получаем ответы пользователя для этой секции
 		const userAnswers = await this.answersComponentUserRepository.find({
 			where: {
 				user: { id: user.id },
@@ -962,8 +967,6 @@ export class CourseService {
 				answer.answer
 			])
 		)
-		//
-		// console.log('!!!!!!!!!!!!', userAnswersMap)
 
 		// Применяем ответы к компонентам задач
 		sectionComponents.forEach(component => {
@@ -973,20 +976,23 @@ export class CourseService {
 				component.componentTask.userAnswer =
 					userAnswersMap.get(answerKey) || null
 
-				console.log('HERE', component.componentTask.questions)
-
+				// Проверяем тип задачи и обновляем компонент в соответствии с типом
 				if (component.componentTask.type === CourseComponentType.Text) {
-					const { id, title, description, type } =
-						component.componentTask
+					const {
+						id,
+						title,
+						description,
+						type,
+						content_description
+					} = component.componentTask
 					component.componentTask = {
 						id,
 						title,
 						description,
 						type,
 						userAnswer: component.componentTask.userAnswer,
-						content_description:
-							component.componentTask.content_description,
-						questions: undefined,
+						content_description,
+						questions: undefined, // Убираем вопросы для текстовых заданий
 						created_at: undefined,
 						status: undefined,
 						tags: undefined,
@@ -996,13 +1002,41 @@ export class CourseService {
 						answer: undefined
 					}
 				} else if (
-					component.componentTask.type === CourseComponentType.Quiz ||
-					component.componentTask.type ===
-					CourseComponentType.MultiPlayChoice ||
+					[
+						CourseComponentType.Quiz,
+						CourseComponentType.MultiPlayChoice
+					].includes(component.componentTask.type)
+				) {
+					// Для квизов и мультивыборов
+					const {
+						id,
+						title,
+						description,
+						type,
+						content_description,
+						questions
+					} = component.componentTask
+					component.componentTask = {
+						id,
+						title,
+						description,
+						type,
+						userAnswer: component.componentTask.userAnswer,
+						content_description,
+						questions,
+						created_at: undefined,
+						status: undefined,
+						tags: undefined,
+						sort: undefined,
+						sectionComponents: undefined,
+						user: undefined,
+						answer: undefined
+					}
+				} else if (
 					component.componentTask.type ===
 					CourseComponentType.SimpleTask
 				) {
-					// Создаем новый объект, чтобы оставить оригинальную сущность нетронутой
+					// Для простых задач
 					const { id, title, description, type } =
 						component.componentTask
 					component.componentTask = {
@@ -1011,9 +1045,8 @@ export class CourseService {
 						description,
 						type,
 						userAnswer: component.componentTask.userAnswer,
-						content_description:
-							component.componentTask.content_description,
-						questions: component.componentTask.questions,
+						content_description: undefined,
+						questions: undefined,
 						created_at: undefined,
 						status: undefined,
 						tags: undefined,
@@ -1024,26 +1057,27 @@ export class CourseService {
 					}
 				}
 
+				// Убираем правильные ответы из вопросов (если они есть)
 				if (Array.isArray(component.componentTask.questions)) {
-					// Удаляем correctAnswer у каждого вопроса
 					component.componentTask.questions =
 						component.componentTask.questions.map(question => {
-							const { correctOption, ...rest } = question // Деструктурируем и исключаем correctAnswer
-							return rest // Возвращаем объект без correctAnswer
+							const { correctOption, ...rest } = question // Убираем correctOption
+							return rest
 						})
 				}
 			}
 		})
-		//
-		// console.log('!!!!!!!!!!!!', userAnswersMap)
 
+		// Возвращаем результат с компонентами секции
 		return {
 			id: currentSection.id,
 			name: currentSection.name,
 			small_description: currentSection.description,
 			components: sectionComponents,
 			files: currentSection.uploadFile,
-			links: [currentSection.externalLinks].map(it => it).filter(Boolean)
+			links: currentSection.externalLinks
+				? [currentSection.externalLinks]
+				: []
 		}
 	}
 }

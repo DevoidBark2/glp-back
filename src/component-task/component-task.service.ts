@@ -180,10 +180,16 @@ export class ComponentTaskService {
 							Array.isArray(question.correctOption) &&
 							userAnswer.length ===
 								question.correctOption.length &&
+							// Все выбранные варианты должны быть среди правильных опций
 							userAnswer.every(
 								answer =>
 									Array.isArray(question.correctOption) &&
 									question.correctOption.includes(answer)
+							) &&
+							// Никаких неверных вариантов не должно быть среди выбранных
+							question.correctOption.every(
+								correctAnswer =>
+									userAnswer.includes(correctAnswer) // Проверяем, что все правильные варианты выбраны
 							)
 					} else {
 						// Для остальных типов задач
@@ -201,7 +207,6 @@ export class ComponentTaskService {
 					id: task.id,
 					question: task.title,
 					userAnswer: body.answers,
-					correctAnswer: task.answer,
 					isCorrect: String(body.answers) === task.answer
 				}
 
@@ -220,7 +225,8 @@ export class ComponentTaskService {
 		// }
 
 		return {
-			answer: results
+			message: 'Ответы успешно сохранены',
+			userAnswer: results
 		}
 	}
 }
