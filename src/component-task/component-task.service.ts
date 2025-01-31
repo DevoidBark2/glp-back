@@ -19,7 +19,7 @@ export class ComponentTaskService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(AnswersComponentUser)
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>
-	) { }
+	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
 		const newComponent = await this.componentTaskRepository.save({
@@ -27,7 +27,7 @@ export class ComponentTaskService {
 			...componentTask
 		})
 
-		const newComponentUser = newComponent.user;
+		const newComponentUser = newComponent.user
 
 		return {
 			...newComponent,
@@ -46,58 +46,58 @@ export class ComponentTaskService {
 	async getAll(user: User) {
 		return user.role !== UserRole.SUPER_ADMIN
 			? this.componentTaskRepository.find({
-				where: {
-					user: { id: user.id }
-				},
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					where: {
+						user: { id: user.id }
+					},
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
 					}
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				}
-			})
+				})
 			: this.componentTaskRepository.find({
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
 					}
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				}
-			})
+				})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {
@@ -140,74 +140,77 @@ export class ComponentTaskService {
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
 		const task = await this.componentTaskRepository.findOne({
 			where: { id: body.task.id }
-		});
+		})
 
 		const section = await this.sectionRepository.findOne({
 			where: {
 				id: Number(body.currentSection)
 			}
-		});
+		})
 
 		if (!task) {
 			throw new BadRequestException(
 				`Задачи с ID ${body.task.id} не существует`
-			);
+			)
 		}
 
 		// Проверяем, является ли `answers` массивом чисел или строкой
-		const isAnswersArray = Array.isArray(body.answers);
+		const isAnswersArray = Array.isArray(body.answers)
 
-		console.log("Ответ", body.answers)
+		console.log('Ответ', body.answers)
 
-		console.log("ЗАДАЧА", task)
-		const results = task.questions ? task.questions.map((question, index) => {
-			console.log("Вопрос", question);
-			const userAnswer = isAnswersArray && task.type === CourseComponentType.Quiz ? body.answers[index] : task.type === CourseComponentType.MultiPlayChoice ? body.answers : body.answers; // Если массив, берём по индексу
-			const taskType = task.type;
+		console.log('ЗАДАЧА', task)
+		const results = task.questions
+			? task.questions.map((question, index) => {
+					console.log('Вопрос', question)
+					const userAnswer =
+						isAnswersArray && task.type === CourseComponentType.Quiz
+							? body.answers[index]
+							: task.type === CourseComponentType.MultiPlayChoice
+								? body.answers
+								: body.answers // Если массив, берём по индексу
+					const taskType = task.type
 
-			// Проверяем корректность ответа в зависимости от типа задачи
-			let isCorrect;
-			if (taskType === CourseComponentType.MultiPlayChoice) {
-				// Сравниваем массивы для MultiPlayChoice
-				isCorrect = Array.isArray(userAnswer) &&
-					Array.isArray(question.correctOption) &&
-					userAnswer.length === question.correctOption.length &&
-					userAnswer.every(answer => Array.isArray(question.correctOption) && question.correctOption.includes(answer));
-			} else {
-				// Для остальных типов задач
-				isCorrect = question.correctOption === userAnswer;
-			}
+					// Проверяем корректность ответа в зависимости от типа задачи
+					let isCorrect
+					if (taskType === CourseComponentType.MultiPlayChoice) {
+						// Сравниваем массивы для MultiPlayChoice
+						isCorrect =
+							Array.isArray(userAnswer) &&
+							Array.isArray(question.correctOption) &&
+							userAnswer.length ===
+								question.correctOption.length &&
+							userAnswer.every(
+								answer =>
+									Array.isArray(question.correctOption) &&
+									question.correctOption.includes(answer)
+							)
+					} else {
+						// Для остальных типов задач
+						isCorrect = question.correctOption === userAnswer
+					}
 
-			return {
-				id: question.id,
-				question: question.question,
-				userAnswer,
-				correctAnswer: question.correctOption,
-				isCorrect,
-			};
-		}) : {
-			id: task.id,
-			question: task.title,
-			userAnswer: body.answers,
-			correctAnswer: task.answer,
-			isCorrect: String(body.answers) === task.answer,
-		};
+					return {
+						id: question.id,
+						question: question.question,
+						userAnswer,
+						isCorrect
+					}
+				})
+			: {
+					id: task.id,
+					question: task.title,
+					userAnswer: body.answers,
+					correctAnswer: task.answer,
+					isCorrect: String(body.answers) === task.answer
+				}
 
-		const savedAnswers = await this.answersComponentUserRepository.save({
+		await this.answersComponentUserRepository.save({
 			user,
 			task,
 			answer: results,
 			section: section
-		});
-
-		const resBody = {
-			message: 'Ответы успешно сохранены',
-			answers: {
-				task: savedAnswers.task,
-				answer: results,
-				section: section
-			},
-		};
+		})
 
 		// if (CourseComponentType.MultiPlayChoice === body.task.type || CourseComponentType.Quiz === body.task.type) {
 		// 	resBody['userAnswer'] = {
@@ -216,6 +219,8 @@ export class ComponentTaskService {
 		// 	};
 		// }
 
-		return resBody;
+		return {
+			answer: results
+		}
 	}
 }
