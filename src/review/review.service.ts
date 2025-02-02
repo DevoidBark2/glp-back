@@ -33,4 +33,28 @@ export class ReviewService {
             review: body.review
         })
     }
+
+    async getReviewsForCourse(courseId: number) {
+        return await this.reviewCourseRepository.find({
+            where: {
+                course: { id: courseId }
+            },
+            relations: {
+                user: true
+            },
+            select: {
+                user: {
+                    id: true,
+                    first_name: true,
+                    second_name: true,
+                    last_name: true,
+                    profile_url: true,
+                    method_auth: true
+                }
+            },
+            order: {
+                created_at: "DESC"
+            }
+        })
+    }
 }

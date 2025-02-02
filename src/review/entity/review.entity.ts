@@ -1,6 +1,6 @@
 import { CourseEntity } from "src/course/entity/course.entity";
 import { User } from "src/user/entity/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity('reviews')
 class ReviewCourse {
@@ -15,6 +15,9 @@ class ReviewCourse {
 
     @ManyToOne(() => CourseEntity, (course) => course.reviews, { onDelete: "CASCADE" })
     course: CourseEntity;
+
+    @CreateDateColumn()
+    created_at: Date
 }
 
 export default ReviewCourse

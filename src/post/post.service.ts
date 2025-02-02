@@ -19,12 +19,17 @@ export class PostService {
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
 		private readonly jwtService: JwtService
-	) { }
+	) {}
 
 	async getAllPosts() {
 		return this.postEntityRepository.find({
 			where: {
 				is_publish: true
+			},
+			select: {
+				name: true,
+				description: true,
+				image: true
 			}
 		})
 	}
@@ -57,7 +62,7 @@ export class PostService {
 			where: {
 				user: { id: user.id }
 			},
-			order: { created_at: "DESC" }
+			order: { created_at: 'DESC' }
 		})
 	}
 
@@ -123,7 +128,6 @@ export class PostService {
 		// 		}
 		// 	}
 		// })
-
 		// // Форматируем данные вручную под структуру postMapper
 		// return moderatorPosts.map(moderatorPost => ({
 		// 	id: moderatorPost.post.id,
@@ -146,7 +150,6 @@ export class PostService {
 		// 		created_at: moderatorPost.post.user.created_at
 		// 	}
 		// }))
-
 		// return await this.postEntityRepository.find({
 		//   where: {
 		//     status: PostStatusEnum.IN_PROCESSING
@@ -242,7 +245,6 @@ export class PostService {
 		// 		role: UserRole.MODERATOR
 		// 	}
 		// })
-
 		// const randomModerator =
 		// 	moderators[Math.floor(Math.random() * moderators.length)]
 		// await this.moderatorPostRepository.save({

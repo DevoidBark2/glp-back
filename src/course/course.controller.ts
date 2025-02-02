@@ -23,13 +23,9 @@ import {
 	ApiTags
 } from '@nestjs/swagger'
 import { CreateCourseDto } from './dto/create_course.dto'
-import { ResponseCoursesInterceptor } from '../interceptors/response-courses.interceptor'
-import { CourseEntity } from './entity/course.entity'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
 import { EventLoggingInterceptor } from '../interceptors/event-logging.interceptor'
-import { LogAction } from '../decorators/log-action.decorator'
-import { ActionEvent } from '../events/enum/action-event.enum'
 import { ChangeCourseDto } from './dto/change-course.dto'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SubscribeCourseDto } from './dto/subsribe-course.dto'
@@ -40,7 +36,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
 	// @UseInterceptors(ResponseCoursesInterceptor)
@@ -215,5 +211,10 @@ export class CourseController {
 	@Get('get-course-members')
 	async getCourseMembers(@Query('courseId') courseId: number) {
 		return await this.courseService.getCourseMembers(courseId)
+	}
+
+	@Get('popular-courses')
+	async getAllPopularCourse() {
+		return this.courseService.getAllPopularCourses();
 	}
 }

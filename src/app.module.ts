@@ -27,6 +27,7 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
 import { CommentsModule } from './comments/comments.module';
 import { ExamsModule } from './exams/exams.module';
 import { ReviewModule } from './review/review.module';
+import { PdfModule } from './pdf/pdf.module';
 
 @Module({
 	imports: [
@@ -74,7 +75,8 @@ import { ReviewModule } from './review/review.module';
 		TwoFactorAuthModule,
 		CommentsModule,
 		ExamsModule,
-		ReviewModule
+		ReviewModule,
+		PdfModule
 	]
 	// providers: [
 	// 	WebsocketGateway,

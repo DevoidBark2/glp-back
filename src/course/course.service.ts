@@ -37,7 +37,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -46,6 +46,11 @@ export class CourseService {
 			},
 			relations: {
 				category: true
+			},
+			select: {
+				id: true,
+				name: true,
+				image: true,
 			}
 		})
 	}
@@ -309,8 +314,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -324,59 +329,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -1079,5 +1084,49 @@ export class CourseService {
 				? [currentSection.externalLinks]
 				: []
 		}
+	}
+
+	async getAllPopularCourses() {
+		const courses = await this.courseEntityRepository.find({
+			relations: {
+				courseUsers: true,
+				reviews: true,
+				category: true, // Убедимся, что категория загружается
+			},
+			select: {
+				id: true,
+				name: true,
+				image: true,
+				category: { id: true, name: true }, // Выбираем только нужные поля категории
+			}
+		});
+
+		// Фильтруем курсы, у которых есть подписчики
+		const filteredCourses = courses.filter(course => course.courseUsers.length > 0);
+
+		// Рассчитываем средний рейтинг и сортируем курсы
+		const sortedCourses = filteredCourses
+			.map(course => {
+				const totalRating = course.reviews.reduce((sum, review) => sum + review.rating, 0);
+				const averageRating = course.reviews.length ? totalRating / course.reviews.length : 0;
+				return {
+					id: course.id,
+					name: course.name,
+					image: course.image,
+					category: course.category,
+					subscribersCount: course.courseUsers.length,
+					averageRating
+				};
+			})
+			// Сортируем сначала по количеству подписчиков, затем по рейтингу
+			.sort((a, b) => {
+				if (b.subscribersCount !== a.subscribersCount) {
+					return b.subscribersCount - a.subscribersCount;
+				}
+				return b.averageRating - a.averageRating;
+			})
+			.slice(0, 5); // Берем топ-5
+
+		return sortedCourses;
 	}
 }
