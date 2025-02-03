@@ -48,8 +48,6 @@ export class ComponentTaskController {
 			req['user']
 		)
 
-		console.log(component)
-
 		return {
 			message: 'Компонент успешно создан!',
 			component: component
