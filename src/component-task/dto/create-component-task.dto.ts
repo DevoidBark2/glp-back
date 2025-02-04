@@ -4,7 +4,7 @@ import { QuestionsType } from '../entity/component-task.entity'
 
 export class CreateComponentTaskDto {
 	@ApiProperty()
-	id: number
+	id: string
 	@ApiProperty()
 	title: string
 	@ApiProperty()

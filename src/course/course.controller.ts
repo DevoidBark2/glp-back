@@ -36,7 +36,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) { }
+	constructor(private readonly courseService: CourseService) {}
 
 	@Get('/courses')
 	// @UseInterceptors(ResponseCoursesInterceptor)
@@ -110,13 +110,7 @@ export class CourseController {
 	@Get('/get-user-courses')
 	async getUserCourses(@Req() req: Request) {
 		try {
-			const courses = await this.courseService.getAllUserCourses(
-				req['user']
-			)
-
-			return {
-				courses: courses
-			}
+			return await this.courseService.getAllUserCourses(req['user'])
 		} catch (e) {
 			throw new BadRequestException(`Ошибка при получении данных: ${e}`)
 		}
@@ -158,7 +152,7 @@ export class CourseController {
 	}
 
 	@Authorization()
-	@Get('/full-course')
+	@Get('/get-course-menu')
 	async getFullCourse(
 		@Query('courseId') courseId: number,
 		@Req() req: Request
@@ -215,6 +209,6 @@ export class CourseController {
 
 	@Get('popular-courses')
 	async getAllPopularCourse() {
-		return this.courseService.getAllPopularCourses();
+		return this.courseService.getAllPopularCourses()
 	}
 }

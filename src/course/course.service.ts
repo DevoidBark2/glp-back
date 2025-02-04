@@ -681,107 +681,107 @@ export class CourseService {
 		return total
 	}
 
-	async getFullCourseById(courseId: number, user: User) {
-		const course = await this.courseEntityRepository.findOne({
-			where: { id: courseId },
-			relations: {
-				sections: {
-					sectionComponents: {
-						componentTask: true
-					},
-					parentSection: true
-				}
-			},
-			order: {
-				sections: {
-					sectionComponents: { sort: 'ASC' },
-					parentSection: { sort: 'ASC' },
-					sort_number: 'ASC'
-				}
-			}
-		})
-
-		if (!course) {
-			throw new Error('Course with ID ${courseId} not found')
-		}
-
-		const sections = course.sections
-
-		if (!sections || sections.length === 0) {
-			return {
-				courseId: course.id,
-				courseName: course.name,
-				sections: []
-			}
-		}
-
-		const sectionIds = sections.map(section => section.id)
-
-		// Получение всех ответов пользователя для разделов (включая задачи и без них)
-		const userAnswers = await this.answersComponentUserRepository.find({
-			where: {
-				user: { id: user.id },
-				section: { id: In(sectionIds) }
-			},
-			relations: ['task', 'section']
-		})
-
-		// Создаем Map по sectionId для быстрого доступа
-		const userAnswersMap = new Map(
-			userAnswers.map(answer => [answer.section.id, answer.answer])
-		)
-
-		// Группируем секции по parentSection
-		const mainSectionMap = new Map<number, any>()
-		const rootSections: any[] = []
-
-		// Обработка секций и добавление ответов в компоненты задач
-		sections.forEach(section => {
-			const sectionId = section.id
-			const parentSection = section.parentSection
-
-			if (parentSection) {
-				const mainSectionId = parentSection.id
-				if (!mainSectionMap.has(mainSectionId)) {
-					mainSectionMap.set(mainSectionId, {
-						id: mainSectionId,
-						name: parentSection.title,
-						children: []
-					})
-				}
-				mainSectionMap.get(mainSectionId).children.push({
-					id: sectionId,
-					name: section.name,
-					...section,
-					children: []
-				})
-			} else {
-				rootSections.push({
-					id: sectionId,
-					name: section.name,
-					...section,
-					children: []
-				})
-			}
-
-			// Применяем ответы к компонентам задач
-			const userAnswer = userAnswersMap.get(sectionId) || null
-			section.sectionComponents.forEach(component => {
-				if (component.componentTask) {
-					component.componentTask.userAnswer = userAnswer
-				}
-			})
-		})
-
-		// Собираем все секции в один результат
-		const groupedSections = [...mainSectionMap.values(), ...rootSections]
-
-		return {
-			courseId: course.id,
-			name: course.name,
-			sections: groupedSections
-		}
-	}
+	// async getFullCourseById(courseId: number, user: User) {
+	// 	const course = await this.courseEntityRepository.findOne({
+	// 		where: { id: courseId },
+	// 		relations: {
+	// 			sections: {
+	// 				sectionComponents: {
+	// 					componentTask: true
+	// 				},
+	// 				parentSection: true
+	// 			}
+	// 		},
+	// 		order: {
+	// 			sections: {
+	// 				sectionComponents: { sort: 'ASC' },
+	// 				parentSection: { sort: 'ASC' },
+	// 				sort_number: 'ASC'
+	// 			}
+	// 		}
+	// 	})
+	//
+	// 	if (!course) {
+	// 		throw new Error('Course with ID ${courseId} not found')
+	// 	}
+	//
+	// 	const sections = course.sections
+	//
+	// 	if (!sections || sections.length === 0) {
+	// 		return {
+	// 			courseId: course.id,
+	// 			courseName: course.name,
+	// 			sections: []
+	// 		}
+	// 	}
+	//
+	// 	const sectionIds = sections.map(section => section.id)
+	//
+	// 	// Получение всех ответов пользователя для разделов (включая задачи и без них)
+	// 	const userAnswers = await this.answersComponentUserRepository.find({
+	// 		where: {
+	// 			user: { id: user.id },
+	// 			section: { id: In(sectionIds) }
+	// 		},
+	// 		relations: ['task', 'section']
+	// 	})
+	//
+	// 	// Создаем Map по sectionId для быстрого доступа
+	// 	const userAnswersMap = new Map(
+	// 		userAnswers.map(answer => [answer.section.id, answer.answer])
+	// 	)
+	//
+	// 	// Группируем секции по parentSection
+	// 	const mainSectionMap = new Map<number, any>()
+	// 	const rootSections: any[] = []
+	//
+	// 	// Обработка секций и добавление ответов в компоненты задач
+	// 	sections.forEach(section => {
+	// 		const sectionId = section.id
+	// 		const parentSection = section.parentSection
+	//
+	// 		if (parentSection) {
+	// 			const mainSectionId = parentSection.id
+	// 			if (!mainSectionMap.has(mainSectionId)) {
+	// 				mainSectionMap.set(mainSectionId, {
+	// 					id: mainSectionId,
+	// 					name: parentSection.title,
+	// 					children: []
+	// 				})
+	// 			}
+	// 			mainSectionMap.get(mainSectionId).children.push({
+	// 				id: sectionId,
+	// 				name: section.name,
+	// 				...section,
+	// 				children: []
+	// 			})
+	// 		} else {
+	// 			rootSections.push({
+	// 				id: sectionId,
+	// 				name: section.name,
+	// 				...section,
+	// 				children: []
+	// 			})
+	// 		}
+	//
+	// 		// Применяем ответы к компонентам задач
+	// 		const userAnswer = userAnswersMap.get(sectionId) || null
+	// 		section.sectionComponents.forEach(component => {
+	// 			if (component.componentTask) {
+	// 				component.componentTask.userAnswer = userAnswer
+	// 			}
+	// 		})
+	// 	})
+	//
+	// 	// Собираем все секции в один результат
+	// 	const groupedSections = [...mainSectionMap.values(), ...rootSections]
+	//
+	// 	return {
+	// 		courseId: course.id,
+	// 		name: course.name,
+	// 		sections: groupedSections
+	// 	}
+	// }
 
 	async subscribeCourse(body: SubscribeCourseDto) {
 		const course = await this.courseEntityRepository.findOne({

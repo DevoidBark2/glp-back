@@ -7,8 +7,7 @@ import {
 	Post,
 	Put,
 	Query,
-	Req,
-	UseInterceptors
+	Req
 } from '@nestjs/common'
 import { ComponentTaskService } from './component-task.service'
 import { ApiTags } from '@nestjs/swagger'
@@ -22,23 +21,22 @@ import { Authorization } from 'src/auth/decorators/auth.decorator'
 @ApiTags('Компоненты раздела')
 @Controller('')
 export class ComponentTaskController {
-	constructor(private readonly componentTaskService: ComponentTaskService) { }
+	constructor(private readonly componentTaskService: ComponentTaskService) {}
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
-	@Get('/component-task')
+	@Get('/components')
 	async getComponentTask(@Req() req: Request) {
 		return await this.componentTaskService.getAll(req['user'])
 	}
 
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/component-task/:id')
-	async getComponentTaskById(@Param('id') id: number) {
+	async getComponentTaskById(@Param('id') id: string) {
 		return await this.componentTaskService.getComponentById(id)
 	}
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
-	@Post('/component-task')
-	// @UseInterceptors(ResponseComponentTaskInterceptor)
+	@Post('/components')
 	async createComponentTask(
 		@Body() body: CreateComponentTaskDto,
 		@Req() req: Request
@@ -65,7 +63,7 @@ export class ComponentTaskController {
 
 	@ResponseMessage('Компонент успешно удален!')
 	@Delete('/component-task/:id')
-	async deleteComponentTask(@Param('id') id: number, @Req() req: Request) {
+	async deleteComponentTask(@Param('id') id: string, @Req() req: Request) {
 		return await this.componentTaskService.delete(id, req['user'])
 	}
 

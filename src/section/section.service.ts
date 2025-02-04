@@ -80,9 +80,7 @@ export class SectionService {
 
 		const componentIdsString = section.components // "20,18"
 
-		const componentIdsArray = componentIdsString
-			.split(',')
-			.map(id => Number(id))
+		const componentIdsArray = componentIdsString.split(',').map(id => id)
 
 		await Promise.all(
 			componentIdsArray.map(async (componentId, index) => {
