@@ -18,7 +18,7 @@ export type QuestionsType = {
 	options: string[]
 	correctOption?: number | number[]
 }
-@Entity('component_task')
+@Entity('components')
 export class ComponentTask {
 	@PrimaryColumn({ type: 'uuid' })
 	id: string
