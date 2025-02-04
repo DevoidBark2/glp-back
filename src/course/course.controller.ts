@@ -36,7 +36,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
 	// @UseInterceptors(ResponseCoursesInterceptor)
@@ -210,5 +210,10 @@ export class CourseController {
 	@Get('popular-courses')
 	async getAllPopularCourse() {
 		return this.courseService.getAllPopularCourses()
+	}
+
+	@Post('/check-secret-key')
+	async handleCheckSecretKey(@Body() body: { secret_key: string, courseId: number }) {
+		return await this.courseService.handleCheckCourseSecretKey(body.secret_key, body.courseId)
 	}
 }

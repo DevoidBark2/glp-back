@@ -37,7 +37,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -234,6 +234,7 @@ export class CourseService {
 				publish_date: true,
 				has_certificate: true,
 				content_description: true,
+				secret_key: true,
 				category: {
 					id: true,
 					name: true
@@ -314,8 +315,8 @@ export class CourseService {
 		console.log(createCourse)
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -329,59 +330,59 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -471,8 +472,9 @@ export class CourseService {
 			},
 			relations: {
 				sectionComponents: {
-					section: true,
-					componentTask: true
+					section: {
+						parentSection: true
+					}
 				}
 			}
 		})
@@ -982,12 +984,12 @@ export class CourseService {
 
 				component.componentTask.userAnswer = userAnswerRecord
 					? {
-							...userAnswerRecord,
-							user: undefined, // Можно передать user, если он доступен
-							task: undefined, // Можно передать task, если он доступен
-							section: undefined, // Можно передать section, если он доступен
-							created_at: undefined // Убираем лишнее, если не нужно
-						}
+						...userAnswerRecord,
+						user: undefined, // Можно передать user, если он доступен
+						task: undefined, // Можно передать task, если он доступен
+						section: undefined, // Можно передать section, если он доступен
+						created_at: undefined // Убираем лишнее, если не нужно
+					}
 					: null
 
 				// Остальной код остается неизменным
@@ -1057,5 +1059,22 @@ export class CourseService {
 				})
 				.slice(0, 5)
 		)
+	}
+	async handleCheckCourseSecretKey(secret_key: string, courseId: number) {
+		const course = await this.courseEntityRepository.findOne({
+			where: {
+				id: courseId
+			}
+		})
+
+		if (!course) {
+			throw new BadRequestException(`Курс с ID ${courseId} не найден`)
+		}
+
+		if (course.secret_key !== secret_key) {
+			throw new BadRequestException("Не верный код, попробуйте еще раз.")
+		}
+
+		return true
 	}
 }

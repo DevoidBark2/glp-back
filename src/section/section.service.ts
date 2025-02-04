@@ -27,40 +27,40 @@ export class SectionService {
 		private readonly courseEntityRepository: Repository<CourseEntity>,
 		@InjectRepository(ComponentTask)
 		private readonly componentTaskRepository: Repository<ComponentTask>
-	) {}
+	) { }
 	async findAll(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.sectionEntityRepository.find({
-					relations: {
-						course: true,
-						user: true,
-						sectionComponents: true
-					},
-					select: {
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							role: true
-						}
+				relations: {
+					course: true,
+					user: true,
+					sectionComponents: true
+				},
+				select: {
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						role: true
 					}
-				})
+				}
+			})
 			: this.sectionEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						course: true,
-						sectionComponents: true
-					}
-				})
+				where: { user: { id: user.id } },
+				relations: {
+					course: true,
+					sectionComponents: true
+				}
+			})
 	}
 
 	async createSection(section: CreateSectionCourseDto, user: User) {
 		console.log(section)
 		const parentSection = section.parentSection
 			? await this.mainSectionRepository.findOne({
-					where: { id: Number(section.parentSection) }
-				})
+				where: { id: Number(section.parentSection) }
+			})
 			: null
 
 		const course = await this.courseEntityRepository.findOne({
@@ -136,10 +136,10 @@ export class SectionService {
 		return user.role === UserRole.SUPER_ADMIN
 			? await this.mainSectionRepository.find()
 			: await this.mainSectionRepository.find({
-					where: {
-						user: user
-					}
-				})
+				where: {
+					user: { id: user.id }
+				}
+			})
 	}
 
 	async createMainSections(body: MainSectionDto, user: User) {
