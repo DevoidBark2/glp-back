@@ -5,7 +5,9 @@ export type FileType = {
 	filePath: string
 	fileName: string
 }
-export class CreateSectionCourseDto {
+export class ChangeSectionCourseDto {
+	@ApiProperty({ type: 'number' })
+	id: number
 	@ApiProperty({ type: 'string' })
 	name: string
 	@ApiProperty({ type: 'string' })
