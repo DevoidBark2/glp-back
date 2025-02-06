@@ -10,6 +10,8 @@ import { SectionEntity } from 'src/section/entity/section.entity'
 import { UserRole } from 'src/constants/contants'
 import { CourseComponentType } from './enum/course-component-type.enum'
 import { v4 as uuidv4 } from 'uuid'
+import { ChangeComponentOrderDto } from './dto/change-component-order.dto'
+import { SectionComponentTask } from '../section/entity/section-component-task.entity'
 
 @Injectable()
 export class ComponentTaskService {
@@ -211,5 +213,32 @@ export class ComponentTaskService {
 				answer: data.answer
 			}
 		}
+	}
+
+	async changeComponentOrder(body: ChangeComponentOrderDto, user: User) {
+		console.log(body)
+
+		const currentSection = await this.sectionRepository.findOne({
+			where: { id: body.sectionId },
+			relations: { sectionComponents: true }
+		})
+
+		if (!currentSection) {
+			throw new Error('Раздел не найден')
+		}
+
+		// Обновляем sort для каждого компонента
+		await Promise.all(
+			body.components.map(({ id, sort }) =>
+				this.sectionRepository
+					.createQueryBuilder()
+					.update(SectionComponentTask)
+					.set({ sort })
+					.where('id = :id', { id })
+					.execute()
+			)
+		)
+
+		return { message: 'Порядок компонентов обновлен' }
 	}
 }

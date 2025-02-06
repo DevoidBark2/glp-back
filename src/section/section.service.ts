@@ -68,6 +68,24 @@ export class SectionService {
 			where: { id: Number(section.course.id) }
 		})
 
+		console.log(parentSection)
+
+		let sortNumber = 0
+
+		if (parentSection) {
+			const lastSection = await this.sectionEntityRepository.find({
+				order: { sort_number: 'DESC' }
+			})
+
+			console.log(lastSection)
+
+			sortNumber = lastSection
+				? Number(lastSection[0].sort_number) + 1
+				: 0
+		}
+
+		// console.log(sortNumber)
+
 		const sectionItem = await this.sectionEntityRepository.save({
 			name: section.name,
 			description: section.description,
@@ -76,7 +94,8 @@ export class SectionService {
 			uploadFile: section.uploadFile,
 			user: user,
 			status: StatusSectionEnum.ACTIVE,
-			parentSection: parentSection
+			parentSection: parentSection,
+			sort_number: sortNumber // Присваиваем правильный порядок
 		})
 
 		await Promise.all(
@@ -189,6 +208,11 @@ export class SectionService {
 					componentTask: true
 				},
 				parentSection: true
+			},
+			order: {
+				sectionComponents: {
+					sort: 'ASC'
+				}
 			}
 		})
 

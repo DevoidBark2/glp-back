@@ -17,6 +17,7 @@ import { UserRole } from '../constants/contants'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SaveTaskUserDto } from './dto/save-task-user.dto'
 import { Authorization } from 'src/auth/decorators/auth.decorator'
+import { ChangeComponentOrderDto } from './dto/change-component-order.dto'
 
 @ApiTags('Компоненты раздела')
 @Controller('')
@@ -83,6 +84,18 @@ export class ComponentTaskController {
 	@Post('save-task-user')
 	async saveUserTask(@Body() body: SaveTaskUserDto, @Req() req: Request) {
 		return await this.componentTaskService.addAnswerForTask(
+			body,
+			req['user']
+		)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Post('change-order-component')
+	async changeComponentOrder(
+		@Body() body: ChangeComponentOrderDto,
+		@Req() req: Request
+	) {
+		return await this.componentTaskService.changeComponentOrder(
 			body,
 			req['user']
 		)

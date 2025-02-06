@@ -21,6 +21,6 @@ import { User } from 'src/user/entity/user.entity'
 		])
 	],
 	controllers: [ComponentTaskController],
-	providers: [ComponentTaskService,UserService, JwtService]
+	providers: [ComponentTaskService, UserService, JwtService]
 })
 export class ComponentTaskModule {}
