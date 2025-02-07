@@ -256,4 +256,15 @@ export class SectionService {
 			title: section.title
 		}
 	}
+
+	async updateOrderParentSection(body: {
+		sections: { id: number; sort: number; sectionId: number }[]
+		courseId: number
+	}) {
+		for (const section of body.sections) {
+			await this.sectionEntityRepository.update(section.sectionId, {
+				sort_number: section.sort
+			})
+		}
+	}
 }

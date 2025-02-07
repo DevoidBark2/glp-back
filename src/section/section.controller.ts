@@ -7,7 +7,6 @@ import {
 	Post,
 	Put,
 	Req,
-	UploadedFiles,
 	UseInterceptors
 } from '@nestjs/common'
 import { SectionService } from './section.service'
@@ -115,5 +114,17 @@ export class SectionController {
 		@Req() req: Request
 	) {
 		return await this.sectionService.createMainSections(body, req['user'])
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Post('update-order-parent-section')
+	async updateOrderParentSection(
+		@Body()
+		body: {
+			sections: { id: number; sort: number; sectionId: number }[]
+			courseId: number
+		}
+	) {
+		return await this.sectionService.updateOrderParentSection(body)
 	}
 }
