@@ -28,6 +28,8 @@ import { CommentsModule } from './comments/comments.module';
 import { ExamsModule } from './exams/exams.module';
 import { ReviewModule } from './review/review.module';
 import { PdfModule } from './pdf/pdf.module';
+import { ThreeModelModule } from './three-model/three-model.module';
+import { SeedModule } from './database/seeds/3d_model/seeds.module'
 
 @Module({
 	imports: [
@@ -76,7 +78,9 @@ import { PdfModule } from './pdf/pdf.module';
 		CommentsModule,
 		ExamsModule,
 		ReviewModule,
-		PdfModule
+		PdfModule,
+		ThreeModelModule,
+		SeedModule
 	]
 	// providers: [
 	// 	WebsocketGateway,
