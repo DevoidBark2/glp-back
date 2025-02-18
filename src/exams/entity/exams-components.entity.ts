@@ -14,7 +14,7 @@ export class ExamsComponent {
 	@ManyToOne(() => ComponentTask, component => component.id, {
 		onDelete: 'CASCADE'
 	})
-	component: ComponentTask
+	componentTask: ComponentTask
 
 	@Column({ type: 'int' })
 	sort: number

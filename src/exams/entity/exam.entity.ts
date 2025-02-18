@@ -21,13 +21,9 @@ export class ExamEntity {
 	status: ExamStatus
 	@ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
 	user: User
-	@OneToMany(() => ExamsComponent, examComponent => examComponent.exam, {
-		onDelete: 'CASCADE'
-	})
+	@OneToMany(() => ExamsComponent, examComponent => examComponent.exam)
 	components: ExamsComponent[]
-	@OneToMany(() => CourseEntity, course => course.exam, {
-		onDelete: 'CASCADE'
-	})
+	@OneToMany(() => CourseEntity, course => course.exam, { onDelete: "SET NULL" })
 	course: CourseEntity[]
 	@CreateDateColumn()
 	created_at: Date

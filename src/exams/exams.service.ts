@@ -56,7 +56,7 @@ export class ExamsService {
 		const examComponents = components.components.map(component => {
 			const examComponent = new ExamsComponent()
 			examComponent.exam = examEntity
-			examComponent.component = component
+			examComponent.componentTask = component
 			examComponent.sort = component.sort
 
 			return examComponent
