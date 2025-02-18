@@ -511,15 +511,34 @@ export class CourseService {
 	}
 
 	async getCourseMenuById(courseId: number, user: User) {
-		const course = await this.courseEntityRepository.findOne({
+		const course = await this.loadCourse(courseId)
+		if (!course) throw new Error(`Курс с ID ${courseId} не найден!`)
+
+		const sections = course.sections
+		if (!sections.length) return []
+
+		const totalPoints = this.calculateTotalPoints(sections)
+		const userAnswers = await this.loadUserAnswers(user.id, sections)
+		const userPoints = this.calculateTotalUserPoints(userAnswers)
+
+		const structuredSections = this.structureSections(sections, userAnswers)
+
+		return {
+			sections: structuredSections,
+			courseName: course.name,
+			progress: Math.floor((userPoints / totalPoints) * 100)
+		}
+	}
+
+	// 🔹 Загружаем курс
+	private async loadCourse(courseId: number) {
+		return this.courseEntityRepository.findOne({
 			where: { id: courseId },
 			relations: {
 				courseUsers: true,
 				sections: {
 					parentSection: true,
-					sectionComponents: {
-						componentTask: true
-					}
+					sectionComponents: { componentTask: true }
 				}
 			},
 			order: {
@@ -529,105 +548,71 @@ export class CourseService {
 				}
 			}
 		})
+	}
 
-		if (!course) {
-			throw new Error(`Курс с ID ${courseId} не найден!`)
-		}
-
-		const sections = course.sections
-
-		const totalCount = this.calculateTotalPoints(sections)
-
-		if (!sections || sections.length === 0) {
-			return []
-		}
-
+	// 🔹 Загружаем ответы пользователя
+	private async loadUserAnswers(userId: string, sections: SectionEntity[]) {
 		const sectionIds = sections.map(section => section.id)
-
-		// Загружаем ответы пользователя
-		const userAnswers = await this.answersComponentUserRepository.find({
+		return this.answersComponentUserRepository.find({
 			where: {
-				user: { id: user.id },
+				user: { id: userId },
 				section: { id: In(sectionIds) }
 			},
-			relations: {
-				section: true,
-				task: true
-			}
+			relations: { section: true, task: true }
 		})
+	}
 
-		const totalUserCount = this.calculateTotalUserPoints(userAnswers)
-
+	// 🔹 Структурируем разделы
+	private structureSections(
+		sections: SectionEntity[],
+		userAnswers: AnswersComponentUser[]
+	) {
 		const userAnswersMap = new Map(
 			userAnswers.map(answer => [answer.section.id, answer.answer])
 		)
-
-		// Группируем секции по parentSection
-		const mainSectionMap = new Map<number, any>()
+		const mainSections = new Map<number, any>()
 		const rootSections: any[] = []
 
 		sections.forEach(section => {
-			const sectionId = section.id
-			const parentSection = section.parentSection
-
-			// Получаем ответ пользователя для текущего подраздела
-			const rawUserAnswer = userAnswersMap.get(sectionId) || null
-
-			// Обработка userAnswer
-			let userAnswer = null
-
-			if (rawUserAnswer) {
-				if (rawUserAnswer.confirmedStep) {
-					userAnswer = { confirmedStep: rawUserAnswer.confirmedStep }
-				} else if (Array.isArray(rawUserAnswer)) {
-					const totalAnswers = rawUserAnswer.length
-					const correctAnswers = rawUserAnswer.filter(
-						item => item.isCorrect
-					).length
-					userAnswer = {
-						totalAnswers,
-						correctAnswers
-					}
-				} else {
-					userAnswer = {
-						value: rawUserAnswer.userAnswer,
-						isCorrect: rawUserAnswer.isCorrect
-					}
-				}
-			}
-
-			if (parentSection) {
-				const mainSectionId = parentSection.id
-				if (!mainSectionMap.has(mainSectionId)) {
-					mainSectionMap.set(mainSectionId, {
-						id: mainSectionId,
-						name: parentSection.title,
+			const userAnswer = this.processUserAnswer(
+				userAnswersMap.get(section.id)
+			)
+			if (section.parentSection) {
+				const parentId = section.parentSection.id
+				if (!mainSections.has(parentId)) {
+					mainSections.set(parentId, {
+						id: parentId,
+						name: section.parentSection.title,
 						children: []
 					})
 				}
-				mainSectionMap.get(mainSectionId).children.push({
-					id: sectionId,
+				mainSections.get(parentId).children.push({
+					id: section.id,
 					name: section.name,
-					userAnswer // Добавляем обработанный ответ пользователя
+					userAnswer
 				})
 			} else {
 				rootSections.push({
-					id: sectionId,
+					id: section.id,
 					name: section.name,
-					userAnswer, // Добавляем обработанный ответ пользователя
+					userAnswer,
 					children: []
 				})
 			}
 		})
 
-		// Собираем итоговый список родительских секций и их потомков
-		const groupedSections = [...mainSectionMap.values(), ...rootSections]
+		return [...mainSections.values(), ...rootSections]
+	}
 
-		return {
-			sections: groupedSections,
-			courseName: course.name,
-			progress: Math.floor((totalUserCount / totalCount) * 100)
-		}
+	private processUserAnswer(rawAnswer: any) {
+		if (!rawAnswer) return null
+		return rawAnswer.confirmedStep
+			? { confirmedStep: rawAnswer.confirmedStep }
+			: {
+					totalAnswers: rawAnswer.length,
+					correctAnswers: rawAnswer.filter(item => item.isCorrect)
+						.length
+				}
 	}
 
 	private calculateTotalPoints(sections: SectionEntity[]) {
@@ -911,7 +896,6 @@ export class CourseService {
 	async getCurrentSection(courseId: number, sectionId: number, user: User) {
 		// Проверяем, если sectionId равен -1 (для проверки экзамена)
 		if (Number(sectionId) === -1) {
-			// Ищем пользователя в курсе
 			const courseUser = await this.courseUserRepository.findOne({
 				where: {
 					user: { id: user.id },
@@ -919,10 +903,8 @@ export class CourseService {
 				}
 			})
 
-			// Получаем прогресс пользователя
-			const userProgress = courseUser?.progress ?? -1
+			const userProgress = courseUser?.progress
 
-			// Проверяем, если прогресс недостаточен для доступа к экзамену
 			if (userProgress < 0) {
 				return {
 					message:
@@ -930,7 +912,6 @@ export class CourseService {
 				}
 			}
 
-			// Ищем экзамен по courseId
 			return await this.examEntityRepository.findOne({
 				where: { course: { id: courseId } },
 				relations: { components: { component: true } }
@@ -952,9 +933,10 @@ export class CourseService {
 			}
 		})
 
-		// Если курс не найден, выбрасываем ошибку
 		if (!course) {
-			throw new Error(`Course with ID ${courseId} not found`)
+			throw new BadRequestException(
+				`Course with ID ${courseId} not found`
+			)
 		}
 
 		// Ищем нужную секцию по sectionId

@@ -156,10 +156,6 @@ export class ComponentTaskService {
 			where: { id: Number(body.currentSection) }
 		})
 
-		console.log('Ответ', body.answers)
-		console.log('ЗАДАЧА', task)
-
-		// Обрабатываем ответы пользователя
 		const results = task.questions?.map((question, index) => {
 			const userAnswer = Array.isArray(body.answers)
 				? body.answers[index]
@@ -170,7 +166,7 @@ export class ComponentTaskService {
 				? question.correctOption
 				: [question.correctOption]
 
-			// Проверка правильности ответа
+			// Проверка правильности ответа для multiple-choice
 			const isCorrect =
 				task.type === CourseComponentType.MultiPlayChoice
 					? Array.isArray(userAnswer) &&
@@ -197,20 +193,42 @@ export class ComponentTaskService {
 			}
 		]
 
-		// Сохранение результата
-		const data = await this.answersComponentUserRepository.save({
-			user,
-			task,
-			answer: results,
-			section
-		})
+		// Логирование для отладки
+		console.log('Received body:', body)
 
+		// Проверяем, существует ли уже запись с ответами для пользователя
+		const existUserAnswer = body.task.userAnswer
+			? await this.answersComponentUserRepository.findOne({
+					where: {
+						id: Number(body.task.userAnswer.id) // Ищем запись по ID
+					}
+				})
+			: null
+
+		let savedAnswer
+
+		// Если ответа не существует, создаем новую запись
+		if (!existUserAnswer) {
+			savedAnswer = await this.answersComponentUserRepository.save({
+				user,
+				task,
+				answer: results,
+				section
+			})
+		} else {
+			// Если ответ уже существует, обновляем его
+			existUserAnswer.answer = results
+			await this.answersComponentUserRepository.save(existUserAnswer)
+			savedAnswer = existUserAnswer // Сохраняем актуальные данные
+		}
+
+		// Возвращаем результат
 		return {
 			message: 'Ответы успешно сохранены',
 			userAnswer: {
-				id: data.id,
+				id: savedAnswer.id,
 				type: task.type,
-				answer: data.answer
+				answer: savedAnswer.answer
 			}
 		}
 	}

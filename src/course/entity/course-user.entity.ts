@@ -3,9 +3,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	ManyToMany,
 	ManyToOne,
-	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn
 } from 'typeorm'
@@ -16,12 +14,10 @@ export class CourseUser {
 	@PrimaryGeneratedColumn()
 	id: number
 	@ManyToOne(() => User, user => user.id, {
-		// eager: true,
 		onDelete: 'CASCADE'
 	})
 	user: User
 	@ManyToOne(() => CourseEntity, course => course.id, {
-		// eager: true,
 		onDelete: 'CASCADE'
 	})
 	course: CourseEntity
