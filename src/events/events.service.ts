@@ -16,6 +16,16 @@ export class EventsService {
 			relations: { user: true },
 			order: {
 				created_at: 'DESC'
+			},
+			select: {
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true,
+					role: true,
+					email: true
+				}
 			}
 		})
 	}
