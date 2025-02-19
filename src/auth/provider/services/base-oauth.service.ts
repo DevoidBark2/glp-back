@@ -14,12 +14,6 @@ export class BaseOAuthService {
 	public constructor(private readonly options: TypeBaseProviderOptions) {}
 
 	public async extractUserInfo(data: any): Promise<TypeUserInfo> {
-		console.log('Приходит', data)
-
-		console.log('Уходит', {
-			...data,
-			provider: this.options.name
-		})
 		return {
 			...data,
 			provider: this.options.name
@@ -87,9 +81,7 @@ export class BaseOAuthService {
 		}
 
 		const user = await userRequest.json()
-		console.log('MAGIC', user)
 		const userData = await this.extractUserInfo(user)
-		console.log('USER_DATA', userData)
 
 		return {
 			...userData,

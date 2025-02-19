@@ -57,7 +57,6 @@ export class SectionService {
 	}
 
 	async createSection(section: CreateSectionCourseDto, user: User) {
-		console.log(section)
 		const parentSection = section.parentSection
 			? await this.mainSectionRepository.findOne({
 					where: { id: Number(section.parentSection) }
@@ -68,8 +67,6 @@ export class SectionService {
 			where: { id: Number(section.course.id) }
 		})
 
-		console.log(parentSection)
-
 		let sortNumber = 0
 
 		if (parentSection) {
@@ -77,14 +74,10 @@ export class SectionService {
 				order: { sort_number: 'DESC' }
 			})
 
-			console.log(lastSection)
-
 			sortNumber = lastSection
 				? Number(lastSection[0].sort_number) + 1
 				: 0
 		}
-
-		// console.log(sortNumber)
 
 		const sectionItem = await this.sectionEntityRepository.save({
 			name: section.name,
@@ -121,7 +114,6 @@ export class SectionService {
 	}
 
 	async changeSection(section: ChangeSectionCourseDto, user: User) {
-		console.log(section)
 		// Находим существующий раздел
 		const sectionItem = await this.sectionEntityRepository.findOne({
 			where: { id: Number(section.id) },

@@ -36,7 +36,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) { }
+	constructor(private readonly courseService: CourseService) {}
 
 	@Get('/courses')
 	// @UseInterceptors(ResponseCoursesInterceptor)
@@ -101,8 +101,6 @@ export class CourseController {
 
 	@Post('search-course-by-filter')
 	async getCoursesByFilter(@Body() body: FilterValuesDto) {
-		console.log(body.categories)
-		console.log(body.durations)
 		return await this.courseService.searchCoursesByFilter(body)
 	}
 
@@ -213,7 +211,12 @@ export class CourseController {
 	}
 
 	@Post('/check-secret-key')
-	async handleCheckSecretKey(@Body() body: { secret_key: string, courseId: number }) {
-		return await this.courseService.handleCheckCourseSecretKey(body.secret_key, body.courseId)
+	async handleCheckSecretKey(
+		@Body() body: { secret_key: string; courseId: number }
+	) {
+		return await this.courseService.handleCheckCourseSecretKey(
+			body.secret_key,
+			body.courseId
+		)
 	}
 }

@@ -24,11 +24,11 @@ import { MailModule } from './libs/mail/mail.module'
 import { MailConfirmationModule } from './auth/mail-confirmation/mail-confirmation.module'
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module'
 import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.module'
-import { CommentsModule } from './comments/comments.module';
-import { ExamsModule } from './exams/exams.module';
-import { ReviewModule } from './review/review.module';
-import { PdfModule } from './pdf/pdf.module';
-import { ThreeModelModule } from './three-model/three-model.module';
+import { CommentsModule } from './comments/comments.module'
+import { ExamsModule } from './exams/exams.module'
+import { ReviewModule } from './review/review.module'
+import { PdfModule } from './pdf/pdf.module'
+import { ThreeModelModule } from './three-model/three-model.module'
 import { SeedModule } from './database/seeds/3d_model/seeds.module'
 
 @Module({
@@ -82,12 +82,5 @@ import { SeedModule } from './database/seeds/3d_model/seeds.module'
 		ThreeModelModule,
 		SeedModule
 	]
-	// providers: [
-	// 	WebsocketGateway,
-	// 	{
-	// 		provide: APP_GUARD,
-	// 		useClass: AuthGuards
-	// 	}
-	// ]
 })
-export class AppModule { }
+export class AppModule {}

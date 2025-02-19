@@ -193,9 +193,6 @@ export class ComponentTaskService {
 			}
 		]
 
-		// Логирование для отладки
-		console.log('Received body:', body)
-
 		// Проверяем, существует ли уже запись с ответами для пользователя
 		const existUserAnswer = body.task.userAnswer
 			? await this.answersComponentUserRepository.findOne({
@@ -234,8 +231,6 @@ export class ComponentTaskService {
 	}
 
 	async changeComponentOrder(body: ChangeComponentOrderDto, user: User) {
-		console.log(body)
-
 		const currentSection = await this.sectionRepository.findOne({
 			where: { id: body.sectionId },
 			relations: { sectionComponents: true }

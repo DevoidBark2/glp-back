@@ -6,50 +6,67 @@ import {
 	SubscribeMessage,
 	WebSocketGateway,
 	WebSocketServer
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { Injectable } from '@nestjs/common';
-import { ExamsService } from 'src/exams/exams.service';
+} from '@nestjs/websockets'
+import { Server, Socket } from 'socket.io'
+import { Injectable, UseGuards } from '@nestjs/common'
+import { ExamsService } from 'src/exams/exams.service'
+import { ComponentTask } from '../component-task/entity/component-task.entity'
+import { UserRole } from '../constants/contants'
+import { WsAuthGuard } from './guards/ws.guard'
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: '/' }) // Включаем CORS
 @Injectable()
 export class WebsocketGateway
-	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-	@WebSocketServer() server: Server;
+	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+	@WebSocketServer() server: Server
 
-	constructor(private readonly examService: ExamsService) { }
+	constructor(private readonly examService: ExamsService) {}
 
 	afterInit(server: Server): void {
-		console.log('WebSocket сервер запущен');
+		console.log('WebSocket сервер запущен')
 	}
 
+	@UseGuards(WsAuthGuard)
 	handleConnection(client: Socket): void {
-		console.log(`Клиент подключен: ${client.id}`);
+		console.log(`Клиент подключен: ${JSON.stringify(client.data)}`)
 	}
 
 	handleDisconnect(client: Socket): void {
-		console.log(`Клиент отключен: ${client.id}`);
+		console.log(`Клиент отключен: ${client.id}`)
 	}
 
-	// Получение оставшегося времени экзамена
+	@SubscribeMessage('startExam')
+	async handleStartExam(
+		client: Socket,
+		@MessageBody() { userId, examId }: { userId: string; examId: string }
+	) {
+		// const startTime = await this.examService.startExam(userId, examId)
+		// client.emit('examStarted', { startTime })
+	}
+
 	@SubscribeMessage('getExamTime')
 	async handleGetExamTime(client: Socket, @MessageBody() userId: string) {
-		// const timeLeft = await this.examService.getTimeLeft(userId);
-		// client.emit('examTime', timeLeft);
+		// const timeLeft = await this.examService.getTimeLeft(userId)
+		// client.emit('examTime', timeLeft)
 	}
 
-	// Сохранение текущего вопроса
 	@SubscribeMessage('saveProgress')
-	async handleSaveProgress(client: Socket, @MessageBody() data: { userId: string; questionIndex: number }) {
-		//	await this.examService.saveProgress(data.userId, data.questionIndex);
+	async handleSaveProgress(
+		client: Socket,
+		@MessageBody()
+		{ quiz, answer }: { quiz: ComponentTask; answer: number[] | string }
+	) {
+		console.log(quiz, answer)
+		// await this.examService.saveProgress(userId, questionIndex)
+		// client.emit('progressSaved', { questionIndex })
 	}
 
-	// Проверка завершения экзамена
 	@SubscribeMessage('checkExamStatus')
 	async handleCheckExamStatus(client: Socket, @MessageBody() userId: string) {
-		// const isFinished = await this.examService.isExamFinished(userId);
+		// const isFinished = await this.examService.isExamFinished(userId)
 		// if (isFinished) {
-		// 	client.emit('examFinished');
+		// 	client.emit('examFinished')
 		// }
 	}
 }

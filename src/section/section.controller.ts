@@ -66,7 +66,6 @@ export class SectionController {
 		// 		fileName: file.originalname // Оригинальное имя файла от пользователя
 		// 	})
 		// })
-		console.log(newSectionCourse)
 		await this.sectionService.createSection(newSectionCourse, req['user'])
 	}
 

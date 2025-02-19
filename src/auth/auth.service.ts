@@ -318,8 +318,6 @@ export class AuthService {
 		const providerInstance = this.providerService.findByService(provider)
 		const profile = await providerInstance.findUserByCode(code)
 
-		console.log(profile)
-
 		const account = await this.accountRepository.findOne({
 			where: {
 				id: profile.id,
@@ -327,18 +325,14 @@ export class AuthService {
 			}
 		})
 
-		console.log(account)
-
 		let user = account?.id
 			? await this.userService.findById(account.id)
 			: null
 
-		console.log('sds', user)
 		if (user) {
 			return this.saveSession(req, user)
 		}
 
-		console.log('sadsadsadsadsadsad', profile)
 		user = await this.userService.create(
 			profile.email,
 			'',
@@ -348,10 +342,7 @@ export class AuthService {
 			true
 		)
 
-		console.log(user)
-
 		if (!account) {
-			console.log('HERERERE')
 			await this.accountRepository.save({
 				id: user.id,
 				userId: user.id,

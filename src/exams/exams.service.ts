@@ -17,7 +17,7 @@ export class ExamsService {
 		private readonly examsComponentRepository: Repository<ExamsComponent>,
 		@InjectRepository(CourseEntity)
 		private readonly courseRepository: Repository<CourseEntity>
-	) { }
+	) {}
 
 	async findAll(user: User) {
 		return await this.examEntityRepository.find({
@@ -25,7 +25,7 @@ export class ExamsService {
 				user: { id: user.id }
 			},
 			relations: {
-				user: true,
+				user: true
 			},
 			select: {
 				user: {
@@ -43,7 +43,6 @@ export class ExamsService {
 				created_at: 'DESC'
 			}
 		})
-
 	}
 
 	async createExam(components: CreateExamDto, user: User) {
@@ -97,4 +96,34 @@ export class ExamsService {
 			exam: exam
 		})
 	}
+
+	// async startExam(userId: string, examId: string) {
+	// 	const session = new ExamSession();
+	// 	session.userId = userId;
+	// 	session.examId = examId;
+	// 	session.startTime = new Date();
+	// 	session.endTime = new Date(session.startTime.getTime() + 24 * 60 * 60 * 1000);
+	// 	await this.examSessionRepository.save(session);
+	// 	return session.startTime;
+	// }
+	//
+	// async getTimeLeft(userId: string) {
+	// 	const session = await this.examSessionRepository.findOne({ where: { userId } });
+	// 	if (!session) throw new BadRequestException('Экзамен не найден');
+	// 	const timeLeft = session.endTime.getTime() - new Date().getTime();
+	// 	return timeLeft > 0 ? timeLeft : 0;
+	// }
+	//
+	// async saveProgress(userId: string, questionIndex: number, answer: string) {
+	// 	const answerRecord = new ExamAnswer();
+	// 	answerRecord.userId = userId;
+	// 	answerRecord.questionIndex = questionIndex;
+	// 	answerRecord.answer = answer;
+	// 	await this.examAnswerRepository.save(answerRecord);
+	// }
+	//
+	// async isExamFinished(userId: string) {
+	// 	const session = await this.examSessionRepository.findOne({ where: { userId } });
+	// 	return session ? new Date() >= session.endTime : false;
+	// }
 }

@@ -6,6 +6,7 @@ import { ExamEntity } from './entity/exam.entity'
 import { UserModule } from '../user/user.module'
 import { ExamsComponent } from './entity/exams-components.entity'
 import { CourseEntity } from 'src/course/entity/course.entity'
+import { WebsocketGateway } from '../websockets/websocket.gateway'
 
 @Module({
 	imports: [
@@ -13,6 +14,6 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 		UserModule
 	],
 	controllers: [ExamsController],
-	providers: [ExamsService]
+	providers: [ExamsService, WebsocketGateway]
 })
-export class ExamsModule { }
+export class ExamsModule {}
