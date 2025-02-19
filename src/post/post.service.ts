@@ -19,7 +19,7 @@ export class PostService {
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
 		private readonly jwtService: JwtService
-	) {}
+	) { }
 
 	async getAllPosts() {
 		return this.postEntityRepository.find({
@@ -27,6 +27,7 @@ export class PostService {
 				is_publish: true
 			},
 			select: {
+				id: true,
 				name: true,
 				description: true,
 				image: true
