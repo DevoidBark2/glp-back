@@ -213,7 +213,6 @@ export class CourseService {
 	}
 
 	async findOneById(courseId: number, user: User) {
-		// Fetch the course details (exclude courseUsers data for optimization)
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
 			relations: {
