@@ -6,6 +6,8 @@ import { User } from '../user/entity/user.entity'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { SectionEntity } from '../section/entity/section.entity'
 import { v4 as uuidv4 } from 'uuid'
+import { CommentAddedEvent } from 'src/achievements/events/achievement.events'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class CommentsService {
@@ -13,8 +15,9 @@ export class CommentsService {
 		@InjectRepository(Comments)
 		private readonly commentsRepository: Repository<Comments>,
 		@InjectRepository(SectionEntity)
-		private readonly sectionEntityRepository: Repository<SectionEntity>
-	) {}
+		private readonly sectionEntityRepository: Repository<SectionEntity>,
+		private eventEmitter: EventEmitter2
+	) { }
 
 	async getSectionComments(sectionId: number) {
 		return await this.commentsRepository.find({
@@ -50,6 +53,10 @@ export class CommentsService {
 			section: section,
 			user: user
 		})
+
+
+		console.log(user.id)
+		this.eventEmitter.emit('comment.added', new CommentAddedEvent(user.id));
 
 		return {
 			id: newComment.id,

@@ -20,13 +20,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:create": "cross-var ts-node node_modules/typeorm/cli.js migration:create ./src/database/migrations/$npm_config_name",
     "migrate": "ts-node node_modules/typeorm/cli.js migration:run -d src/shared/utils/datasource.ts",
-    "migration:down": "ts-node node_modules/typeorm/cli.js migration:revert -d src/shared/utils/datasource.ts"
+    "migration:down": "ts-node node_modules/typeorm/cli.js migration:revert -d src/shared/utils/datasource.ts",
+    "data:sync": "ts-node -r tsconfig-paths/register ./src/database/seed.helper.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/event-emitter": "^3.0.1",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",

@@ -18,6 +18,7 @@ import { CourseUser } from 'src/course/entity/course-user.entity'
 import { AuthMethodEnum } from '../../auth/enum/auth-method.enum'
 import { Account } from './account.entity'
 import ReviewCourse from 'src/review/entity/review.entity'
+import { AchievementUser } from 'src/achievements/entities/achievement-users.entity'
 
 @Entity('users')
 export class User {
@@ -91,4 +92,6 @@ export class User {
 	accounts: Account[]
 	@OneToMany(() => ReviewCourse, review => review.user, { cascade: true })
 	reviews: ReviewCourse[]
+	@OneToMany(() => AchievementUser, achievementUser => achievementUser.user)
+	achievements: AchievementUser[]
 }

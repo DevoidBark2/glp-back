@@ -29,11 +29,12 @@ import { ExamsModule } from './exams/exams.module'
 import { ReviewModule } from './review/review.module'
 import { PdfModule } from './pdf/pdf.module'
 import { ThreeModelModule } from './three-model/three-model.module'
-import { SeedModule } from './database/seeds/3d_model/seeds.module'
 import { UsersLevelsModule } from './users-levels/users-levels.module';
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
 	imports: [
+		EventEmitterModule.forRoot(),
 		ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: !IS_DEV_ENV }),
 		TypeOrmModule.forRootAsync({
 			imports: [ConfigModule],
@@ -81,8 +82,7 @@ import { UsersLevelsModule } from './users-levels/users-levels.module';
 		ReviewModule,
 		PdfModule,
 		ThreeModelModule,
-		SeedModule,
 		UsersLevelsModule
 	]
 })
-export class AppModule {}
+export class AppModule { }

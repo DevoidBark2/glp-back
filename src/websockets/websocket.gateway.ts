@@ -13,15 +13,15 @@ import { ExamsService } from 'src/exams/exams.service'
 import { ComponentTask } from '../component-task/entity/component-task.entity'
 import { UserRole } from '../constants/contants'
 import { WsAuthGuard } from './guards/ws.guard'
+import { OnEvent } from '@nestjs/event-emitter'
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: '/' }) // Включаем CORS
 @Injectable()
 export class WebsocketGateway
-	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server
 
-	constructor(private readonly examService: ExamsService) {}
+	constructor(private readonly examService: ExamsService) { }
 
 	afterInit(server: Server): void {
 		console.log('WebSocket сервер запущен')
@@ -68,5 +68,16 @@ export class WebsocketGateway
 		// if (isFinished) {
 		// 	client.emit('examFinished')
 		// }
+	}
+
+	@OnEvent('achievement.completed')
+	async handleAchievementCompleted(event: { userId: string; achievementTitle: string }) {
+		console.log(`Пользователь ${event.userId} получил достижение: ${event.achievementTitle}`);
+
+		// Отправляем уведомление через сокет
+		this.server.emit('achievementNotification', {
+			title: event.achievementTitle,
+			message: `Поздравляем! Вы получили достижение: ${event.achievementTitle}`,
+		});
 	}
 }

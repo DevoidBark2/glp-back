@@ -11,4 +11,4 @@ import { SectionEntity } from '../section/entity/section.entity'
 	controllers: [CommentsController],
 	providers: [CommentsService]
 })
-export class CommentsModule {}
+export class CommentsModule { }

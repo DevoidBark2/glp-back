@@ -1,10 +1,10 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm'
 import { ConditionTypeEnum } from '../enums/condition_type.enum'
 
 @Entity('achievements')
 export class Achievement {
-	@PrimaryColumn({ type: 'uuid' })
-	id: string
+	@PrimaryGeneratedColumn()
+	id: number
 	@Column({ type: 'varchar', length: 255 })
 	title: string
 	@Column({ type: 'varchar', length: 255 })
