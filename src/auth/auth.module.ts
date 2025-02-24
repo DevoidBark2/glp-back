@@ -23,10 +23,13 @@ import { CourseUser } from '../course/entity/course-user.entity'
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 import { Token } from './entity/token.entity'
 import { EventEntity } from '../events/entity/event.entity'
+import { UserLevel } from '../users-levels/entity/user-level.entity'
+import { UsersLevelsModule } from '../users-levels/users-levels.module'
 
 @Module({
 	imports: [
 		forwardRef(() => UserModule),
+		forwardRef(() => UsersLevelsModule),
 		PassportModule,
 		TypeOrmModule.forFeature([
 			User,
@@ -35,7 +38,8 @@ import { EventEntity } from '../events/entity/event.entity'
 			Account,
 			CourseUser,
 			Token,
-			EventEntity
+			EventEntity,
+			UserLevel
 		]),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],

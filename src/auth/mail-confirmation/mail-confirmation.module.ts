@@ -11,11 +11,13 @@ import { UserService } from '../../user/user.service'
 import { MailService } from '../../libs/mail/mail.service'
 import { CourseUser } from '../../course/entity/course-user.entity'
 import { JwtModule } from '@nestjs/jwt'
+import { UsersLevelsModule } from '../../users-levels/users-levels.module'
 
 @Module({
 	imports: [
 		MailModule,
 		JwtModule,
+		UsersLevelsModule,
 		forwardRef(() => AuthModule),
 		TypeOrmModule.forFeature([Account, Token, User, CourseUser])
 	],

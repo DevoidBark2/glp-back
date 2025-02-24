@@ -30,6 +30,7 @@ import { ReviewModule } from './review/review.module'
 import { PdfModule } from './pdf/pdf.module'
 import { ThreeModelModule } from './three-model/three-model.module'
 import { SeedModule } from './database/seeds/3d_model/seeds.module'
+import { UsersLevelsModule } from './users-levels/users-levels.module';
 
 @Module({
 	imports: [
@@ -80,7 +81,8 @@ import { SeedModule } from './database/seeds/3d_model/seeds.module'
 		ReviewModule,
 		PdfModule,
 		ThreeModelModule,
-		SeedModule
+		SeedModule,
+		UsersLevelsModule
 	]
 })
 export class AppModule {}

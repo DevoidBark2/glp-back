@@ -30,6 +30,7 @@ import { MailConfirmationService } from './mail-confirmation/mail-confirmation.s
 import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service'
 import { EventEntity } from '../events/entity/event.entity'
 import { ActionEvent } from '../events/enum/action-event.enum'
+import { UsersLevelsService } from '../users-levels/users-levels.service'
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,8 @@ export class AuthService {
 		private readonly accountRepository: Repository<Account>,
 		private readonly twoFactorService: TwoFactorAuthService,
 		@InjectRepository(EventEntity)
-		private readonly eventEntityRepository: Repository<EventEntity>
+		private readonly eventEntityRepository: Repository<EventEntity>,
+		private readonly usersLevelsService: UsersLevelsService
 	) {}
 
 	// Метод для точного соответствия требованиям каждого уровня
@@ -354,6 +356,8 @@ export class AuthService {
 				expires_at: profile.expires_at
 			})
 		}
+
+		await this.usersLevelsService.setDefaultLevelToUser(user)
 
 		return this.saveSession(req, user)
 	}

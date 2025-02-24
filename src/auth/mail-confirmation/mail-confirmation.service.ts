@@ -16,6 +16,7 @@ import { User } from '../../user/entity/user.entity'
 import { MailService } from '../../libs/mail/mail.service'
 import { UserService } from '../../user/user.service'
 import { AuthService } from '../auth.service'
+import { UsersLevelsService } from '../../users-levels/users-levels.service'
 
 @Injectable()
 export class MailConfirmationService {
@@ -26,6 +27,7 @@ export class MailConfirmationService {
 		private readonly userRepository: Repository<User>,
 		private readonly mailService: MailService,
 		private readonly userService: UserService,
+		private readonly usersLevelsService: UsersLevelsService,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
 	) {}
@@ -62,6 +64,7 @@ export class MailConfirmationService {
 			type: TokenType.VERIFICATION
 		})
 
+		await this.usersLevelsService.setDefaultLevelToUser(existingUser)
 		return this.authService.saveSession(req, existingUser)
 	}
 

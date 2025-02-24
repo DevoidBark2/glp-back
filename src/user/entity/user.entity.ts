@@ -2,7 +2,6 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
 	OneToMany,
 	OneToOne,
 	PrimaryColumn,
@@ -90,6 +89,6 @@ export class User {
 	method_auth: AuthMethodEnum
 	@OneToMany(() => Account, account => account.user)
 	accounts: Account[]
-	@OneToMany(() => ReviewCourse, (review) => review.user, { cascade: true })
-	reviews: ReviewCourse[];
+	@OneToMany(() => ReviewCourse, review => review.user, { cascade: true })
+	reviews: ReviewCourse[]
 }
