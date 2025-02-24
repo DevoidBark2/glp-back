@@ -30,6 +30,9 @@ export class UsersLevelsService {
 					method_auth: true,
 					profile_url: true
 				}
+			},
+			order: {
+				points: 'DESC'
 			}
 		})
 	}
