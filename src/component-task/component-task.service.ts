@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ILike, Repository } from 'typeorm'
 import { ComponentTask } from './entity/component-task.entity'
@@ -141,95 +141,6 @@ export class ComponentTaskService {
 		})
 	}
 
-	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
-		const task = await this.componentTaskRepository.findOne({
-			where: { id: body.task.id }
-		})
-
-		if (!task) {
-			throw new BadRequestException(
-				`Задачи с ID ${body.task.id} не существует`
-			)
-		}
-
-		const section = await this.sectionRepository.findOne({
-			where: { id: Number(body.currentSection) }
-		})
-
-		const results = task.questions?.map((question, index) => {
-			const userAnswer = Array.isArray(body.answers)
-				? body.answers[index]
-				: body.answers
-
-			// Приводим `question.correctOption` к массиву
-			const correctOptions = Array.isArray(question.correctOption)
-				? question.correctOption
-				: [question.correctOption]
-
-			// Проверка правильности ответа для multiple-choice
-			const isCorrect =
-				task.type === CourseComponentType.MultiPlayChoice
-					? Array.isArray(userAnswer) &&
-						userAnswer.every(answer =>
-							correctOptions.includes(answer)
-						) &&
-						correctOptions.every(correct =>
-							userAnswer.includes(correct)
-						)
-					: correctOptions.includes(userAnswer as number)
-
-			return {
-				id: question.id,
-				question: question.question,
-				userAnswer,
-				isCorrect
-			}
-		}) ?? [
-			{
-				id: task.id,
-				question: task.title,
-				userAnswer: body.answers,
-				isCorrect: String(body.answers) === task.answer
-			}
-		]
-
-		// Проверяем, существует ли уже запись с ответами для пользователя
-		const existUserAnswer = body.task.userAnswer
-			? await this.answersComponentUserRepository.findOne({
-					where: {
-						id: Number(body.task.userAnswer.id) // Ищем запись по ID
-					}
-				})
-			: null
-
-		let savedAnswer
-
-		// Если ответа не существует, создаем новую запись
-		if (!existUserAnswer) {
-			savedAnswer = await this.answersComponentUserRepository.save({
-				user,
-				task,
-				answer: results,
-				section
-			})
-		} else {
-			// Если ответ уже существует, обновляем его
-			existUserAnswer.answer = results
-			await this.answersComponentUserRepository.save(existUserAnswer)
-			savedAnswer = existUserAnswer // Сохраняем актуальные данные
-		}
-
-		// Возвращаем результат
-		return {
-			message: 'Ответы успешно сохранены',
-			userAnswer: {
-				id: savedAnswer.id,
-				type: task.type,
-				answer: savedAnswer.answer
-			}
-		}
-	}
-
 	async changeComponentOrder(body: ChangeComponentOrderDto, user: User) {
 		const currentSection = await this.sectionRepository.findOne({
 			where: { id: body.sectionId },
@@ -253,5 +164,92 @@ export class ComponentTaskService {
 		)
 
 		return { message: 'Порядок компонентов обновлен' }
+	}
+
+	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
+		console.log('Anwser', body)
+
+		const section = await this.sectionRepository.findOne({
+			where: { id: Number(body.currentSection) }
+		})
+
+		const results = body.task.questions?.map((question, index) => {
+			const correctOptions = Array.isArray(question.correctOption)
+				? question.correctOption
+				: [question.correctOption]
+
+			const userAnswer =
+				Array.isArray(body.answers) &&
+				body.task.type === CourseComponentType.Quiz
+					? body.answers[index]
+					: body.answers
+
+			let isCorrect: boolean
+
+			if (body.task.type === CourseComponentType.MultiPlayChoice) {
+				console.log('Correct', correctOptions)
+				console.log('Answer user', body.answers)
+
+				const incorrectAnswers = body.answers.filter(
+					(ans: any) => !correctOptions.includes(ans)
+				).length
+
+				isCorrect =
+					incorrectAnswers === 0 &&
+					body.answers.length === correctOptions.length
+			} else {
+				isCorrect = correctOptions.includes(userAnswer as number)
+			}
+
+			return {
+				id: question.id,
+				question: question.question,
+				userAnswer,
+				isCorrect
+			}
+		}) ?? {
+			id: body.task.id,
+			question: body.task.title,
+			userAnswer: body.answers,
+			isCorrect: String(body.answers) === body.task.answer
+		}
+
+		const existUserAnswer = body.task.userAnswer
+			? await this.answersComponentUserRepository.findOne({
+					where: { id: Number(body.task.userAnswer.id) }
+				})
+			: null
+
+		let savedAnswer: AnswersComponentUser
+
+		console.log(results)
+
+		if (!existUserAnswer) {
+			savedAnswer = await this.answersComponentUserRepository.save({
+				user,
+				task: body.task,
+				answer: results,
+				section
+			})
+		} else {
+			existUserAnswer.answer = results
+			await this.answersComponentUserRepository.save(existUserAnswer)
+			savedAnswer = existUserAnswer
+		}
+
+		const correctAnswersCount =
+			Array.isArray(results) &&
+			results.filter(res => res.isCorrect).length
+		const totalAnswersCount = Array.isArray(results) && results.length
+
+		return {
+			userAnswer: {
+				id: savedAnswer.id,
+				type: body.task.type,
+				answer: savedAnswer.answer,
+				correctAnswers: correctAnswersCount,
+				totalAnswers: totalAnswersCount
+			}
+		}
 	}
 }
