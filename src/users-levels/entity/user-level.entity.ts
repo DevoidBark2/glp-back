@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm'
 import { User } from '../../user/entity/user.entity'
 import { UserLevelEnum } from '../enums/user-level.enum'
 
@@ -7,9 +7,10 @@ export class UserLevel {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@ManyToOne(() => User, user => user.id, {
+	@OneToOne(() => User, user => user.id, {
 		onDelete: 'CASCADE'
 	})
+	@JoinColumn()
 	user: User
 
 	@Column({ type: 'int', default: 0 })

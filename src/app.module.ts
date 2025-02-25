@@ -31,6 +31,8 @@ import { PdfModule } from './pdf/pdf.module'
 import { ThreeModelModule } from './three-model/three-model.module'
 import { UsersLevelsModule } from './users-levels/users-levels.module';
 import { EventEmitterModule } from '@nestjs/event-emitter'
+import { CoinsModule } from './coins/coins.module';
+import { XpModule } from './xp/xp.module';
 
 @Module({
 	imports: [
@@ -82,7 +84,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 		ReviewModule,
 		PdfModule,
 		ThreeModelModule,
-		UsersLevelsModule
+		UsersLevelsModule,
+		CoinsModule,
+		XpModule
 	]
 })
 export class AppModule { }

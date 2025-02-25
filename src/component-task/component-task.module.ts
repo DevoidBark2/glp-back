@@ -9,6 +9,13 @@ import { CourseUser } from 'src/course/entity/course-user.entity'
 import { UserService } from 'src/user/user.service'
 import { JwtService } from '@nestjs/jwt'
 import { User } from 'src/user/entity/user.entity'
+import { ComponentTaskListener } from './component-task.listener'
+import { CoinsService } from 'src/coins/coins.service'
+import { XpService } from 'src/xp/xp.service'
+import { UserLevel } from 'src/users-levels/entity/user-level.entity'
+import { AchievementsService } from 'src/achievements/achievements.service'
+import { Achievement } from 'src/achievements/entities/achievement.entity'
+import { AchievementUser } from 'src/achievements/entities/achievement-users.entity'
 
 @Module({
 	imports: [
@@ -17,10 +24,13 @@ import { User } from 'src/user/entity/user.entity'
 			AnswersComponentUser,
 			SectionEntity,
 			CourseUser,
-			User
-		])
+			User,
+			UserLevel,
+			Achievement,
+			AchievementUser
+		]),
 	],
 	controllers: [ComponentTaskController],
-	providers: [ComponentTaskService, UserService, JwtService]
+	providers: [ComponentTaskService, UserService, JwtService, ComponentTaskListener, CoinsService, XpService, AchievementsService]
 })
-export class ComponentTaskModule {}
+export class ComponentTaskModule { }

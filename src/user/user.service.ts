@@ -34,7 +34,7 @@ export class UserService {
 		private readonly jwtService: JwtService
 		// @Inject(forwardRef(() => AuthService)) // Используем forwardRef для инжекции
 		// private readonly authService: AuthService
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -164,6 +164,9 @@ export class UserService {
 		const user = await this.userRepository.findOne({
 			where: {
 				id: userId
+			},
+			relations: {
+				userLevel: true
 			}
 		})
 		const userCourses = await this.courseUserRepository.find({
@@ -194,6 +197,8 @@ export class UserService {
 			is_two_factor_enabled: user.is_two_factor_enabled,
 			method_auth: user.method_auth,
 			created_at: user.created_at,
+			userLevel: user.userLevel,
+			coins: user.coins,
 			userCourses: userCourses.map(courseUser => {
 				return {
 					id: courseUser.id,
