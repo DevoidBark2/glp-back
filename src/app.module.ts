@@ -33,6 +33,10 @@ import { UsersLevelsModule } from './users-levels/users-levels.module';
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { CoinsModule } from './coins/coins.module';
 import { XpModule } from './xp/xp.module';
+import { FramesModule } from './customize/frames/frames.module';
+import { IconsModule } from './customize/icons/icons.module';
+import { EffectsModule } from './customize/effects/effects.module';
+import { CustomizeModule } from './customize/customize.module';
 
 @Module({
 	imports: [
@@ -86,7 +90,11 @@ import { XpModule } from './xp/xp.module';
 		ThreeModelModule,
 		UsersLevelsModule,
 		CoinsModule,
-		XpModule
+		XpModule,
+		FramesModule,
+		IconsModule,
+		EffectsModule,
+		CustomizeModule
 	]
 })
 export class AppModule { }
