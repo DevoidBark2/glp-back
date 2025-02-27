@@ -1,7 +1,5 @@
 import {
 	BadRequestException,
-	forwardRef,
-	Inject,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
@@ -22,7 +20,6 @@ import { BlockUserDto } from './dto/block-user.dto'
 import { StatusUserEnum } from './enum/user-status.enum'
 import { AuthMethodEnum } from '../auth/enum/auth-method.enum'
 import { v4 as uuidv4 } from 'uuid'
-import { AuthService } from '../auth/auth.service'
 
 @Injectable()
 export class UserService {
@@ -32,9 +29,7 @@ export class UserService {
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private readonly jwtService: JwtService
-		// @Inject(forwardRef(() => AuthService)) // Используем forwardRef для инжекции
-		// private readonly authService: AuthService
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -60,6 +55,11 @@ export class UserService {
 			relations: {
 				courses: {
 					category: true
+				},
+				activeCustomization: {
+					frame: true,
+					effect: true,
+					icon: true
 				},
 				posts: true,
 				accounts: true
@@ -166,7 +166,9 @@ export class UserService {
 				id: userId
 			},
 			relations: {
-				userLevel: true
+				userLevel: true,
+				purchases: true,
+				activeCustomization: true
 			}
 		})
 		const userCourses = await this.courseUserRepository.find({
@@ -199,6 +201,8 @@ export class UserService {
 			created_at: user.created_at,
 			userLevel: user.userLevel,
 			coins: user.coins,
+			purchases: user.purchases,
+			activeCustomization: user.activeCustomization,
 			userCourses: userCourses.map(courseUser => {
 				return {
 					id: courseUser.id,

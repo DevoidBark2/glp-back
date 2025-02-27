@@ -29,14 +29,15 @@ import { ExamsModule } from './exams/exams.module'
 import { ReviewModule } from './review/review.module'
 import { PdfModule } from './pdf/pdf.module'
 import { ThreeModelModule } from './three-model/three-model.module'
-import { UsersLevelsModule } from './users-levels/users-levels.module';
+import { UsersLevelsModule } from './users-levels/users-levels.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
-import { CoinsModule } from './coins/coins.module';
-import { XpModule } from './xp/xp.module';
-import { FramesModule } from './customize/frames/frames.module';
-import { IconsModule } from './customize/icons/icons.module';
-import { EffectsModule } from './customize/effects/effects.module';
-import { CustomizeModule } from './customize/customize.module';
+import { CoinsModule } from './coins/coins.module'
+import { XpModule } from './xp/xp.module'
+import { FramesModule } from './customize/frames/frames.module'
+import { IconsModule } from './customize/icons/icons.module'
+import { EffectsModule } from './customize/effects/effects.module'
+import { CustomizeModule } from './customize/customize.module'
+import { PurchasesModule } from './customize/purchases/purchases.module'
 
 @Module({
 	imports: [
@@ -94,7 +95,8 @@ import { CustomizeModule } from './customize/customize.module';
 		FramesModule,
 		IconsModule,
 		EffectsModule,
-		CustomizeModule
+		CustomizeModule,
+		PurchasesModule
 	]
 })
-export class AppModule { }
+export class AppModule {}

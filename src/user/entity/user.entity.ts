@@ -20,6 +20,8 @@ import { Account } from './account.entity'
 import ReviewCourse from 'src/review/entity/review.entity'
 import { AchievementUser } from 'src/achievements/entities/achievement-users.entity'
 import { UserLevel } from 'src/users-levels/entity/user-level.entity'
+import { Purchase } from '../../customize/purchases/entity/purchases.entity'
+import { ActiveCustomization } from '../../customize/active_customizations/entity/active_customizations.entity'
 
 @Entity('users')
 export class User {
@@ -97,6 +99,11 @@ export class User {
 	achievements: AchievementUser[]
 	@OneToOne(() => UserLevel, userLevel => userLevel.user, { cascade: true })
 	userLevel: UserLevel
-	@Column({ type: "int", default: 0 })
+	@Column({ type: 'int', default: 0 })
 	coins: number
+	@OneToMany(() => Purchase, purchase => purchase.user)
+	purchases: Purchase[]
+
+	@OneToOne(() => ActiveCustomization, customization => customization.user)
+	activeCustomization: ActiveCustomization
 }
