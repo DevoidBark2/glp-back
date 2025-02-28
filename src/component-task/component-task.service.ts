@@ -15,6 +15,8 @@ import { SectionComponentTask } from '../section/entity/section-component-task.e
 import { AddAnswerForTask, CommentAddedEvent } from 'src/achievements/events/achievement.events'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { AddCoinsForUser, AddXpForUser } from './events/component-task.events'
+import { CourseService } from 'src/course/course.service'
+import { CourseEntity } from 'src/course/entity/course.entity'
 
 @Injectable()
 export class ComponentTaskService {
@@ -25,7 +27,10 @@ export class ComponentTaskService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(AnswersComponentUser)
 		private readonly answersComponentUserRepository: Repository<AnswersComponentUser>,
-		private eventEmitter: EventEmitter2
+		@InjectRepository(CourseEntity)
+		private readonly courseEntityRepository: Repository<CourseEntity>,
+		private eventEmitter: EventEmitter2,
+		private courseService: CourseService
 	) { }
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
@@ -171,48 +176,45 @@ export class ComponentTaskService {
 	}
 
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
-		console.log('Anwser', body)
+
+		console.log('Answer', body);
 
 		const section = await this.sectionRepository.findOne({
-			where: { id: Number(body.currentSection) }
-		})
+			where: { id: Number(body.currentSection) },
+			relations: {
+				course: true
+			}
+		});
 
-		const results: {
-			id: string;
-			question: string;
-			userAnswer: number | number[];
-			isCorrect: boolean;
-		}[] | {
-			id: string;
-			question: string;
-			userAnswer: number[];
-			isCorrect: boolean;
-		} = body.task.questions?.map((question, index) => {
+		const currentTask = await this.componentTaskRepository.findOne({
+			where: { id: body.task.id }
+		});
+
+		const results = currentTask.questions?.map((question, index) => {
 			const correctOptions = Array.isArray(question.correctOption)
 				? question.correctOption
-				: [question.correctOption]
+				: [question.correctOption];
 
 			const userAnswer =
-				Array.isArray(body.answers) &&
-					body.task.type === CourseComponentType.Quiz
+				Array.isArray(body.answers) && currentTask.type === CourseComponentType.Quiz
 					? body.answers[index]
-					: body.answers
+					: body.answers;
 
-			let isCorrect: boolean
+			let isCorrect: boolean;
 
-			if (body.task.type === CourseComponentType.MultiPlayChoice) {
-				console.log('Correct', correctOptions)
-				console.log('Answer user', body.answers)
+			if (currentTask.type === CourseComponentType.MultiPlayChoice) {
+				console.log('Correct', correctOptions);
+				console.log('Answer user', body.answers);
 
 				const incorrectAnswers = body.answers.filter(
 					(ans: any) => !correctOptions.includes(ans)
-				).length
+				).length;
 
 				isCorrect =
 					incorrectAnswers === 0 &&
-					body.answers.length === correctOptions.length
+					body.answers.length === correctOptions.length;
 			} else {
-				isCorrect = correctOptions.includes(userAnswer as number)
+				isCorrect = correctOptions.includes(userAnswer as number);
 			}
 
 			return {
@@ -220,53 +222,64 @@ export class ComponentTaskService {
 				question: question.question,
 				userAnswer,
 				isCorrect
-			}
-		}) ?? {
-				id: body.task.id,
-				question: body.task.title,
-				userAnswer: body.answers,
-				isCorrect: String(body.answers) === body.task.answer
-			}
+			};
+		}) ?? [
+				{
+					id: currentTask.id,
+					question: currentTask.title,
+					userAnswer: body.answers,
+					isCorrect: String(body.answers) === currentTask.answer
+				}
+			];
 
 		const existUserAnswer = body.task.userAnswer
 			? await this.answersComponentUserRepository.findOne({
 				where: { id: Number(body.task.userAnswer.id) }
 			})
-			: null
+			: null;
 
-		let savedAnswer: AnswersComponentUser
+		let savedAnswer: AnswersComponentUser;
 
-		console.log(results)
-		this.eventEmitter.emit('coins.added', new AddCoinsForUser(user.id, 100));
-		this.eventEmitter.emit('xp.added', new AddXpForUser(user.id, 50))
+		console.log(results);
+
+		const previousCorrectAnswers =
+			Array.isArray(body.task.userAnswer?.answer)
+				? body.task.userAnswer.answer.filter(ans => ans.isCorrect).length
+				: 0;
+
+		const currentCorrectAnswers =
+			Array.isArray(results)
+				? results.filter(ans => ans.isCorrect).length
+				: (results as any).isCorrect ? 1 : 0;
+
+		// Вычисляем количество новых исправленных ответов
+		const newlyCorrectedAnswers = currentCorrectAnswers - previousCorrectAnswers;
+
 		if (!existUserAnswer) {
-			// if (Array.isArray(results)) {
-			// 	if (results[0].isCorrect) {
-			// 		this.eventEmitter.emit('coins.added', new AddCoinsForUser(user.id, 100));
-			// 		//this.eventEmitter.emit('xp.added', new AddXpForUser(user.id, 50))
-			// 	}
-			// } else {
-			// 	if (results.isCorrect) {
-			// 		this.eventEmitter.emit('coins.added', new AddCoinsForUser(user.id, 100));
-			// 		//this.eventEmitter.emit('xp.added', new AddXpForUser(user.id, 50))
-			// 	}
-			// }
 			savedAnswer = await this.answersComponentUserRepository.save({
 				user,
 				task: body.task,
 				answer: results,
 				section
-			})
+			});
 		} else {
-			existUserAnswer.answer = results
-			await this.answersComponentUserRepository.save(existUserAnswer)
-			savedAnswer = existUserAnswer
+			existUserAnswer.answer = results;
+			savedAnswer = existUserAnswer;
+			await this.answersComponentUserRepository.save(existUserAnswer);
+		}
+
+		// Начисляем награду только за новые исправленные ответы
+		if (newlyCorrectedAnswers > 0) {
+			this.eventEmitter.emit('coins.added', new AddCoinsForUser(user.id, newlyCorrectedAnswers * 50));
+			this.eventEmitter.emit('xp.added', new AddXpForUser(user.id, newlyCorrectedAnswers * 25));
 		}
 
 		const correctAnswersCount =
 			Array.isArray(results) &&
-			results.filter(res => res.isCorrect).length
-		const totalAnswersCount = Array.isArray(results) && results.length
+			results.filter(res => res.isCorrect).length;
+		const totalAnswersCount = Array.isArray(results) && results.length;
+
+		const progress = await this.courseService.calculateUserProgress(user, body.courseId)
 
 		return {
 			userAnswer: {
@@ -274,8 +287,9 @@ export class ComponentTaskService {
 				type: body.task.type,
 				answer: savedAnswer.answer,
 				correctAnswers: correctAnswersCount,
-				totalAnswers: totalAnswersCount
+				totalAnswers: totalAnswersCount,
+				progress: progress
 			}
-		}
+		};
 	}
 }

@@ -37,7 +37,7 @@ export class CourseService {
 		private readonly sectionRepository: Repository<SectionEntity>,
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -218,7 +218,8 @@ export class CourseService {
 			relations: {
 				category: true,
 				user: true,
-				exam: true
+				exam: true,
+				sections: true
 			},
 			select: {
 				id: true,
@@ -312,8 +313,8 @@ export class CourseService {
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -327,61 +328,61 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true,
-						category: true
+				relations: {
+					user: true,
+					category: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true,
-						category: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true,
+					category: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -490,42 +491,31 @@ export class CourseService {
 		})
 
 		await this.courseEntityRepository.update(course.id, {
-			name: course.name,
-			image: course.image,
-			small_description: course.small_description,
+			...course,
 			category: category,
-			access_right: course.access_right,
-			duration: course.duration,
-			level: course.level,
-			publish_date: course.publish_date,
-			content_description: course.content_description,
-			secret_key: course.secret_key,
-			status: course.status,
-			user: user
+			user: user,
 		})
 	}
 
 	async getCourseMenuById(courseId: number, user: User) {
-		const course = await this.loadCourse(courseId)
-		if (!course) throw new Error(`Курс с ID ${courseId} не найден!`)
+		const course = await this.loadCourse(courseId);
+		if (!course) throw new Error(`Курс с ID ${courseId} не найден!`);
 
-		const sections = course.sections
-		if (!sections.length) return []
+		const sections = course.sections;
+		if (!sections.length) return [];
 
-		const totalPoints = this.calculateTotalPoints(sections)
-		const userAnswers = await this.loadUserAnswers(user.id, sections)
-		const userPoints = this.calculateTotalUserPoints(userAnswers)
+		const progress = await this.calculateUserProgress(user, courseId);
 
-		const structuredSections = this.structureSections(sections, userAnswers)
+		const userAnswers = await this.loadUserAnswers(user.id, sections);
+		const structuredSections = this.structureSections(sections, userAnswers);
 
 		return {
 			sections: structuredSections,
 			courseName: course.name,
-			progress: Math.floor((userPoints / totalPoints) * 100)
-		}
+			progress
+		};
 	}
 
-	// 🔹 Загружаем курс
 	private async loadCourse(courseId: number) {
 		return this.courseEntityRepository.findOne({
 			where: { id: courseId },
@@ -545,7 +535,6 @@ export class CourseService {
 		})
 	}
 
-	// 🔹 Загружаем ответы пользователя
 	private async loadUserAnswers(userId: string, sections: SectionEntity[]) {
 		const sectionIds = sections.map(section => section.id)
 		return this.answersComponentUserRepository.find({
@@ -557,7 +546,6 @@ export class CourseService {
 		})
 	}
 
-	// 🔹 Структурируем разделы
 	private structureSections(
 		sections: SectionEntity[],
 		userAnswers: AnswersComponentUser[]
@@ -599,46 +587,70 @@ export class CourseService {
 		return [...mainSections.values(), ...rootSections]
 	}
 
+	/**
+ * Функция вычисления прогресса пользователя в курсе
+ * @param user - Пользователь
+ * @param course - Курс, в которsом нужно узнать прогресс
+ * @returns Прогресс в процентах (от 0 до 100)
+ */
+	public async calculateUserProgress(user: User, courseId: number): Promise<number> {
+
+		const course = await this.courseEntityRepository.findOne({
+			where: {
+				id: courseId
+			},
+			relations: {
+				sections: {
+					sectionComponents: {
+						componentTask: true
+					}
+				}
+			}
+		})
+		if (!course || !course.sections.length) return 0;
+
+		const totalPoints = this.calculateTotalPoints(course.sections);
+		if (totalPoints === 0) return 0;
+
+		const userAnswers = await this.loadUserAnswers(user.id, course.sections);
+		const userPoints = this.calculateTotalUserPoints(userAnswers);
+
+		return Math.floor((userPoints / totalPoints) * 100);
+	}
+
+
 	private processUserAnswer(rawAnswer: any) {
 		if (!rawAnswer) return null
 		return rawAnswer.confirmedStep
 			? { confirmedStep: rawAnswer.confirmedStep }
 			: {
-					totalAnswers: rawAnswer.length,
-					correctAnswers: rawAnswer.filter(item => item.isCorrect)
-						.length
-				}
+				totalAnswers: rawAnswer.length,
+				correctAnswers: rawAnswer.filter(item => item.isCorrect)
+					.length
+			}
 	}
 
-	private calculateTotalPoints(sections: SectionEntity[]) {
-		let totalPoints = 0
+	private calculateTotalPoints(sections: SectionEntity[]): number {
+		let totalPoints = 0;
 
 		sections.forEach(section => {
 			section.sectionComponents.forEach(it => {
-				// Проверка для Quiz задачи
+				console.log(it.componentTask)
 				if (it.componentTask.type === CourseComponentType.Quiz) {
-					const count = it.componentTask.questions.length // Количество вопросов — это максимальные очки
-					totalPoints += count
+					totalPoints += it.componentTask.questions.length;
 				}
 
-				// Проверка для MultiPlayChoice задачи
-				if (
-					it.componentTask.type ===
-					CourseComponentType.MultiPlayChoice
-				) {
-					const count = 3 // Максимальные очки для MultiPlayChoice
-					totalPoints += count
+				if (it.componentTask.type === CourseComponentType.MultiPlayChoice) {
+					totalPoints += 3;
 				}
 
-				// Проверка для SimpleTask задачи
 				if (it.componentTask.type === CourseComponentType.SimpleTask) {
-					const count = 4 // Максимальные очки для SimpleTask
-					totalPoints += count
+					totalPoints += 4;
 				}
-			})
-		})
+			});
+		});
 
-		return totalPoints
+		return totalPoints;
 	}
 
 	private calculateTotalUserPoints(userAnswers: AnswersComponentUser[]) {
@@ -660,7 +672,11 @@ export class CourseService {
 							total += 3
 						}
 					})
-				} else {
+				} else if (it.task.type === CourseComponentType.SimpleTask) {
+					// SimpleTask даёт фиксированное количество очков (например, 10)
+					if (it.answer.length > 0) {
+						total += 4;
+					}
 				}
 			}
 		})
@@ -871,12 +887,12 @@ export class CourseService {
 
 				component.componentTask.userAnswer = userAnswerRecord
 					? {
-							...userAnswerRecord,
-							user: undefined, // Можно передать user, если он доступен
-							task: undefined, // Можно передать task, если он доступен
-							section: undefined, // Можно передать section, если он доступен
-							created_at: undefined // Убираем лишнее, если не нужно
-						}
+						...userAnswerRecord,
+						user: undefined, // Можно передать user, если он доступен
+						task: undefined, // Можно передать task, если он доступен
+						section: undefined, // Можно передать section, если он доступен
+						created_at: undefined // Убираем лишнее, если не нужно
+					}
 					: null
 				component.componentTask.questions?.map(it => {
 					delete it.correctOption

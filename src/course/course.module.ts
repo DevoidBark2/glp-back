@@ -29,6 +29,7 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 		UserModule
 	],
 	controllers: [CourseController],
-	providers: [CourseService]
+	providers: [CourseService],
+	exports: [CourseService]
 })
-export class CourseModule {}
+export class CourseModule { }

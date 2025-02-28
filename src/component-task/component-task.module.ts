@@ -16,6 +16,8 @@ import { UserLevel } from 'src/users-levels/entity/user-level.entity'
 import { AchievementsService } from 'src/achievements/achievements.service'
 import { Achievement } from 'src/achievements/entities/achievement.entity'
 import { AchievementUser } from 'src/achievements/entities/achievement-users.entity'
+import { CourseModule } from 'src/course/course.module'
+import { CourseEntity } from 'src/course/entity/course.entity'
 
 @Module({
 	imports: [
@@ -27,8 +29,10 @@ import { AchievementUser } from 'src/achievements/entities/achievement-users.ent
 			User,
 			UserLevel,
 			Achievement,
-			AchievementUser
+			AchievementUser,
+			CourseEntity
 		]),
+		CourseModule
 	],
 	controllers: [ComponentTaskController],
 	providers: [ComponentTaskService, UserService, JwtService, ComponentTaskListener, CoinsService, XpService, AchievementsService]

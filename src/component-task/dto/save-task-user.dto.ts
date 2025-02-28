@@ -8,4 +8,6 @@ export class SaveTaskUserDto {
 	answers: number[]
 	@ApiProperty()
 	currentSection: number
+	@ApiProperty()
+	courseId: number
 }

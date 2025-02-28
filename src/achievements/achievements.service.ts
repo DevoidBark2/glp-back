@@ -50,18 +50,10 @@ export class AchievementsService {
 	}
 
 	async updateAchievementProgress(userId: string, condition: ConditionTypeEnum, progressIncrease: number) {
-		console.log(userId)
 		const achievement = await this.achievementRepository.findOne({ where: { condition } });
 
 		if (!achievement) return;
 
-		const user = await this.userRepository.findOne({
-			where: {
-				id: userId
-			}
-		})
-
-		// Ищем существующую запись пользователя в таблице связей
 		let achievementUser = await this.achievementUserRepository.findOne({
 			where: { user: { id: userId }, achievement: { id: achievement.id } },
 			relations: {
@@ -70,10 +62,12 @@ export class AchievementsService {
 			},
 		});
 
-		// Если записи нет — создаем новую
+		// Если достижение уже получено, ничего не делаем
+		if (achievementUser?.completed) return;
+
 		if (!achievementUser) {
 			achievementUser = this.achievementUserRepository.create({
-				user: { id: userId } as User, // Явно приводим к User, чтобы избежать ошибок
+				user: { id: userId } as User,
 				achievement: achievement,
 				progress: 0,
 				completed: false,
@@ -94,11 +88,8 @@ export class AchievementsService {
 			});
 		}
 
-		// Сохраняем обновленный прогресс
 		await this.achievementUserRepository.save(achievementUser);
 	}
-
-
 
 	findOne(id: number) {
 		return `This action returns a #${id} achievement`
