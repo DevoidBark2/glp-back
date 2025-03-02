@@ -36,10 +36,9 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) {}
+	constructor(private readonly courseService: CourseService) { }
 
 	@Get('/courses')
-	// @UseInterceptors(ResponseCoursesInterceptor)
 	@ApiOperation({ summary: 'Get all courses' })
 	async findAll() {
 		return await this.courseService.findAll()

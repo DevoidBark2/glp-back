@@ -264,17 +264,19 @@ export class CourseService {
 
 		// Check if the user is enrolled in the course using a direct query
 		const isUserEnrolled =
-			(await this.courseEntityRepository
-				.createQueryBuilder('course')
-				.innerJoin('course.courseUsers', 'courseUser')
-				.where('course.id = :courseId', { courseId })
-				.andWhere('courseUser.userId = :userId', { userId: user.id })
-				.getCount()) > 0
+			await this.courseUserRepository.findOne({
+				where: {
+					user: { id: user.id },
+					course: { id: courseId }
+				}
+			})
+
+		console.log(isUserEnrolled)
 
 		// Return the course with the additional `isUserEnrolled` field
 		return {
 			...course,
-			isUserEnrolled
+			isUserEnrolled: !!isUserEnrolled
 		}
 	}
 
@@ -673,8 +675,7 @@ export class CourseService {
 						}
 					})
 				} else if (it.task.type === CourseComponentType.SimpleTask) {
-					// SimpleTask даёт фиксированное количество очков (например, 10)
-					if (it.answer.length > 0) {
+					if (it.answer[0].isCorrect) {
 						total += 4;
 					}
 				}
@@ -821,7 +822,12 @@ export class CourseService {
 
 			return await this.examEntityRepository.findOne({
 				where: { course: { id: courseId } },
-				relations: { components: { componentTask: true } }
+				relations: { components: { componentTask: true }, },
+				order: {
+					components: {
+						sort: "ASC"
+					}
+				}
 			})
 		}
 

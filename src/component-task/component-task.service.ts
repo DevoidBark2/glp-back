@@ -281,6 +281,10 @@ export class ComponentTaskService {
 
 		const progress = await this.courseService.calculateUserProgress(user, body.courseId)
 
+		if (progress === 100) {
+			console.log("YOOO")
+		}
+
 		return {
 			userAnswer: {
 				id: savedAnswer.id,
