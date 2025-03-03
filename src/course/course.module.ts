@@ -12,6 +12,7 @@ import { UserModule } from 'src/user/user.module'
 import { AnswersComponentUser } from 'src/component-task/entity/component-task-user.entity'
 import { SectionEntity } from 'src/section/entity/section.entity'
 import { ExamEntity } from '../exams/entity/exam.entity'
+import { ExamUsers } from '../exams/entity/exam-users.entity'
 
 @Module({
 	imports: [
@@ -22,7 +23,8 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 			CourseUser,
 			AnswersComponentUser,
 			SectionEntity,
-			ExamEntity
+			ExamEntity,
+			ExamUsers
 		]),
 		JwtModule,
 		EventsModule,
@@ -32,4 +34,4 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 	providers: [CourseService],
 	exports: [CourseService]
 })
-export class CourseModule { }
+export class CourseModule {}

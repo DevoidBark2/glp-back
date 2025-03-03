@@ -36,7 +36,7 @@ import { FilterValuesDto } from './dto/filter-options.dto'
 @UseInterceptors(EventLoggingInterceptor)
 @Controller()
 export class CourseController {
-	constructor(private readonly courseService: CourseService) { }
+	constructor(private readonly courseService: CourseService) {}
 
 	@Get('/courses')
 	@ApiOperation({ summary: 'Get all courses' })
@@ -52,7 +52,7 @@ export class CourseController {
 	@Authorization()
 	@Delete('delete-course-member')
 	@ResponseMessage('Участник успешно удален!')
-	async deleteCoursMember(@Query('id') id: number) {
+	async deleteCourseMember(@Query('id') id: number) {
 		await this.courseService.deleteCourseMember(id)
 	}
 
@@ -195,6 +195,17 @@ export class CourseController {
 			currentSection,
 			req['user']
 		)
+	}
+
+	@Authorization(
+		UserRole.STUDENT,
+		UserRole.TEACHER,
+		UserRole.SUPER_ADMIN,
+		UserRole.MODERATOR
+	)
+	@Get('/start-exam')
+	async startExam(@Query('courseId') courseId: number, @Req() req: Request) {
+		return await this.courseService.startExam(courseId, req['user'])
 	}
 
 	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
