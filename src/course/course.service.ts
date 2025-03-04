@@ -142,18 +142,15 @@ export class CourseService {
 	}
 
 	async searchCoursesByFilter(filters: FilterValuesDto) {
-		// Начинаем с пустых параметров для where
 		const whereConditions: any = {}
 
-		// Фильтрация по категориям
-		if (filters.categories && filters.categories.length > 0) {
-			whereConditions['category.id'] = In(filters.categories)
+		if (filters.searchString) {
+			whereConditions.name = ILike(`%${filters.searchString}%`)
 		}
 
-		// Фильтрация по уровням сложности
 		if (filters.levels && filters.levels.length > 0) {
-			const levelValues = filters.levels.map(level => level.value)
-			whereConditions['level'] = In(levelValues)
+			const levelValues = filters.levels.map(level => Number(level)) // Преобразуем в число
+			whereConditions.level = In(levelValues)
 		}
 
 		// Фильтрация по продолжительности
@@ -188,15 +185,18 @@ export class CourseService {
 			if (sortOption === 'newest') {
 				orderConditions['publish_date'] = 'DESC'
 			}
-			// Пример для сортировки по рейтингу
-			// else if (sortOption === 'rating') {
-			//   orderConditions['rating'] = 'DESC';
-			// }
+			if (sortOption === 'rating') {
+			}
 		}
 
+		console.log(filters.levels)
 		// Запрос с фильтрацией и сортировкой
-		const courses = await this.courseEntityRepository.find({
-			where: whereConditions,
+		return await this.courseEntityRepository.find({
+			where: {
+				...whereConditions,
+				category: In(filters.categories)
+				// level: In(filters.levels)
+			},
 			order: orderConditions,
 			relations: {
 				category: true,
@@ -211,8 +211,6 @@ export class CourseService {
 				}
 			}
 		})
-
-		return courses
 	}
 
 	async findOneById(courseId: number, user: User) {
@@ -737,8 +735,8 @@ export class CourseService {
 		})
 		const courseUser = await this.courseUserRepository.findOne({
 			where: {
-				user: user,
-				course: course
+				user: { id: user.id },
+				course: { id: course.id }
 			}
 		})
 
@@ -749,7 +747,11 @@ export class CourseService {
 		await this.courseUserRepository.delete(courseUser.id)
 	}
 
-	async updateSectionStep(prevSectionStep: number, user: User) {
+	async updateSectionStep(
+		prevSectionStep: number,
+		courseId: number,
+		user: User
+	) {
 		if (prevSectionStep === -1) {
 			return
 		}
@@ -797,7 +799,8 @@ export class CourseService {
 			return await this.answersComponentUserRepository.save({
 				user: user,
 				answer: { confirmedStep: prevSectionStep },
-				section: section
+				section: section,
+				course: { id: courseId }
 			})
 		} catch (error) {
 			console.error('Ошибка при сохранении записи:', error)
@@ -926,6 +929,7 @@ export class CourseService {
 				component.componentTask.userAnswer = userAnswerRecord
 					? {
 							...userAnswerRecord,
+							courseUser: undefined,
 							user: undefined, // Можно передать user, если он доступен
 							task: undefined, // Можно передать task, если он доступен
 							section: undefined, // Можно передать section, если он доступен

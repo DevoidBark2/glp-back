@@ -35,6 +35,14 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 		CourseModule
 	],
 	controllers: [ComponentTaskController],
-	providers: [ComponentTaskService, UserService, JwtService, ComponentTaskListener, CoinsService, XpService, AchievementsService]
+	providers: [
+		ComponentTaskService,
+		UserService,
+		JwtService,
+		ComponentTaskListener,
+		CoinsService,
+		XpService,
+		AchievementsService
+	]
 })
-export class ComponentTaskModule { }
+export class ComponentTaskModule {}

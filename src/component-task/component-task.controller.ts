@@ -53,8 +53,9 @@ export class ComponentTaskController {
 		}
 	}
 
-	@ResponseMessage('Компонент успешно обновлен!')
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Put('/component-task')
+	@ResponseMessage('Компонент успешно обновлен!')
 	async changeComponentTask(
 		@Req() req: Request,
 		@Body() body: CreateComponentTaskDto
@@ -62,8 +63,9 @@ export class ComponentTaskController {
 		return await this.componentTaskService.change(body, req['user'])
 	}
 
-	@ResponseMessage('Компонент успешно удален!')
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Delete('/component-task/:id')
+	@ResponseMessage('Компонент успешно удален!')
 	async deleteComponentTask(@Param('id') id: string, @Req() req: Request) {
 		return await this.componentTaskService.delete(id, req['user'])
 	}

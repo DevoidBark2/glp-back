@@ -161,6 +161,7 @@ export class CourseController {
 		await this.courseService.subscribeCourse(body)
 	}
 
+	@Authorization()
 	@Delete('/leave-course/:id')
 	async leaveFromCourse(@Param('id') id: number, @Req() req: Request) {
 		return await this.courseService.leaveCourse(id, req['user'])
@@ -169,11 +170,12 @@ export class CourseController {
 	@Authorization()
 	@Post('/update-step')
 	async updateSectionStep(
-		@Body() body: { prevSection: number },
+		@Body() body: { prevSection: number; courseId: number },
 		@Req() req: Request
 	) {
 		return await this.courseService.updateSectionStep(
 			body.prevSection,
+			body.courseId,
 			req['user']
 		)
 	}

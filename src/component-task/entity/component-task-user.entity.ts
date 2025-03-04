@@ -8,6 +8,7 @@ import {
 import { ComponentTask } from './component-task.entity'
 import { User } from '../../user/entity/user.entity'
 import { SectionEntity } from 'src/section/entity/section.entity'
+import { CourseUser } from '../../course/entity/course-user.entity'
 
 @Entity('answers_component_user')
 export class AnswersComponentUser {
@@ -33,4 +34,9 @@ export class AnswersComponentUser {
 
 	@CreateDateColumn()
 	created_at: Date
+
+	@ManyToOne(() => CourseUser, courseUser => courseUser.id, {
+		onDelete: 'CASCADE'
+	})
+	courseUser: CourseUser
 }
