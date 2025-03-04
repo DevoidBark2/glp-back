@@ -33,7 +33,7 @@ export class ComponentTaskService {
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private eventEmitter: EventEmitter2,
 		private courseService: CourseService
-	) {}
+	) { }
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
 		const newComponent = await this.componentTaskRepository.save({
@@ -61,58 +61,58 @@ export class ComponentTaskService {
 	async getAll(user: User) {
 		return user.role !== UserRole.SUPER_ADMIN
 			? this.componentTaskRepository.find({
-					where: {
-						user: { id: user.id }
-					},
-					relations: {
-						user: true
-					},
-					select: {
+				where: {
+					user: { id: user.id }
+				},
+				relations: {
+					user: true
+				},
+				select: {
+					id: true,
+					title: true,
+					type: true,
+					created_at: true,
+					status: true,
+					user: {
 						id: true,
-						title: true,
-						type: true,
-						created_at: true,
-						status: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							email: true,
-							role: true
-						}
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						email: true,
+						role: true
 					}
-				})
+				},
+				order: {
+					user: {
+						role: 'DESC'
+					}
+				}
+			})
 			: this.componentTaskRepository.find({
-					relations: {
-						user: true
-					},
-					select: {
+				relations: {
+					user: true
+				},
+				select: {
+					id: true,
+					title: true,
+					type: true,
+					created_at: true,
+					status: true,
+					user: {
 						id: true,
-						title: true,
-						type: true,
-						created_at: true,
-						status: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							email: true,
-							role: true
-						}
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						email: true,
+						role: true
 					}
-				})
+				},
+				order: {
+					user: {
+						role: 'DESC'
+					}
+				}
+			})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {
@@ -198,7 +198,7 @@ export class ComponentTaskService {
 
 			const userAnswer =
 				Array.isArray(body.answers) &&
-				currentTask.type === CourseComponentType.Quiz
+					currentTask.type === CourseComponentType.Quiz
 					? body.answers[index]
 					: body.answers
 
@@ -226,46 +226,46 @@ export class ComponentTaskService {
 				isCorrect
 			}
 		}) ?? [
-			{
-				id: currentTask.id,
-				question: currentTask.title,
-				userAnswer: body.answers,
-				isCorrect: String(body.answers) === currentTask.answer
-			}
-		]
+				{
+					id: currentTask.id,
+					question: currentTask.title,
+					userAnswer: body.answers,
+					isCorrect: String(body.answers) === currentTask.answer
+				}
+			]
 
 		const existUserAnswer = body.task.userAnswer
 			? await this.answersComponentUserRepository.findOne({
-					where: { id: Number(body.task.userAnswer.id) }
-				})
+				where: { id: Number(body.task.userAnswer.id) }
+			})
 			: null
 
 		let savedAnswer: AnswersComponentUser
 
 		console.log(results)
 
-		const previousCorrectAnswers = Array.isArray(
-			body.task.userAnswer?.answer
-		)
-			? body.task.userAnswer.answer.filter(ans => ans.isCorrect).length
-			: 0
+		// const previousCorrectAnswers = Array.isArray(
+		// 	body.task?.userAnswer?.answer
+		// )
+		// 	? body.task.userAnswer.answer.filter(ans => ans.isCorrect).length
+		// 	: 0
 
-		const currentCorrectAnswers = Array.isArray(results)
-			? results.filter(ans => ans.isCorrect).length
-			: (results as any).isCorrect
-				? 1
-				: 0
+		// const currentCorrectAnswers = Array.isArray(results)
+		// 	? results.filter(ans => ans.isCorrect).length
+		// 	: (results as any).isCorrect
+		// 		? 1
+		// 		: 0
 
-		// Вычисляем количество новых исправленных ответов
-		const newlyCorrectedAnswers =
-			currentCorrectAnswers - previousCorrectAnswers
+		// // Вычисляем количество новых исправленных ответов
+		// const newlyCorrectedAnswers =
+		// 	currentCorrectAnswers - previousCorrectAnswers
 
 		if (!existUserAnswer) {
 			savedAnswer = await this.answersComponentUserRepository.save({
 				user,
 				task: body.task,
 				answer: results,
-				courseUser: { id: body.courseId },
+				//courseUser: { id: body.courseId },
 				section
 			})
 		} else {
@@ -274,17 +274,17 @@ export class ComponentTaskService {
 			await this.answersComponentUserRepository.save(existUserAnswer)
 		}
 
-		// Начисляем награду только за новые исправленные ответы
-		if (newlyCorrectedAnswers > 0) {
-			this.eventEmitter.emit(
-				'coins.added',
-				new AddCoinsForUser(user.id, newlyCorrectedAnswers * 50)
-			)
-			this.eventEmitter.emit(
-				'xp.added',
-				new AddXpForUser(user.id, newlyCorrectedAnswers * 25)
-			)
-		}
+		// // Начисляем награду только за новые исправленные ответы
+		// if (newlyCorrectedAnswers > 0) {
+		// 	this.eventEmitter.emit(
+		// 		'coins.added',
+		// 		new AddCoinsForUser(user.id, newlyCorrectedAnswers * 50)
+		// 	)
+		// 	this.eventEmitter.emit(
+		// 		'xp.added',
+		// 		new AddXpForUser(user.id, newlyCorrectedAnswers * 25)
+		// 	)
+		// }
 
 		const correctAnswersCount =
 			Array.isArray(results) &&
