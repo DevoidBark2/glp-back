@@ -14,9 +14,8 @@ import { User } from '../user/entity/user.entity'
 import { RegisterUserDto } from './dto/register.dto'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { SettingsEntity } from '../settings/entity/settings.entity'
 import { LoginDto } from './dto/login.dto'
-import { DEFAULT_SETTINGS_FOR_NEW_USER, UserRole } from '../constants/contants'
+import { UserRole } from '../constants/contants'
 import { GeneralSettingsEntity } from 'src/general-settings/entity/general-settings.entity'
 import { GeneralSettingsService } from 'src/general-settings/general-settings.service'
 import { ComplexityPasswordEnum } from 'src/general-settings/enum/complexity-password.enum'
@@ -41,8 +40,6 @@ export class AuthService {
 		private readonly mailConfirmationService: MailConfirmationService,
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
-		@InjectRepository(SettingsEntity)
-		private readonly settingsEntityRepository: Repository<SettingsEntity>,
 		@InjectRepository(GeneralSettingsEntity)
 		private readonly generalSettingsEntityRepository: Repository<GeneralSettingsEntity>,
 		private readonly jwtService: JwtService,
@@ -220,18 +217,6 @@ export class AuthService {
 			isVerified: false,
 			method_auth: AuthMethodEnum.CREDENTIALS
 		})
-		//
-		const settingForNewUser = this.settingsEntityRepository.create({
-			vertex_color: DEFAULT_SETTINGS_FOR_NEW_USER.VERTEX_COLOR,
-			edge_color: DEFAULT_SETTINGS_FOR_NEW_USER.EDGE_COLOR,
-			type_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.TYPE_VERTEX,
-			border_vertex: DEFAULT_SETTINGS_FOR_NEW_USER.BORDER_VERTEX,
-			enabled_grid: DEFAULT_SETTINGS_FOR_NEW_USER.ENABLED_GRID,
-			background_color: DEFAULT_SETTINGS_FOR_NEW_USER.BACKGROUND_COLOR,
-			user: newUser
-		})
-
-		await this.settingsEntityRepository.save(settingForNewUser)
 
 		await this.mailConfirmationService.sendVerificationToken(newUser.email)
 
@@ -258,7 +243,7 @@ export class AuthService {
 				success: false
 			})
 			throw new UnauthorizedException(
-				'Неверный пароль. Попробуйте другой пароль!'
+				'Неверный логин или пароль. Попробуйте еще раз!'
 			)
 		}
 

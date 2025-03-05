@@ -14,7 +14,7 @@ export class Purchase {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@ManyToOne(() => User, user => user.purchases)
+	@ManyToOne(() => User, user => user.purchases, { onDelete: 'CASCADE' })
 	user: User
 
 	@ManyToOne(() => Frame, { nullable: true }) // Покупка рамки

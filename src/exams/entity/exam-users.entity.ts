@@ -13,7 +13,7 @@ export class ExamUsers {
 	id: number
 	@ManyToOne(() => ExamEntity, exam => exam.id)
 	exam: ExamEntity
-	@ManyToOne(() => User, user => user.id)
+	@ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
 	user: User
 	@CreateDateColumn()
 	createdAt: Date

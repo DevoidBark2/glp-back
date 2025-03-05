@@ -17,7 +17,9 @@ export class ActiveCustomization {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@ManyToOne(() => User, user => user.activeCustomization)
+	@ManyToOne(() => User, user => user.activeCustomization, {
+		onDelete: 'CASCADE'
+	})
 	user: User
 
 	@ManyToOne(() => Frame, frame => frame.id)

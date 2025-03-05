@@ -8,7 +8,6 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from '../user/entity/user.entity'
-import { SettingsEntity } from '../settings/entity/settings.entity'
 import { GeneralSettingsEntity } from 'src/general-settings/entity/general-settings.entity'
 import { GeneralSettingsModule } from 'src/general-settings/general-settings.module'
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha'
@@ -33,7 +32,6 @@ import { UsersLevelsModule } from '../users-levels/users-levels.module'
 		PassportModule,
 		TypeOrmModule.forFeature([
 			User,
-			SettingsEntity,
 			GeneralSettingsEntity,
 			Account,
 			CourseUser,

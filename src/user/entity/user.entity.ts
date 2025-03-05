@@ -10,7 +10,6 @@ import {
 import { CourseEntity } from '../../course/entity/course.entity'
 import PostEntity from '../../post/entity/post.entity'
 import { UserRole } from '../../constants/contants'
-import { SettingsEntity } from '../../settings/entity/settings.entity'
 import { StatusUserEnum } from '../enum/user-status.enum'
 import { TableSize } from '../enum/table-size.enum'
 import { TableFooter } from '../enum/table-footer.enum'
@@ -63,8 +62,6 @@ export class User {
 	courses: CourseEntity[]
 	@OneToMany(() => PostEntity, post => post.user)
 	posts: PostEntity[]
-	@OneToOne(() => SettingsEntity, settings => settings.user)
-	settings: SettingsEntity
 	@Column({ type: 'varchar', nullable: true })
 	profile_url: string
 	@Column({ type: 'numeric', nullable: true, default: 0 })

@@ -6,7 +6,6 @@ import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
-import { SettingsModule } from './settings/settings.module'
 import { CourseModule } from './course/course.module'
 import { SectionModule } from './section/section.module'
 import { CategoryModule } from './category/category.module'
@@ -67,7 +66,6 @@ import { PurchasesModule } from './customize/purchases/purchases.module'
 		AuthModule,
 		UserModule,
 		PostModule,
-		SettingsModule,
 		CourseModule,
 		SectionModule,
 		CategoryModule,
