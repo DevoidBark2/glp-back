@@ -40,7 +40,7 @@ export class CourseService {
 		private readonly examEntityRepository: Repository<ExamEntity>,
 		@InjectRepository(ExamUsers)
 		private readonly examUsersRepository: Repository<ExamUsers>
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -315,8 +315,8 @@ export class CourseService {
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-					where: { id: createCourse.category }
-				})
+				where: { id: createCourse.category }
+			})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -330,61 +330,61 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-					relations: {
-						user: true,
-						category: true
+				relations: {
+					user: true,
+					category: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					},
-					order: {
-						user: {
-							role: 'DESC'
-						},
-						created_at: 'DESC'
-					},
-					select: {
+					created_at: 'DESC'
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
 						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
 					}
-				})
+				}
+			})
 			: await this.courseEntityRepository.find({
-					where: { user: { id: user.id } },
-					relations: {
-						user: true,
-						category: true
-					},
-					order: {
-						user: {
-							role: 'DESC'
-						}
-					},
-					select: {
-						id: true,
-						name: true,
-						created_at: true,
-						status: true,
-						duration: true,
-						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+				where: { user: { id: user.id } },
+				relations: {
+					user: true,
+					category: true
+				},
+				order: {
+					user: {
+						role: 'DESC'
 					}
-				})
+				},
+				select: {
+					id: true,
+					name: true,
+					created_at: true,
+					status: true,
+					duration: true,
+					level: true,
+					user: {
+						id: true,
+						first_name: true,
+						second_name: true,
+						last_name: true,
+						phone: true,
+						role: true
+					}
+				}
+			})
 	}
 
 	async delete(courseId: number) {
@@ -627,10 +627,10 @@ export class CourseService {
 		return rawAnswer.confirmedStep
 			? { confirmedStep: rawAnswer.confirmedStep }
 			: {
-					totalAnswers: rawAnswer.length,
-					correctAnswers: rawAnswer.filter(item => item.isCorrect)
-						.length
-				}
+				totalAnswers: rawAnswer.length,
+				correctAnswers: rawAnswer.filter(item => item.isCorrect)
+					.length
+			}
 	}
 
 	private calculateTotalPoints(sections: SectionEntity[]): number {
@@ -744,6 +744,13 @@ export class CourseService {
 			throw new BadRequestException(`Курс с ID ${id} не найден!`)
 		}
 
+		// Добавить удаление ответов на экзамен, когда появится
+
+
+
+		await this.answersComponentUserRepository.delete({
+			user: { id: user.id }
+		})
 		await this.courseUserRepository.delete(courseUser.id)
 	}
 
@@ -928,13 +935,13 @@ export class CourseService {
 
 				component.componentTask.userAnswer = userAnswerRecord
 					? {
-							...userAnswerRecord,
-							courseUser: undefined,
-							user: undefined, // Можно передать user, если он доступен
-							task: undefined, // Можно передать task, если он доступен
-							section: undefined, // Можно передать section, если он доступен
-							created_at: undefined // Убираем лишнее, если не нужно
-						}
+						...userAnswerRecord,
+						courseUser: undefined,
+						user: undefined, // Можно передать user, если он доступен
+						task: undefined, // Можно передать task, если он доступен
+						section: undefined, // Можно передать section, если он доступен
+						created_at: undefined // Убираем лишнее, если не нужно
+					}
 					: null
 				component.componentTask.questions?.map(it => {
 					delete it.correctOption

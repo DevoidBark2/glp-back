@@ -24,6 +24,7 @@ import { Token } from './entity/token.entity'
 import { EventEntity } from '../events/entity/event.entity'
 import { UserLevel } from '../users-levels/entity/user-level.entity'
 import { UsersLevelsModule } from '../users-levels/users-levels.module'
+import { SectionModule } from 'src/section/section.module'
 
 @Module({
 	imports: [
@@ -60,7 +61,8 @@ import { UsersLevelsModule } from '../users-levels/users-levels.module'
 			useFactory: getProvidersConfig,
 			inject: [ConfigService]
 		}),
-		forwardRef(() => MailConfirmationModule)
+		forwardRef(() => MailConfirmationModule,),
+		forwardRef(() => SectionModule)
 	],
 	controllers: [AuthController],
 	providers: [
@@ -72,4 +74,4 @@ import { UsersLevelsModule } from '../users-levels/users-levels.module'
 	],
 	exports: [AuthService, TwoFactorAuthService]
 })
-export class AuthModule {}
+export class AuthModule { }

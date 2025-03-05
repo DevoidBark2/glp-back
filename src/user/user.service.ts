@@ -1,5 +1,7 @@
 import {
 	BadRequestException,
+	forwardRef,
+	Inject,
 	Injectable,
 	NotFoundException,
 	UnauthorizedException
@@ -20,6 +22,8 @@ import { BlockUserDto } from './dto/block-user.dto'
 import { StatusUserEnum } from './enum/user-status.enum'
 import { AuthMethodEnum } from '../auth/enum/auth-method.enum'
 import { v4 as uuidv4 } from 'uuid'
+import { AuthService } from 'src/auth/auth.service'
+import { Request, Response } from 'express'
 
 @Injectable()
 export class UserService {
@@ -28,8 +32,10 @@ export class UserService {
 		private readonly userRepository: Repository<User>,
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
-		private readonly jwtService: JwtService
-	) {}
+		private readonly jwtService: JwtService,
+		@Inject(forwardRef(() => AuthService))
+		private readonly authService: AuthService
+	) { }
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -116,7 +122,9 @@ export class UserService {
 		if (!deletedUser) {
 			throw `Пользователя с ID ${id} не существует!`
 		}
-
+		// await this.accountRepository.delete({
+		// 	id: deletedUser.id
+		// })
 		await this.userRepository.delete(id)
 	}
 
@@ -205,8 +213,7 @@ export class UserService {
 			activeCustomization: user.activeCustomization,
 			userCourses: userCourses.map(courseUser => {
 				return {
-					id: courseUser.id,
-					courseId: courseUser.course.id,
+					id: courseUser.course.id,
 					enrolledAt: courseUser.enrolledAt,
 					progress: courseUser.progress,
 					name: courseUser.course.name,
@@ -313,7 +320,7 @@ export class UserService {
 		}
 	}
 
-	async deleteAccount(id: string) {
+	async deleteAccount(id: string, req: Request, res: Response) {
 		const user = await this.userRepository.findOneBy({ id })
 
 		if (!user) {
@@ -321,8 +328,11 @@ export class UserService {
 				`Пользователя с ID ${id} не существует!`
 			)
 		}
+		await this.authService.logout(req, res).then(async () => {
+			await this.userRepository.delete(id)
+		});
+		console.log('here')
 
-		await this.userRepository.delete(id)
 	}
 
 	async getAllTeachers() {

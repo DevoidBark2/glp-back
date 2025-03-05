@@ -26,6 +26,17 @@ export class ReviewService {
             throw new BadRequestException(`Курса с ID  ${body.courseId} не существует!`)
         }
 
+        const existReviewForCourse = await this.reviewCourseRepository.findOne({
+            where: {
+                user: { id: user.id },
+                course: { id: course.id }
+            }
+        })
+
+        if (existReviewForCourse) {
+            throw new BadRequestException("Ваш отзыв уже сохранен.")
+        }
+
         return await this.reviewCourseRepository.save({
             course: course,
             user: user,
@@ -56,5 +67,9 @@ export class ReviewService {
                 created_at: "DESC"
             }
         })
+    }
+
+    async deleteReviewsForCourse(id: number) {
+        await this.reviewCourseRepository.delete(id);
     }
 }

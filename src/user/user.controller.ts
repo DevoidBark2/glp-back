@@ -10,6 +10,7 @@ import {
 	Put,
 	Query,
 	Req,
+	Res,
 	UploadedFile,
 	UseInterceptors
 } from '@nestjs/common'
@@ -30,11 +31,12 @@ import { ChangeUserRoleDto } from './dto/change-user-role.dto'
 import { BlockUserDto } from './dto/block-user.dto'
 import { Authorized } from '../auth/decorators/authorized.decorator'
 import { Authorization } from '../auth/decorators/auth.decorator'
+import { Request, Response } from 'express'
 
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) { }
 
 	@Get('users')
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
@@ -106,7 +108,7 @@ export class UserController {
 		@Body() body: ChangeUserProfileDto,
 		@Req() req: Request
 	) {
-		return await this.userService.updateProfile(body, req['user'])
+		return await this.userService.updateProfile(body, req['user?'])
 	}
 
 	@Authorization(
@@ -127,7 +129,7 @@ export class UserController {
 			imagePath = 'uploads/' + image.filename
 		}
 
-		await this.userService.uploadAvatar(imagePath, req['user'])
+		await this.userService.uploadAvatar(imagePath, req['user?'])
 
 		return imagePath
 	}
@@ -141,7 +143,7 @@ export class UserController {
 	@Post('change-password')
 	@ResponseMessage('Пароль успешно обновлен!')
 	async changePassword(@Body() body: ChangePasswordDto, @Req() req: Request) {
-		return await this.userService.changePassword(body, req['user'])
+		return await this.userService.changePassword(body, req['user?'])
 	}
 
 	@Roles(UserRole.SUPER_ADMIN)
@@ -174,8 +176,8 @@ export class UserController {
 	@Authorization()
 	@HttpCode(HttpStatus.OK)
 	@Delete('/delete-account')
-	async deleteAccount(@Authorized('id') id: string) {
-		return await this.userService.deleteAccount(id)
+	async deleteAccount(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Authorized('id') id: string) {
+		return await this.userService.deleteAccount(id, req, res)
 	}
 
 	@HttpCode(HttpStatus.OK)

@@ -50,7 +50,7 @@ export class AuthService {
 		@InjectRepository(EventEntity)
 		private readonly eventEntityRepository: Repository<EventEntity>,
 		private readonly usersLevelsService: UsersLevelsService
-	) {}
+	) { }
 
 	// Метод для точного соответствия требованиям каждого уровня
 	private checkPasswordComplexity(
@@ -332,8 +332,7 @@ export class AuthService {
 		if (!account) {
 			await this.accountRepository.save({
 				id: user.id,
-				userId: user.id,
-				user: null,
+				user: user,
 				type: 'oauth',
 				provider: profile.provider,
 				access_token: profile.access_token,

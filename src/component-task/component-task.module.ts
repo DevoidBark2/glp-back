@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { ComponentTaskService } from './component-task.service'
 import { ComponentTaskController } from './component-task.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -18,6 +18,7 @@ import { Achievement } from 'src/achievements/entities/achievement.entity'
 import { AchievementUser } from 'src/achievements/entities/achievement-users.entity'
 import { CourseModule } from 'src/course/course.module'
 import { CourseEntity } from 'src/course/entity/course.entity'
+import { AuthModule } from 'src/auth/auth.module'
 
 @Module({
 	imports: [
@@ -32,7 +33,8 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 			AchievementUser,
 			CourseEntity
 		]),
-		CourseModule
+		CourseModule,
+		forwardRef(() => AuthModule)
 	],
 	controllers: [ComponentTaskController],
 	providers: [
@@ -45,4 +47,4 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 		AchievementsService
 	]
 })
-export class ComponentTaskModule {}
+export class ComponentTaskModule { }

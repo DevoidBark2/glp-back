@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { SectionService } from './section.service'
 import { SectionController } from './section.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -11,6 +11,7 @@ import { ComponentTask } from '../component-task/entity/component-task.entity'
 import { UserService } from '../user/user.service'
 import { CourseUser } from '../course/entity/course-user.entity'
 import { JwtService } from '@nestjs/jwt'
+import { AuthModule } from 'src/auth/auth.module'
 
 @Module({
 	imports: [
@@ -22,9 +23,10 @@ import { JwtService } from '@nestjs/jwt'
 			CourseEntity,
 			ComponentTask,
 			CourseUser
-		])
+		]),
+		forwardRef(() => AuthModule)
 	],
 	controllers: [SectionController],
-	providers: [SectionService, UserService, JwtService]
+	providers: [SectionService, UserService, JwtService],
 })
-export class SectionModule {}
+export class SectionModule { }
