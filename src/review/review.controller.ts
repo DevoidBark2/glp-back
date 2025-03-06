@@ -15,7 +15,7 @@ import { ResponseMessage } from 'src/decorators/response-message.decorator'
 
 @Controller('')
 export class ReviewController {
-	constructor(private readonly reviewService: ReviewService) {}
+	constructor(private readonly reviewService: ReviewService) { }
 
 	@Authorization()
 	@Post('/course-review')
@@ -24,7 +24,7 @@ export class ReviewController {
 		@Body() body: CreateCourseReviewDto,
 		@Req() req: Request
 	) {
-		return await this.reviewService.crateCourseReview(body, req['user'])
+		await this.reviewService.crateCourseReview(body, req['user'])
 	}
 
 	@Get('/course-reviews')

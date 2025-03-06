@@ -35,7 +35,7 @@ export class UserService {
 		private readonly jwtService: JwtService,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
-	) {}
+	) { }
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -225,6 +225,7 @@ export class UserService {
 	}
 
 	async updateProfile(body: ChangeUserProfileDto, user: User) {
+		console.log(user)
 		const currentUser = await this.userRepository.findOne({
 			where: { id: user.id }
 		})

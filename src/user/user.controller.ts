@@ -31,7 +31,7 @@ import { ChangeUserRoleDto } from './dto/change-user-role.dto'
 import { BlockUserDto } from './dto/block-user.dto'
 import { Authorized } from '../auth/decorators/authorized.decorator'
 import { Authorization } from '../auth/decorators/auth.decorator'
-import { Request, Response } from 'express'
+// import { Request, Response } from 'express'
 
 @ApiTags('Пользователи')
 @Controller()
@@ -108,7 +108,7 @@ export class UserController {
 		@Body() body: ChangeUserProfileDto,
 		@Req() req: Request
 	) {
-		return await this.userService.updateProfile(body, req['user?'])
+		return await this.userService.updateProfile(body, req['user'])
 	}
 
 	@Authorization(
@@ -177,7 +177,7 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	@Delete('/delete-account')
 	async deleteAccount(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Authorized('id') id: string) {
-		return await this.userService.deleteAccount(id, req, res)
+		//return await this.userService.deleteAccount(id, req, res)
 	}
 
 	@HttpCode(HttpStatus.OK)

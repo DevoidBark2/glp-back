@@ -37,7 +37,7 @@ export class ReviewService {
             throw new BadRequestException("Ваш отзыв уже сохранен.")
         }
 
-        return await this.reviewCourseRepository.save({
+        await this.reviewCourseRepository.save({
             course: course,
             user: user,
             rating: body.rating,

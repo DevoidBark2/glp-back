@@ -849,9 +849,9 @@ export class CourseService {
 			})
 
 			if (examUser) {
-				const exam = await this.examEntityRepository.findOne({
+				const data = await this.examEntityRepository.findOne({
 					where: { course: { id: courseId } },
-					relations: { components: { componentTask: true } },
+					relations: { components: { componentTask: true }, exam: true },
 					order: {
 						components: {
 							sort: 'ASC'
@@ -860,8 +860,9 @@ export class CourseService {
 				})
 
 				return {
-					...exam,
-					startExam: examUser.createdAt
+					...data,
+					startExamAt: data.exam.startExamAt,
+					endExamAt: data.exam.endExamAt
 				}
 			} else {
 				return {
@@ -972,13 +973,17 @@ export class CourseService {
 				exam: true
 			}
 		})
+
+		const endExamAt = new Date();
+		endExamAt.setHours(endExamAt.getHours() + 2)
 		await this.examUsersRepository.save({
 			user: user,
-			exam: course.exam
+			exam: course.exam,
+			endExamAt: endExamAt
 		})
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },
-			relations: { components: { componentTask: true } },
+			relations: { components: { componentTask: true }, exam: true },
 			order: {
 				components: {
 					sort: 'ASC'

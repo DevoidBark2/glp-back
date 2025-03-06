@@ -1,7 +1,10 @@
 import {
+	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToOne,
+	OneToOne,
 	PrimaryGeneratedColumn
 } from 'typeorm'
 import { ExamEntity } from './exam.entity'
@@ -11,10 +14,13 @@ import { User } from '../../user/entity/user.entity'
 export class ExamUsers {
 	@PrimaryGeneratedColumn()
 	id: number
-	@ManyToOne(() => ExamEntity, exam => exam.id)
+	@OneToOne(() => ExamEntity, exam => exam.id)
+	@JoinColumn()
 	exam: ExamEntity
 	@ManyToOne(() => User, user => user.id, { onDelete: 'CASCADE' })
 	user: User
 	@CreateDateColumn()
-	createdAt: Date
+	startExamAt: Date
+	@Column({ type: "timestamp", })
+	endExamAt: Date
 }
