@@ -35,7 +35,7 @@ export class UserService {
 		private readonly jwtService: JwtService,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -330,9 +330,8 @@ export class UserService {
 		}
 		await this.authService.logout(req, res).then(async () => {
 			await this.userRepository.delete(id)
-		});
+		})
 		console.log('here')
-
 	}
 
 	async getAllTeachers() {
