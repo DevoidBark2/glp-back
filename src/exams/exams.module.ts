@@ -14,6 +14,7 @@ import { WebsocketGateway } from '../websockets/websocket.gateway'
 		UserModule
 	],
 	controllers: [ExamsController],
-	providers: [ExamsService, WebsocketGateway]
+	providers: [ExamsService, WebsocketGateway],
+	exports: [ExamsService]
 })
-export class ExamsModule {}
+export class ExamsModule { }

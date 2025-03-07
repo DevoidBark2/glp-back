@@ -17,7 +17,7 @@ export class FramesService {
 
 		@InjectRepository(ActiveCustomization)
 		private readonly activeCustomizationRepository: Repository<ActiveCustomization>
-	) {}
+	) { }
 
 	async findAllForUser(user: User) {
 		const frames = await this.frameRepository.find({
@@ -43,8 +43,6 @@ export class FramesService {
 					frame: true
 				}
 			})
-
-		console.log(activeCustomization)
 
 		return frames.map(frame => ({
 			...frame,

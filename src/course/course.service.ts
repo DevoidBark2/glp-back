@@ -639,7 +639,6 @@ export class CourseService {
 
 		sections.forEach(section => {
 			section.sectionComponents.forEach(it => {
-				console.log(it.componentTask)
 				if (it.componentTask.type === CourseComponentType.Quiz) {
 					totalPoints += it.componentTask.questions.length
 				}
@@ -984,13 +983,13 @@ export class CourseService {
 		})
 
 		const now = new Date();
-    	const delayInMs = endExamAt.getTime() - now.getTime();
+		const delayInMs = endExamAt.getTime() - now.getTime();
 
 		await this.examQueue.add(
-			'checkExam', 
+			'checkExam',
 			{ userId: user.id, examId: course.exam.id },
 			{ delay: 10000 }
-		  );
+		);
 
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },

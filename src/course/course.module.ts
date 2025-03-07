@@ -15,6 +15,7 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { BullModule } from '@nestjs/bull'
 import { ExamProcessor } from './processors/exam.processor'
+import { ExamsModule } from 'src/exams/exams.module'
 
 @Module({
 	imports: [
@@ -33,10 +34,11 @@ import { ExamProcessor } from './processors/exam.processor'
 		}),
 		JwtModule,
 		EventsModule,
-		UserModule
+		UserModule,
+		ExamsModule
 	],
 	controllers: [CourseController],
-	providers: [CourseService],
+	providers: [ExamProcessor, CourseService],
 	exports: [CourseService]
 })
-export class CourseModule {}
+export class CourseModule { }

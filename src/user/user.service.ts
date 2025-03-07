@@ -225,7 +225,6 @@ export class UserService {
 	}
 
 	async updateProfile(body: ChangeUserProfileDto, user: User) {
-		console.log(user)
 		const currentUser = await this.userRepository.findOne({
 			where: { id: user.id }
 		})
@@ -332,7 +331,6 @@ export class UserService {
 		await this.authService.logout(req, res).then(async () => {
 			await this.userRepository.delete(id)
 		})
-		console.log('here')
 	}
 
 	async getAllTeachers() {
