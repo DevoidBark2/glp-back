@@ -13,6 +13,8 @@ import { AnswersComponentUser } from 'src/component-task/entity/component-task-u
 import { SectionEntity } from 'src/section/entity/section.entity'
 import { ExamEntity } from '../exams/entity/exam.entity'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
+import { BullModule } from '@nestjs/bull'
+import { ExamProcessor } from './processors/exam.processor'
 
 @Module({
 	imports: [
@@ -26,6 +28,9 @@ import { ExamUsers } from '../exams/entity/exam-users.entity'
 			ExamEntity,
 			ExamUsers
 		]),
+		BullModule.registerQueue({
+			name: 'examQueue'
+		}),
 		JwtModule,
 		EventsModule,
 		UserModule

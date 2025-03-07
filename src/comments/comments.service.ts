@@ -54,8 +54,6 @@ export class CommentsService {
 			user: user
 		})
 
-
-		console.log(user.id)
 		this.eventEmitter.emit('comment.added', new CommentAddedEvent(user.id));
 
 		return {

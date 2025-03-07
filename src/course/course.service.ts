@@ -18,6 +18,8 @@ import { CourseComponentType } from 'src/component-task/enum/course-component-ty
 import { ExamEntity } from '../exams/entity/exam.entity'
 import { FilterType, FilterValuesDto } from './dto/filter-options.dto'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
+import { InjectQueue } from '@nestjs/bull'
+import { Queue } from 'bull'
 
 @Injectable()
 export class CourseService {
@@ -39,7 +41,8 @@ export class CourseService {
 		@InjectRepository(ExamEntity)
 		private readonly examEntityRepository: Repository<ExamEntity>,
 		@InjectRepository(ExamUsers)
-		private readonly examUsersRepository: Repository<ExamUsers>
+		private readonly examUsersRepository: Repository<ExamUsers>,
+		@InjectQueue('examQueue') private readonly examQueue: Queue
 	) { }
 
 	async findAll() {
@@ -189,7 +192,6 @@ export class CourseService {
 			}
 		}
 
-		console.log(filters.levels)
 		// Запрос с фильтрацией и сортировкой
 		return await this.courseEntityRepository.find({
 			where: {
@@ -271,7 +273,6 @@ export class CourseService {
 			}
 		})
 
-		console.log(isUserEnrolled)
 
 		// Return the course with the additional `isUserEnrolled` field
 		return {
@@ -981,6 +982,16 @@ export class CourseService {
 			exam: course.exam,
 			endExamAt: endExamAt
 		})
+
+		const now = new Date();
+    	const delayInMs = endExamAt.getTime() - now.getTime();
+
+		await this.examQueue.add(
+			'checkExam', 
+			{ userId: user.id, examId: course.exam.id },
+			{ delay: 10000 }
+		  );
+
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },
 			relations: { components: { componentTask: true }, exam: true },

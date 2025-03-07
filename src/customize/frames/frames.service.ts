@@ -35,8 +35,6 @@ export class FramesService {
 			}
 		})
 
-		console.log(purchasedFrames)
-
 		// Получаем активную рамку
 		const activeCustomization =
 			await this.activeCustomizationRepository.findOne({

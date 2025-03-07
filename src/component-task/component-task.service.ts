@@ -178,8 +178,6 @@ export class ComponentTaskService {
 	}
 
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
-		console.log('Answer', body)
-
 		const section = await this.sectionRepository.findOne({
 			where: { id: Number(body.currentSection) },
 			relations: {
@@ -205,8 +203,6 @@ export class ComponentTaskService {
 			let isCorrect: boolean
 
 			if (currentTask.type === CourseComponentType.MultiPlayChoice) {
-				console.log('Correct', correctOptions)
-				console.log('Answer user', body.answers)
 
 				const incorrectAnswers = body.answers.filter(
 					(ans: any) => !correctOptions.includes(ans)
@@ -241,8 +237,6 @@ export class ComponentTaskService {
 			: null
 
 		let savedAnswer: AnswersComponentUser
-
-		console.log(results)
 
 		// const previousCorrectAnswers = Array.isArray(
 		// 	body.task?.userAnswer?.answer

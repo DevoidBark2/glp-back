@@ -33,8 +33,6 @@ export class IconsService {
 			}
 		})
 
-		console.log(purchasedIcons)
-
 		const activeCustomization =
 			await this.activeCustomizationRepository.findOne({
 				where: { user: { id: user.id } },
@@ -42,8 +40,6 @@ export class IconsService {
 					icon: true
 				}
 			})
-
-		console.log(activeCustomization)
 
 		return icons.map(icon => ({
 			...icon,

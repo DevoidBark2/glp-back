@@ -42,8 +42,6 @@ export class EffectsService {
 				}
 			})
 
-		console.log(activeCustomization)
-
 		return effects.map(effect => ({
 			...effect,
 			isPurchased: purchasedEffects.some(p => p.effect?.id === effect.id),

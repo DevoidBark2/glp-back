@@ -37,6 +37,7 @@ import { IconsModule } from './customize/icons/icons.module'
 import { EffectsModule } from './customize/effects/effects.module'
 import { CustomizeModule } from './customize/customize.module'
 import { PurchasesModule } from './customize/purchases/purchases.module'
+import { BullModule } from '@nestjs/bull'
 
 @Module({
 	imports: [
@@ -62,6 +63,13 @@ import { PurchasesModule } from './customize/purchases/purchases.module'
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', 'src', 'uploads'),
 			serveRoot: '/uploads'
+		}),
+		BullModule.forRoot({
+			redis: {
+				host: 'localhost',
+				port: 6379,
+				password: 'password'
+			}
 		}),
 		AuthModule,
 		UserModule,
