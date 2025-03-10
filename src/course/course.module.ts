@@ -16,6 +16,7 @@ import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { BullModule } from '@nestjs/bull'
 import { ExamProcessor } from './processors/exam.processor'
 import { ExamsModule } from 'src/exams/exams.module'
+import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 
 @Module({
 	imports: [
@@ -27,7 +28,8 @@ import { ExamsModule } from 'src/exams/exams.module'
 			AnswersComponentUser,
 			SectionEntity,
 			ExamEntity,
-			ExamUsers
+			ExamUsers,
+			ExamUsersAnswerEntity
 		]),
 		BullModule.registerQueue({
 			name: 'examQueue'
@@ -41,4 +43,4 @@ import { ExamsModule } from 'src/exams/exams.module'
 	providers: [ExamProcessor, CourseService],
 	exports: [CourseService]
 })
-export class CourseModule { }
+export class CourseModule {}

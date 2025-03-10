@@ -28,39 +28,39 @@ export class SectionService {
 		private readonly courseEntityRepository: Repository<CourseEntity>,
 		@InjectRepository(ComponentTask)
 		private readonly componentTaskRepository: Repository<ComponentTask>
-	) { }
+	) {}
 	async findAll(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.sectionEntityRepository.find({
-				relations: {
-					course: true,
-					user: true,
-					sectionComponents: true
-				},
-				select: {
-					user: {
-						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						role: true
+					relations: {
+						course: true,
+						user: true,
+						sectionComponents: true
+					},
+					select: {
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: this.sectionEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					course: true,
-					sectionComponents: true
-				}
-			})
+					where: { user: { id: user.id } },
+					relations: {
+						course: true,
+						sectionComponents: true
+					}
+				})
 	}
 
 	async createSection(section: CreateSectionCourseDto, user: User) {
 		const parentSection = section.parentSection
 			? await this.mainSectionRepository.findOne({
-				where: { id: Number(section.parentSection) }
-			})
+					where: { id: Number(section.parentSection) }
+				})
 			: null
 
 		const course = await this.courseEntityRepository.findOne({
@@ -76,9 +76,10 @@ export class SectionService {
 
 			console.log(lastSection)
 
-			sortNumber = lastSection.length > 0
-				? Number(lastSection[0].sort_number) + 1
-				: 0
+			sortNumber =
+				lastSection.length > 0
+					? Number(lastSection[0].sort_number) + 1
+					: 0
 		}
 
 		const sectionItem = await this.sectionEntityRepository.save({
@@ -129,8 +130,8 @@ export class SectionService {
 		// Если передан родительский раздел, получаем его
 		const parentSection = section.parentSection
 			? await this.mainSectionRepository.findOne({
-				where: { id: Number(section.parentSection) }
-			})
+					where: { id: Number(section.parentSection) }
+				})
 			: null
 
 		// Получаем курс

@@ -19,6 +19,8 @@ import { AchievementUser } from 'src/achievements/entities/achievement-users.ent
 import { CourseModule } from 'src/course/course.module'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { AuthModule } from 'src/auth/auth.module'
+import { ExamUsers } from '../exams/entity/exam-users.entity'
+import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 
 @Module({
 	imports: [
@@ -31,7 +33,9 @@ import { AuthModule } from 'src/auth/auth.module'
 			UserLevel,
 			Achievement,
 			AchievementUser,
-			CourseEntity
+			CourseEntity,
+			ExamUsers,
+			ExamUsersAnswerEntity
 		]),
 		CourseModule,
 		forwardRef(() => AuthModule)
@@ -47,4 +51,4 @@ import { AuthModule } from 'src/auth/auth.module'
 		AchievementsService
 	]
 })
-export class ComponentTaskModule { }
+export class ComponentTaskModule {}

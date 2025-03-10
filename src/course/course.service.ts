@@ -20,6 +20,7 @@ import { FilterType, FilterValuesDto } from './dto/filter-options.dto'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { InjectQueue } from '@nestjs/bull'
 import { Queue } from 'bull'
+import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 
 @Injectable()
 export class CourseService {
@@ -42,8 +43,10 @@ export class CourseService {
 		private readonly examEntityRepository: Repository<ExamEntity>,
 		@InjectRepository(ExamUsers)
 		private readonly examUsersRepository: Repository<ExamUsers>,
+		@InjectRepository(ExamUsersAnswerEntity)
+		private readonly examUsersAnswerEntityRepository: Repository<ExamUsersAnswerEntity>,
 		@InjectQueue('examQueue') private readonly examQueue: Queue
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.courseEntityRepository.find({
@@ -273,7 +276,6 @@ export class CourseService {
 			}
 		})
 
-
 		// Return the course with the additional `isUserEnrolled` field
 		return {
 			...course,
@@ -316,8 +318,8 @@ export class CourseService {
 	async createCourse(createCourse: CreateCourseDto, currentUser: User) {
 		const category = createCourse.category
 			? await this.categoryEntityRepository.findOne({
-				where: { id: createCourse.category }
-			})
+					where: { id: createCourse.category }
+				})
 			: null
 
 		return await this.courseEntityRepository.save({
@@ -331,61 +333,61 @@ export class CourseService {
 	async getAllUserCourses(user: User) {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.courseEntityRepository.find({
-				relations: {
-					user: true,
-					category: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
+					relations: {
+						user: true,
+						category: true
 					},
-					created_at: 'DESC'
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					order: {
+						user: {
+							role: 'DESC'
+						},
+						created_at: 'DESC'
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 			: await this.courseEntityRepository.find({
-				where: { user: { id: user.id } },
-				relations: {
-					user: true,
-					category: true
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				},
-				select: {
-					id: true,
-					name: true,
-					created_at: true,
-					status: true,
-					duration: true,
-					level: true,
-					user: {
+					where: { user: { id: user.id } },
+					relations: {
+						user: true,
+						category: true
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						phone: true,
-						role: true
+						name: true,
+						created_at: true,
+						status: true,
+						duration: true,
+						level: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							phone: true,
+							role: true
+						}
 					}
-				}
-			})
+				})
 	}
 
 	async delete(courseId: number) {
@@ -628,10 +630,10 @@ export class CourseService {
 		return rawAnswer.confirmedStep
 			? { confirmedStep: rawAnswer.confirmedStep }
 			: {
-				totalAnswers: rawAnswer.length,
-				correctAnswers: rawAnswer.filter(item => item.isCorrect)
-					.length
-			}
+					totalAnswers: rawAnswer.length,
+					correctAnswers: rawAnswer.filter(item => item.isCorrect)
+						.length
+				}
 	}
 
 	private calculateTotalPoints(sections: SectionEntity[]): number {
@@ -746,8 +748,6 @@ export class CourseService {
 
 		// Добавить удаление ответов на экзамен, когда появится
 
-
-
 		await this.answersComponentUserRepository.delete({
 			user: { id: user.id }
 		})
@@ -819,6 +819,7 @@ export class CourseService {
 
 	async getCurrentSection(courseId: number, sectionId: number, user: User) {
 		// Проверяем, если sectionId равен -1 (для проверки экзамена)
+		// Проверяем, если sectionId равен -1 (для проверки экзамена)
 		if (Number(sectionId) === -1) {
 			const userProgress = await this.calculateUserProgress(
 				user,
@@ -833,60 +834,69 @@ export class CourseService {
 				}
 			}
 
-			const course = await this.courseEntityRepository.findOne({
-				where: {
-					id: courseId
-				},
-				relations: {
-					exam: true
-				}
-			})
-			const examUser = await this.examUsersRepository.findOne({
-				where: {
-					user: { id: user.id },
-					exam: { id: course.exam.id }
-				}
+			const examData = await this.examEntityRepository.findOne({
+				where: { course: { id: courseId } },
+				relations: { components: { componentTask: true }, exam: true },
+				order: { components: { sort: 'ASC' } }
 			})
 
-			if (examUser) {
-				const data = await this.examEntityRepository.findOne({
-					where: { course: { id: courseId } },
-					relations: { components: { componentTask: true }, exam: true },
-					order: {
-						components: {
-							sort: 'ASC'
-						}
+			const userAnswers = await this.examUsersAnswerEntityRepository.find(
+				{
+					where: { user: { id: user.id } },
+					relations: {
+						task: true
 					}
-				})
+				}
+			)
 
-				return {
-					...data,
-					startExamAt: data.exam.startExamAt,
-					endExamAt: data.exam.endExamAt
-				}
-			} else {
-				return {
-					success: true,
-					message:
-						'Экзамен начнётся сразу, как только вы нажмёте на кнопку "Начать".\n' +
-						'После начала у вас будет 2 часа на его прохождение.'
-				}
+			const userAnswersMap = new Map(
+				userAnswers
+					.filter(answer => answer.task?.id) // Исключаем ответы без task.id
+					.map(answer => [
+						answer.task.id,
+						{ id: answer.id, answer: answer.answer }
+					])
+			)
+
+			examData.components.forEach(component => {
+				if (!component.componentTask) return
+
+				const taskId = component.componentTask.id
+				const userAnswerRecord = userAnswersMap.get(taskId)
+
+				component.componentTask.userAnswer = userAnswerRecord
+					? {
+							...userAnswerRecord,
+							courseUser: undefined,
+							user: undefined,
+							task: undefined,
+							section: undefined,
+							created_at: undefined
+						}
+					: null
+
+				component.componentTask.questions?.forEach(it => {
+					delete it.correctOption
+				})
+				component.componentTask.userAnswer.answer.forEach(answer => {
+					delete answer.isCorrect
+				})
+			})
+
+			return {
+				...examData,
+				startExamAt: examData.exam.startExamAt,
+				endExamAt: examData.exam.endExamAt
 			}
 		}
 
-		// Получаем курс с секциями и компонентами для данного courseId
+		// Получаем курс с секциями и компонентами
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
 			relations: {
 				sections: { sectionComponents: { componentTask: true } }
 			},
-			order: {
-				sections: {
-					sectionComponents: {
-						sort: 'ASC'
-					}
-				}
-			}
+			order: { sections: { sectionComponents: { sort: 'ASC' } } }
 		})
 
 		if (!course) {
@@ -895,31 +905,23 @@ export class CourseService {
 			)
 		}
 
-		// Ищем нужную секцию по sectionId
 		const currentSection = course.sections.find(
 			section => section.id === sectionId
 		)
 
-		// Если секция не найдена, выбрасываем ошибку
 		if (!currentSection) {
 			throw new BadRequestException(
 				`Section with ID ${sectionId} not found in course with ID ${courseId}`
 			)
 		}
 
-		// Получаем компоненты текущей секции
 		const sectionComponents = currentSection.sectionComponents
 
-		// Получаем ответы пользователя для этой секции
 		const userAnswers = await this.answersComponentUserRepository.find({
-			where: {
-				user: { id: user.id },
-				section: { id: sectionId }
-			},
+			where: { user: { id: user.id }, section: { id: sectionId } },
 			relations: ['task', 'section']
 		})
 
-		// Создаем Map для быстрого доступа к ответам пользователя
 		const userAnswersMap = new Map(
 			userAnswers.map(answer => [
 				`${answer.task ? answer.task.id : 'null'}-${answer.section.id}`,
@@ -927,7 +929,6 @@ export class CourseService {
 			])
 		)
 
-		// Применяем ответы к компонентам задач
 		sectionComponents.forEach(component => {
 			if (component.componentTask) {
 				const taskId = component.componentTask.id
@@ -936,22 +937,20 @@ export class CourseService {
 
 				component.componentTask.userAnswer = userAnswerRecord
 					? {
-						...userAnswerRecord,
-						courseUser: undefined,
-						user: undefined, // Можно передать user, если он доступен
-						task: undefined, // Можно передать task, если он доступен
-						section: undefined, // Можно передать section, если он доступен
-						created_at: undefined // Убираем лишнее, если не нужно
-					}
+							...userAnswerRecord,
+							courseUser: undefined,
+							user: undefined, // Можно передать user, если он доступен
+							task: undefined, // Можно передать task, если он доступен
+							section: undefined, // Можно передать section, если он доступен
+							created_at: undefined // Убираем лишнее, если не нужно
+						}
 					: null
-				component.componentTask.questions?.map(it => {
+				component.componentTask.questions?.forEach(it => {
 					delete it.correctOption
 				})
-				// Остальной код остается неизменным
 			}
 		})
 
-		// Возвращаем результат с компонентами секции
 		return {
 			id: currentSection.id,
 			name: currentSection.name,
@@ -974,7 +973,7 @@ export class CourseService {
 			}
 		})
 
-		const endExamAt = new Date();
+		const endExamAt = new Date()
 		endExamAt.setHours(endExamAt.getHours() + 2)
 		await this.examUsersRepository.save({
 			user: user,
@@ -982,14 +981,14 @@ export class CourseService {
 			endExamAt: endExamAt
 		})
 
-		const now = new Date();
-		const delayInMs = endExamAt.getTime() - now.getTime();
+		const now = new Date()
+		const delayInMs = endExamAt.getTime() - now.getTime()
 
-		await this.examQueue.add(
-			'checkExam',
-			{ userId: user.id, examId: course.exam.id },
-			{ delay: 10000 }
-		);
+		// await this.examQueue.add(
+		// 	'checkExam',
+		// 	{ userId: user.id, examId: course.exam.id },
+		// 	{ delay: 10000 }
+		// )
 
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },

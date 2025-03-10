@@ -17,6 +17,8 @@ import { AddCoinsForUser, AddXpForUser } from './events/component-task.events'
 import { CourseService } from 'src/course/course.service'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { CourseUser } from '../course/entity/course-user.entity'
+import { ExamUsers } from '../exams/entity/exam-users.entity'
+import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 
 @Injectable()
 export class ComponentTaskService {
@@ -32,8 +34,10 @@ export class ComponentTaskService {
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
 		private eventEmitter: EventEmitter2,
-		private courseService: CourseService
-	) { }
+		private courseService: CourseService,
+		@InjectRepository(ExamUsersAnswerEntity)
+		private examUsersAnswerEntityRepository: Repository<ExamUsersAnswerEntity>
+	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
 		const newComponent = await this.componentTaskRepository.save({
@@ -61,58 +65,58 @@ export class ComponentTaskService {
 	async getAll(user: User) {
 		return user.role !== UserRole.SUPER_ADMIN
 			? this.componentTaskRepository.find({
-				where: {
-					user: { id: user.id }
-				},
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					where: {
+						user: { id: user.id }
+					},
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
 					}
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				}
-			})
+				})
 			: this.componentTaskRepository.find({
-				relations: {
-					user: true
-				},
-				select: {
-					id: true,
-					title: true,
-					type: true,
-					created_at: true,
-					status: true,
-					user: {
+					relations: {
+						user: true
+					},
+					select: {
 						id: true,
-						first_name: true,
-						second_name: true,
-						last_name: true,
-						email: true,
-						role: true
+						title: true,
+						type: true,
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							email: true,
+							role: true
+						}
+					},
+					order: {
+						user: {
+							role: 'DESC'
+						}
 					}
-				},
-				order: {
-					user: {
-						role: 'DESC'
-					}
-				}
-			})
+				})
 	}
 
 	async change(component: CreateComponentTaskDto, user: User) {
@@ -178,12 +182,17 @@ export class ComponentTaskService {
 	}
 
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
-		const section = await this.sectionRepository.findOne({
-			where: { id: Number(body.currentSection) },
-			relations: {
-				course: true
-			}
-		})
+		console.log(body)
+
+		const section =
+			body.currentSection !== -1
+				? await this.sectionRepository.findOne({
+						where: { id: Number(body.currentSection) },
+						relations: {
+							course: true
+						}
+					})
+				: null
 
 		const currentTask = await this.componentTaskRepository.findOne({
 			where: { id: body.task.id }
@@ -196,14 +205,13 @@ export class ComponentTaskService {
 
 			const userAnswer =
 				Array.isArray(body.answers) &&
-					currentTask.type === CourseComponentType.Quiz
+				currentTask.type === CourseComponentType.Quiz
 					? body.answers[index]
 					: body.answers
 
 			let isCorrect: boolean
 
 			if (currentTask.type === CourseComponentType.MultiPlayChoice) {
-
 				const incorrectAnswers = body.answers.filter(
 					(ans: any) => !correctOptions.includes(ans)
 				).length
@@ -222,20 +230,27 @@ export class ComponentTaskService {
 				isCorrect
 			}
 		}) ?? [
-				{
-					id: currentTask.id,
-					question: currentTask.title,
-					userAnswer: body.answers,
-					isCorrect: String(body.answers) === currentTask.answer
-				}
-			]
+			{
+				id: currentTask.id,
+				question: currentTask.title,
+				userAnswer: body.answers,
+				isCorrect: String(body.answers) === currentTask.answer
+			}
+		]
 
 		const existUserAnswer = body.task.userAnswer
 			? await this.answersComponentUserRepository.findOne({
-				where: { id: Number(body.task.userAnswer.id) }
-			})
+					where: { id: Number(body.task.userAnswer.id) }
+				})
 			: null
 
+		const existUserExamAnswer = body.task.userAnswer
+			? await this.examUsersAnswerEntityRepository.findOne({
+					where: { id: Number(body.task.userAnswer.id) }
+				})
+			: null
+
+		let savedExamUserAnswer: ExamUsers
 		let savedAnswer: AnswersComponentUser
 
 		// const previousCorrectAnswers = Array.isArray(
@@ -253,6 +268,18 @@ export class ComponentTaskService {
 		// // Вычисляем количество новых исправленных ответов
 		// const newlyCorrectedAnswers =
 		// 	currentCorrectAnswers - previousCorrectAnswers
+
+		if (!existUserExamAnswer) {
+			await this.examUsersAnswerEntityRepository.save({
+				user,
+				task: body.task,
+				answer: results
+			})
+		} else {
+			existUserExamAnswer.answer = results
+			//savedExamUserAnswer = existUserAnswer
+			await this.examUsersAnswerEntityRepository.save(existUserExamAnswer)
+		}
 
 		if (!existUserAnswer) {
 			savedAnswer = await this.answersComponentUserRepository.save({
