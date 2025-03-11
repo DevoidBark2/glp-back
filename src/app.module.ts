@@ -38,6 +38,8 @@ import { EffectsModule } from './customize/effects/effects.module'
 import { CustomizeModule } from './customize/customize.module'
 import { PurchasesModule } from './customize/purchases/purchases.module'
 import { BullModule } from '@nestjs/bull'
+import { CertificateService } from './certificate/certificate.service';
+import { CertificateModule } from './certificate/certificate.module';
 
 @Module({
 	imports: [
@@ -102,7 +104,9 @@ import { BullModule } from '@nestjs/bull'
 		IconsModule,
 		EffectsModule,
 		CustomizeModule,
-		PurchasesModule
-	]
+		PurchasesModule,
+		CertificateModule
+	],
+	providers: [CertificateService]
 })
 export class AppModule {}

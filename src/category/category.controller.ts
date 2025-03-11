@@ -13,7 +13,7 @@ import { DeleteCategoryDto } from './dto/delete-category.dto'
 import { ChangeCategoryDto } from './dto/change-category.dto'
 import { CategoryEntity } from './entity/category.entity'
 
-@ApiTags('Categories')
+@ApiTags('Категории')
 @Controller()
 export class CategoryController {
 	constructor(private readonly categoryService: CategoryService) {}
