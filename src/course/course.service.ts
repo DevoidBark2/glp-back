@@ -819,7 +819,6 @@ export class CourseService {
 
 	async getCurrentSection(courseId: number, sectionId: number, user: User) {
 		// Проверяем, если sectionId равен -1 (для проверки экзамена)
-		// Проверяем, если sectionId равен -1 (для проверки экзамена)
 		if (Number(sectionId) === -1) {
 			const userProgress = await this.calculateUserProgress(
 				user,
@@ -851,10 +850,10 @@ export class CourseService {
 
 			const userAnswersMap = new Map(
 				userAnswers
-					.filter(answer => answer.task?.id) // Исключаем ответы без task.id
+					.filter(answer => answer?.task?.id)
 					.map(answer => [
-						answer.task.id,
-						{ id: answer.id, answer: answer.answer }
+						answer?.task.id,
+						{ id: answer?.id, answer: answer?.answer }
 					])
 			)
 
@@ -878,8 +877,8 @@ export class CourseService {
 				component.componentTask.questions?.forEach(it => {
 					delete it.correctOption
 				})
-				component.componentTask.userAnswer.answer.forEach(answer => {
-					delete answer.isCorrect
+				component.componentTask.userAnswer?.answer.forEach(answer => {
+					delete answer?.isCorrect
 				})
 			})
 
