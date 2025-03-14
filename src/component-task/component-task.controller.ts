@@ -91,6 +91,18 @@ export class ComponentTaskController {
 		)
 	}
 
+	@Authorization()
+	@Post('submit-exam-user')
+	async submitExamUser(
+		@Query('courseId') courseId: string,
+		@Req() req: Request
+	) {
+		return await this.componentTaskService.submitExamUser(
+			courseId,
+			req['user']
+		)
+	}
+
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('change-order-component')
 	async changeComponentOrder(

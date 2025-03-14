@@ -250,7 +250,7 @@ export class ComponentTaskService {
 				})
 			: null
 
-		let savedExamUserAnswer: ExamUsers
+		let examUserSavedAnswer: ExamUsersAnswerEntity
 		let savedAnswer: AnswersComponentUser
 
 		// const previousCorrectAnswers = Array.isArray(
@@ -270,14 +270,14 @@ export class ComponentTaskService {
 		// 	currentCorrectAnswers - previousCorrectAnswers
 
 		if (!existUserExamAnswer) {
-			await this.examUsersAnswerEntityRepository.save({
-				user,
-				task: body.task,
-				answer: results
-			})
+			examUserSavedAnswer =
+				await this.examUsersAnswerEntityRepository.save({
+					user,
+					task: body.task,
+					answer: results
+				})
 		} else {
 			existUserExamAnswer.answer = results
-			//savedExamUserAnswer = existUserAnswer
 			await this.examUsersAnswerEntityRepository.save(existUserExamAnswer)
 		}
 
@@ -286,13 +286,28 @@ export class ComponentTaskService {
 				user,
 				task: body.task,
 				answer: results,
-				//courseUser: { id: body.courseId },
 				section
 			})
 		} else {
 			existUserAnswer.answer = results
 			savedAnswer = existUserAnswer
 			await this.answersComponentUserRepository.save(existUserAnswer)
+		}
+
+		if (!section) {
+			const answerToUse = examUserSavedAnswer || existUserExamAnswer
+
+			if (answerToUse?.answer?.length) {
+				delete answerToUse.answer[0].isCorrect
+			}
+
+			return {
+				userAnswer: {
+					id: answerToUse.id,
+					type: body.task.type,
+					answer: answerToUse?.answer || []
+				}
+			}
 		}
 
 		// // Начисляем награду только за новые исправленные ответы
@@ -343,4 +358,6 @@ export class ComponentTaskService {
 			}
 		}
 	}
+
+	async submitExamUser(courseId: string, user: User) {}
 }
