@@ -98,7 +98,7 @@ export class ComponentTaskController {
 		@Req() req: Request
 	) {
 		return await this.componentTaskService.submitExamUser(
-			courseId,
+			+courseId,
 			req['user']
 		)
 	}

@@ -19,6 +19,7 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 import { CourseUser } from '../course/entity/course-user.entity'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
+import { ExamEntity } from '../exams/entity/exam.entity'
 
 @Injectable()
 export class ComponentTaskService {
@@ -36,7 +37,11 @@ export class ComponentTaskService {
 		private eventEmitter: EventEmitter2,
 		private courseService: CourseService,
 		@InjectRepository(ExamUsersAnswerEntity)
-		private examUsersAnswerEntityRepository: Repository<ExamUsersAnswerEntity>
+		private examUsersAnswerEntityRepository: Repository<ExamUsersAnswerEntity>,
+		@InjectRepository(ExamUsers)
+		private examUsersRepository: Repository<ExamUsers>,
+		@InjectRepository(ExamEntity)
+		private examEntityRepository: Repository<ExamEntity>
 	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
@@ -184,6 +189,12 @@ export class ComponentTaskService {
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
 		console.log(body)
 
+		const course = await this.courseEntityRepository.findOne({
+			where: {
+				id: body.courseId
+			}
+		})
+
 		const section =
 			body.currentSection !== -1
 				? await this.sectionRepository.findOne({
@@ -274,6 +285,7 @@ export class ComponentTaskService {
 				await this.examUsersAnswerEntityRepository.save({
 					user,
 					task: body.task,
+					course: course,
 					answer: results
 				})
 		} else {
@@ -359,5 +371,55 @@ export class ComponentTaskService {
 		}
 	}
 
-	async submitExamUser(courseId: string, user: User) {}
+	async submitExamUser(courseId: number, user: User) {
+		const userAnswers = await this.examUsersAnswerEntityRepository.find({
+			where: {
+				user: { id: user.id },
+				course: { id: courseId }
+			},
+			relations: { task: true }
+		})
+
+		const userScore =
+			this.courseService.calculateTotalUserPoints(userAnswers)
+
+		const totalExamScore = this.calculateTotalPointsFromTasks(
+			userAnswers.map(it => it.task as ComponentTask)
+		)
+
+		const percentageScore = Math.round((userScore / totalExamScore) * 100)
+
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				course: { id: courseId }
+			}
+		})
+		const userExam = await this.examUsersRepository.findOne({
+			where: {
+				user: { id: user.id },
+				exam: { id: exam.id }
+			}
+		})
+		await this.examUsersRepository.update(userExam.id, {
+			user: { id: user.id },
+			progress: percentageScore,
+			isEndExam: true
+		})
+	}
+
+	private calculateTotalPointsFromTasks(tasks: ComponentTask[]): number {
+		let totalPoints = 0
+
+		tasks.forEach(task => {
+			if (task.type === CourseComponentType.Quiz) {
+				totalPoints += task.questions?.length || 0
+			} else if (task.type === CourseComponentType.MultiPlayChoice) {
+				totalPoints += 3
+			} else if (task.type === CourseComponentType.SimpleTask) {
+				totalPoints += 4
+			}
+		})
+
+		return totalPoints
+	}
 }

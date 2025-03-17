@@ -21,6 +21,7 @@ import { CourseEntity } from 'src/course/entity/course.entity'
 import { AuthModule } from 'src/auth/auth.module'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
+import { ExamEntity } from '../exams/entity/exam.entity'
 
 @Module({
 	imports: [
@@ -35,7 +36,8 @@ import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 			AchievementUser,
 			CourseEntity,
 			ExamUsers,
-			ExamUsersAnswerEntity
+			ExamUsersAnswerEntity,
+			ExamEntity
 		]),
 		CourseModule,
 		forwardRef(() => AuthModule)

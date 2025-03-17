@@ -21,6 +21,10 @@ export class ExamUsers {
 	user: User
 	@CreateDateColumn()
 	startExamAt: Date
-	@Column({ type: "timestamp", })
+	@Column({ type: 'timestamp' })
 	endExamAt: Date
+	@Column({ default: false })
+	isEndExam: boolean
+	@Column({ nullable: true })
+	progress: number
 }

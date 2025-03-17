@@ -199,12 +199,7 @@ export class CourseController {
 		)
 	}
 
-	@Authorization(
-		UserRole.STUDENT,
-		UserRole.TEACHER,
-		UserRole.SUPER_ADMIN,
-		UserRole.MODERATOR
-	)
+	@Authorization()
 	@Get('/start-exam')
 	async startExam(@Query('courseId') courseId: number, @Req() req: Request) {
 		return await this.courseService.startExam(courseId, req['user'])

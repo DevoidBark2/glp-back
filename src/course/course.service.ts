@@ -636,7 +636,7 @@ export class CourseService {
 				}
 	}
 
-	private calculateTotalPoints(sections: SectionEntity[]): number {
+	public calculateTotalPoints(sections: SectionEntity[]): number {
 		let totalPoints = 0
 
 		sections.forEach(section => {
@@ -661,7 +661,9 @@ export class CourseService {
 		return totalPoints
 	}
 
-	private calculateTotalUserPoints(userAnswers: AnswersComponentUser[]) {
+	public calculateTotalUserPoints(
+		userAnswers: AnswersComponentUser[] | ExamUsersAnswerEntity[]
+	) {
 		let total = 0
 
 		userAnswers.map(it => {
@@ -848,6 +850,21 @@ export class CourseService {
 				}
 			)
 
+			const userExam = await this.examUsersRepository.findOne({
+				where: {
+					exam: { id: examData.id },
+					user: { id: user.id }
+				}
+			})
+
+			if (!userExam) {
+				return {
+					success: true,
+					message:
+						'Экзамен продлится 2 часа. Как только вы нажмёте «Начать», отсчёт времени запустится. Удачи!'
+				}
+			}
+
 			const userAnswersMap = new Map(
 				userAnswers
 					.filter(answer => answer?.task?.id)
@@ -877,15 +894,26 @@ export class CourseService {
 				component.componentTask.questions?.forEach(it => {
 					delete it.correctOption
 				})
-				component.componentTask.userAnswer?.answer.forEach(answer => {
-					delete answer?.isCorrect
-				})
+
+				!userExam.isEndExam &&
+					component.componentTask.userAnswer?.answer.forEach(
+						answer => {
+							delete answer?.isCorrect
+						}
+					)
 			})
 
 			return {
 				...examData,
-				startExamAt: examData.exam.startExamAt,
-				endExamAt: examData.exam.endExamAt
+				...(userExam.isEndExam
+					? {
+							success: userExam.progress > 75,
+							message:
+								userExam.progress > 75
+									? '🎉 Поздравляем! Вы успешно завершили экзамен и получили сертификат. Вы можете скачать его в своём профиле.'
+									: '😞 К сожалению, ваш результат ниже 75%. Не расстраивайтесь! Удача обязательно улыбнётся вам в следующий раз.'
+						}
+					: {})
 			}
 		}
 
@@ -938,10 +966,10 @@ export class CourseService {
 					? {
 							...userAnswerRecord,
 							courseUser: undefined,
-							user: undefined, // Можно передать user, если он доступен
-							task: undefined, // Можно передать task, если он доступен
-							section: undefined, // Можно передать section, если он доступен
-							created_at: undefined // Убираем лишнее, если не нужно
+							user: undefined,
+							task: undefined,
+							section: undefined,
+							created_at: undefined
 						}
 					: null
 				component.componentTask.questions?.forEach(it => {
@@ -986,7 +1014,7 @@ export class CourseService {
 		// await this.examQueue.add(
 		// 	'checkExam',
 		// 	{ userId: user.id, examId: course.exam.id },
-		// 	{ delay: 10000 }
+		// 	{ delay: delayInMs }
 		// )
 
 		return await this.examEntityRepository.findOne({

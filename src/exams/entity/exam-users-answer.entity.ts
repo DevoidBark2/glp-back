@@ -7,8 +7,7 @@ import {
 } from 'typeorm'
 import { User } from '../../user/entity/user.entity'
 import { ComponentTask } from '../../component-task/entity/component-task.entity'
-import { SectionEntity } from '../../section/entity/section.entity'
-import { CourseUser } from '../../course/entity/course-user.entity'
+import { CourseEntity } from '../../course/entity/course.entity'
 
 @Entity('exam_answers_user')
 export class ExamUsersAnswerEntity {
@@ -23,6 +22,9 @@ export class ExamUsersAnswerEntity {
 		nullable: true
 	})
 	task: ComponentTask
+
+	@ManyToOne(() => CourseEntity, course => course.id, { onDelete: 'CASCADE' })
+	course: CourseEntity
 
 	@Column({ type: 'json', nullable: false })
 	answer: any
