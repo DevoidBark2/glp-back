@@ -7,7 +7,6 @@ import { UserModule } from '../user/user.module'
 import { ExamsComponent } from './entity/exams-components.entity'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { WebsocketGateway } from '../websockets/websocket.gateway'
-
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([ExamEntity, ExamsComponent, CourseEntity]),
@@ -17,4 +16,4 @@ import { WebsocketGateway } from '../websockets/websocket.gateway'
 	providers: [ExamsService, WebsocketGateway],
 	exports: [ExamsService]
 })
-export class ExamsModule { }
+export class ExamsModule {}

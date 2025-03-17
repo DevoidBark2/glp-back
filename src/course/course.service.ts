@@ -1009,13 +1009,14 @@ export class CourseService {
 		})
 
 		const now = new Date()
-		const delayInMs = endExamAt.getTime() - now.getTime()
+		// const delayInMs = endExamAt.getTime() - now.getTime()
+		const delayInMs = 20000
 
-		// await this.examQueue.add(
-		// 	'checkExam',
-		// 	{ userId: user.id, examId: course.exam.id },
-		// 	{ delay: delayInMs }
-		// )
+		await this.examQueue.add(
+			'checkExam',
+			{ userId: user.id, examId: course.exam.id, courseId: courseId },
+			{ delay: delayInMs }
+		)
 
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },

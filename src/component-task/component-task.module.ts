@@ -39,8 +39,8 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 			ExamUsersAnswerEntity,
 			ExamEntity
 		]),
-		CourseModule,
-		forwardRef(() => AuthModule)
+		forwardRef(() => AuthModule),
+		forwardRef(() => CourseModule)
 	],
 	controllers: [ComponentTaskController],
 	providers: [
@@ -51,6 +51,7 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 		CoinsService,
 		XpService,
 		AchievementsService
-	]
+	],
+	exports: [ComponentTaskService]
 })
 export class ComponentTaskModule {}

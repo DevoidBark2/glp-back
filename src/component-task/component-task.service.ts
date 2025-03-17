@@ -293,6 +293,7 @@ export class ComponentTaskService {
 			await this.examUsersAnswerEntityRepository.save(existUserExamAnswer)
 		}
 
+		// ТУТ НАДО ВОЗРАЩАТЬ А НЕ ЭТО  ДЕЛАТЬ
 		if (!existUserAnswer) {
 			savedAnswer = await this.answersComponentUserRepository.save({
 				user,
@@ -371,37 +372,43 @@ export class ComponentTaskService {
 		}
 	}
 
-	async submitExamUser(courseId: number, user: User) {
+	async submitExamUser(examId: number, courseId: number, userId: string) {
 		const userAnswers = await this.examUsersAnswerEntityRepository.find({
 			where: {
-				user: { id: user.id },
+				user: { id: userId },
 				course: { id: courseId }
 			},
 			relations: { task: true }
+		})
+
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				id: examId
+			},
+			relations: {
+				components: {
+					componentTask: true
+				}
+			}
 		})
 
 		const userScore =
 			this.courseService.calculateTotalUserPoints(userAnswers)
 
 		const totalExamScore = this.calculateTotalPointsFromTasks(
-			userAnswers.map(it => it.task as ComponentTask)
+			exam.components.map(it => it.componentTask)
 		)
 
 		const percentageScore = Math.round((userScore / totalExamScore) * 100)
 
-		const exam = await this.examEntityRepository.findOne({
-			where: {
-				course: { id: courseId }
-			}
-		})
 		const userExam = await this.examUsersRepository.findOne({
 			where: {
-				user: { id: user.id },
+				user: { id: userId },
 				exam: { id: exam.id }
 			}
 		})
 		await this.examUsersRepository.update(userExam.id, {
-			user: { id: user.id },
+			user: { id: userId },
 			progress: percentageScore,
 			isEndExam: true
 		})

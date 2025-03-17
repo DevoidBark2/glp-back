@@ -94,12 +94,14 @@ export class ComponentTaskController {
 	@Authorization()
 	@Post('submit-exam-user')
 	async submitExamUser(
+		@Query('examId') examId: string,
 		@Query('courseId') courseId: string,
 		@Req() req: Request
 	) {
 		return await this.componentTaskService.submitExamUser(
+			+examId,
 			+courseId,
-			req['user']
+			req['user'].id
 		)
 	}
 

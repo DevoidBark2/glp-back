@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { CourseService } from './course.service'
 import { CourseController } from './course.controller'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -17,6 +17,7 @@ import { BullModule } from '@nestjs/bull'
 import { ExamProcessor } from './processors/exam.processor'
 import { ExamsModule } from 'src/exams/exams.module'
 import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
+import { ComponentTaskModule } from '../component-task/component-task.module'
 
 @Module({
 	imports: [
@@ -37,7 +38,8 @@ import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 		JwtModule,
 		EventsModule,
 		UserModule,
-		ExamsModule
+		ExamsModule,
+		forwardRef(() => ComponentTaskModule)
 	],
 	controllers: [CourseController],
 	providers: [ExamProcessor, CourseService],
