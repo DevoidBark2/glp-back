@@ -956,6 +956,7 @@ export class CourseService {
 						}
 					: null
 
+				delete component.componentTask.answer
 				component.componentTask.questions?.forEach(it => {
 					delete it.correctOption
 				})
@@ -1037,6 +1038,8 @@ export class CourseService {
 							created_at: undefined
 						}
 					: null
+
+				delete component.componentTask.answer
 				component.componentTask.questions?.forEach(it => {
 					delete it.correctOption
 				})
@@ -1075,13 +1078,12 @@ export class CourseService {
 
 		const now = new Date()
 		// const delayInMs = endExamAt.getTime() - now.getTime()
-		const delayInMs = 20000
-
-		await this.examQueue.add(
-			'checkExam',
-			{ userId: user.id, examId: course.exam.id, courseId: courseId },
-			{ delay: delayInMs }
-		)
+		//
+		// await this.examQueue.add(
+		// 	'checkExam',
+		// 	{ userId: user.id, examId: course.exam.id, courseId: courseId },
+		// 	{ delay: delayInMs }
+		// )
 
 		return await this.examEntityRepository.findOne({
 			where: { course: { id: courseId } },

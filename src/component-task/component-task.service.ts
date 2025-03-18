@@ -311,7 +311,9 @@ export class ComponentTaskService {
 			const answerToUse = examUserSavedAnswer || existUserExamAnswer
 
 			if (answerToUse?.answer?.length) {
-				delete answerToUse.answer[0].isCorrect
+				answerToUse.answer.map(it => {
+					delete it.isCorrect
+				})
 			}
 
 			return {
@@ -373,6 +375,7 @@ export class ComponentTaskService {
 	}
 
 	async submitExamUser(examId: number, courseId: number, userId: string) {
+		console.log(examId)
 		const userAnswers = await this.examUsersAnswerEntityRepository.find({
 			where: {
 				user: { id: userId },
@@ -381,9 +384,17 @@ export class ComponentTaskService {
 			relations: { task: true }
 		})
 
-		const exam = await this.examEntityRepository.findOne({
+		const examUser = await this.examUsersRepository.findOne({
 			where: {
 				id: examId
+			},
+			relations: {
+				exam: true
+			}
+		})
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				id: examUser.exam.id
 			},
 			relations: {
 				components: {
@@ -392,9 +403,12 @@ export class ComponentTaskService {
 			}
 		})
 
+		console.log(exam)
+
 		const userScore =
 			this.courseService.calculateTotalUserPoints(userAnswers)
 
+		console.log(exam.components.map(it => it.componentTask))
 		const totalExamScore = this.calculateTotalPointsFromTasks(
 			exam.components.map(it => it.componentTask)
 		)
