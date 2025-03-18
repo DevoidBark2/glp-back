@@ -10,6 +10,7 @@ import {
 	Query,
 	Req,
 	UploadedFile,
+	UseGuards,
 	UseInterceptors
 } from '@nestjs/common'
 import { CourseService } from './course.service'
@@ -31,6 +32,7 @@ import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SubscribeCourseDto } from './dto/subsribe-course.dto'
 import { Authorization } from 'src/auth/decorators/auth.decorator'
 import { FilterValuesDto } from './dto/filter-options.dto'
+import { SimpleAuthGuard } from '../decorators/simpleAuth.decorator'
 
 @ApiTags('Курсы')
 @UseInterceptors(EventLoggingInterceptor)
@@ -47,6 +49,12 @@ export class CourseController {
 	@Get('/course/:id')
 	async getCourseById(@Param('id') id: number, @Req() req: Request) {
 		return await this.courseService.findOneById(id, req['user'])
+	}
+
+	@UseGuards(SimpleAuthGuard)
+	@Get('/courses/:id')
+	async getPlatformCourseById(@Param('id') id: number, @Req() req: Request) {
+		return await this.courseService.getPlatformCourseById(id, req['user'])
 	}
 
 	@Authorization()
@@ -163,6 +171,7 @@ export class CourseController {
 
 	@Authorization()
 	@Delete('/leave-course/:id')
+	@ResponseMessage('Вы покинули курс.')
 	async leaveFromCourse(@Param('id') id: number, @Req() req: Request) {
 		return await this.courseService.leaveCourse(id, req['user'])
 	}

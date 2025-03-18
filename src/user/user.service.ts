@@ -24,6 +24,7 @@ import { AuthMethodEnum } from '../auth/enum/auth-method.enum'
 import { v4 as uuidv4 } from 'uuid'
 import { AuthService } from 'src/auth/auth.service'
 import { Request, Response } from 'express'
+import { StatusCourseEnum } from '../course/enum/status_course.enum'
 
 @Injectable()
 export class UserService {
@@ -35,7 +36,7 @@ export class UserService {
 		private readonly jwtService: JwtService,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
-	) { }
+	) {}
 
 	async findAll() {
 		return await this.userRepository.find({
@@ -57,7 +58,12 @@ export class UserService {
 
 	async findById(id: string) {
 		const user = await this.userRepository.findOne({
-			where: { id: id },
+			where: {
+				id: id,
+				courses: {
+					status: StatusCourseEnum.ACTIVE
+				}
+			},
 			relations: {
 				courses: {
 					category: true
@@ -78,6 +84,50 @@ export class UserService {
 		if (!user) {
 			throw new NotFoundException(`Пользователя с ID ${id} не найден!`)
 		}
+
+		return user
+	}
+
+	async getPlatformUserById(id: string) {
+		const user = await this.userRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				courses: {
+					category: true
+				},
+				activeCustomization: {
+					frame: true,
+					effect: true,
+					icon: true
+				}
+			},
+			select: {
+				id: true,
+				first_name: true,
+				second_name: true,
+				method_auth: true,
+				profile_url: true,
+				about_me: true,
+				created_at: true,
+				last_name: true,
+				courses: {
+					id: true,
+					name: true,
+					status: true,
+					image: true
+				}
+			}
+		})
+
+		if (!user) {
+			throw new NotFoundException(`Пользователя с ID ${id} не найден!`)
+		}
+
+		user.courses = user.courses.filter(
+			course => course.status === StatusCourseEnum.ACTIVE
+		)
 
 		return user
 	}

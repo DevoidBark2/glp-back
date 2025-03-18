@@ -283,6 +283,71 @@ export class CourseService {
 		}
 	}
 
+	async getPlatformCourseById(courseId: number, user: User) {
+		const course = await this.courseEntityRepository.findOne({
+			where: { id: courseId },
+			relations: {
+				category: true,
+				user: true,
+				exam: true,
+				sections: true
+			},
+			select: {
+				id: true,
+				name: true,
+				image: true,
+				small_description: true,
+				access_right: true,
+				duration: true,
+				level: true,
+				status: true,
+				publish_date: true,
+				has_certificate: true,
+				content_description: true,
+				secret_key: true,
+				category: {
+					id: true,
+					name: true
+				},
+				user: {
+					id: true,
+					first_name: true,
+					second_name: true,
+					last_name: true,
+					profile_url: true,
+					method_auth: true
+				}
+			}
+		})
+
+		// If the course is not found, return null
+		if (!course) {
+			throw new BadRequestException(`Курс с ID ${courseId} не найден!`)
+		}
+
+		// If no token is provided, return the course without `isUserEnrolled`
+		if (!user) {
+			return {
+				...course,
+				isUserEnrolled: false // Default value since no user to compare
+			}
+		}
+
+		// Check if the user is enrolled in the course using a direct query
+		const isUserEnrolled = await this.courseUserRepository.findOne({
+			where: {
+				user: { id: user.id },
+				course: { id: courseId }
+			}
+		})
+
+		// Return the course with the additional `isUserEnrolled` field
+		return {
+			...course,
+			isUserEnrolled: !!isUserEnrolled
+		}
+	}
+
 	async getCourseMembers(courseId: number) {
 		return await this.courseUserRepository.find({
 			where: { course: { id: courseId } },

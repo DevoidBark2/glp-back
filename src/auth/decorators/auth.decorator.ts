@@ -3,6 +3,7 @@ import { applyDecorators, UseGuards } from '@nestjs/common'
 import { Roles } from '../../decorators/roles.decorator'
 import { AuthGuards } from '../guards/auth.guards'
 import { RolesGuard } from '../guards/roles.guard'
+import { SimpleAuthGuard } from '../../decorators/simpleAuth.decorator'
 
 export function Authorization(...roles: UserRole[]) {
 	if (roles.length > 0) {

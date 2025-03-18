@@ -36,10 +36,10 @@ import { Authorization } from '../auth/decorators/auth.decorator'
 @ApiTags('Пользователи')
 @Controller()
 export class UserController {
-	constructor(private readonly userService: UserService) { }
+	constructor(private readonly userService: UserService) {}
 
 	@Get('users')
-	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Authorization(UserRole.SUPER_ADMIN)
 	@ApiOperation({ summary: 'Get all users' })
 	@Serialize(UsersResponseDto)
 	async findAll() {
@@ -54,23 +54,17 @@ export class UserController {
 		return await this.userService.delete(id)
 	}
 
-	// @Roles(UserRole.SUPER_ADMIN)
-	// @Post('user')
-	// @ApiOperation({ summary: 'Create new user' })
-	// @ApiBody({ type: CreateUserDto })
-	// @Serialize(UsersResponseDto)
-	// @ResponseMessage('Пользователь успешно создан!')
-	// async createUser(@Body() body: CreateUserDto) {
-	// 	return await this.userService.create(body)
-	// }
-
 	@Get('users/:id')
 	@ApiOperation({ summary: 'Get ' })
-	// @Serialize(UserDetailsByIdDto)
 	async getUserById(@Param('id') id: string) {
 		return await this.userService.findById(id)
 	}
 
+	@Get('user/:id')
+	@ApiOperation({ summary: 'Get ' })
+	async getPlatformUserById(@Param('id') id: string) {
+		return await this.userService.getPlatformUserById(id)
+	}
 	@Put('/user/:id')
 	@ApiOperation({ summary: 'Change user info' })
 	async updateUser(@Param('id') id: number, @Body() body: CreateUserDto) {
@@ -176,7 +170,11 @@ export class UserController {
 	@Authorization()
 	@HttpCode(HttpStatus.OK)
 	@Delete('/delete-account')
-	async deleteAccount(@Req() req: Request, @Res({ passthrough: true }) res: Response, @Authorized('id') id: string) {
+	async deleteAccount(
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response,
+		@Authorized('id') id: string
+	) {
 		//return await this.userService.deleteAccount(id, req, res)
 	}
 
