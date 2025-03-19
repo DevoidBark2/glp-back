@@ -30,4 +30,7 @@ export class CourseUser {
 
 	@Column({ type: 'numeric', default: 0 })
 	progress: number
+
+	@Column({ type: 'boolean', default: false })
+	has_certificate: boolean
 }

@@ -25,6 +25,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { AuthService } from 'src/auth/auth.service'
 import { Request, Response } from 'express'
 import { StatusCourseEnum } from '../course/enum/status_course.enum'
+import { ExamUsers } from '../exams/entity/exam-users.entity'
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,8 @@ export class UserService {
 		private readonly userRepository: Repository<User>,
 		@InjectRepository(CourseUser)
 		private readonly courseUserRepository: Repository<CourseUser>,
+		// @InjectRepository(ExamUsers)
+		// private readonly examUsersRepository: Repository<ExamUsers>,
 		private readonly jwtService: JwtService,
 		@Inject(forwardRef(() => AuthService))
 		private readonly authService: AuthService
@@ -229,6 +232,7 @@ export class UserService {
 				activeCustomization: true
 			}
 		})
+
 		const userCourses = await this.courseUserRepository.find({
 			where: {
 				user: { id: userId }
@@ -237,6 +241,8 @@ export class UserService {
 				course: true
 			}
 		})
+
+		console.log(userCourses)
 
 		return {
 			id: userId,
@@ -261,6 +267,7 @@ export class UserService {
 			coins: user.coins,
 			purchases: user.purchases,
 			activeCustomization: user.activeCustomization,
+			exams: user.exams,
 			userCourses: userCourses.map(courseUser => {
 				return {
 					id: courseUser.course.id,
@@ -268,6 +275,7 @@ export class UserService {
 					progress: courseUser.progress,
 					name: courseUser.course.name,
 					image: courseUser.course.image,
+					has_certificate: courseUser.has_certificate,
 					small_description: courseUser.course.small_description
 				}
 			})

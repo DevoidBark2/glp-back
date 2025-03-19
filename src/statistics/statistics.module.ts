@@ -18,11 +18,11 @@ import { AuthModule } from 'src/auth/auth.module'
 			CourseEntity,
 			PostEntity,
 			SectionEntity,
-			CourseUser,
+			CourseUser
 		]),
 		forwardRef(() => AuthModule)
 	],
 	controllers: [StatisticsController],
 	providers: [StatisticsService, UserService, JwtService]
 })
-export class StatisticsModule { }
+export class StatisticsModule {}

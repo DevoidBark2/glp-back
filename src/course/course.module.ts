@@ -43,6 +43,6 @@ import { ComponentTaskModule } from '../component-task/component-task.module'
 	],
 	controllers: [CourseController],
 	providers: [ExamProcessor, CourseService],
-	exports: [CourseService]
+	exports: [CourseService, TypeOrmModule]
 })
 export class CourseModule {}

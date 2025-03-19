@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 import fs from 'fs'
+import { User } from '../user/entity/user.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { CourseEntity } from '../course/entity/course.entity'
 const robotoFont = fs.readFileSync(
 	'./src/certificate/fonts/Roboto-Regular.ttf',
 	'base64'
@@ -9,11 +13,15 @@ const robotoFont = fs.readFileSync(
 
 @Injectable()
 export class CertificateService {
-	async generateCertificate(
-		name: string,
-		courseTitle: string,
-		date: string
-	): Promise<Buffer> {
+	constructor(
+		@InjectRepository(CourseEntity)
+		private readonly courseEntityRepository: Repository<CourseEntity>
+	) {}
+
+	async generateCertificate(courseId: number, user: User): Promise<Buffer> {
+		const course = await this.courseEntityRepository.findOne({
+			where: { id: courseId }
+		})
 		const doc = new jsPDF('l', 'mm', 'a4') // Landscape A4 format
 
 		// Добавление поддержки кириллицы через Roboto
@@ -50,21 +58,26 @@ export class CertificateService {
 		// Имя получателя
 		doc.setFontSize(26)
 		doc.setTextColor(0, 51, 102)
-		doc.text(name, 148.5, 90, { align: 'center' })
+		doc.text(
+			`${user.second_name ?? ''} ${user.first_name ?? ''} ${user.last_name ?? ''}`,
+			148.5,
+			90,
+			{ align: 'center' }
+		)
 
 		// Курс
 		doc.setFont('Roboto', 'normal')
 		doc.setFontSize(18)
 		doc.text(
-			`успешно завершил(а) обучение на курсе: "${courseTitle}"`,
+			`успешно завершил(а) обучение на курсе: "${course.name}"`,
 			148.5,
 			110,
 			{ align: 'center' }
 		)
 
-		// Дата
+		// Дата выдачи = дате завершения экзамена
 		doc.setFontSize(14)
-		doc.text(`Дата выдачи сертификата: ${date}`, 148.5, 130, {
+		doc.text(`Дата выдачи сертификата: ${Date.now()}`, 148.5, 130, {
 			align: 'center'
 		})
 

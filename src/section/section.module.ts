@@ -27,6 +27,6 @@ import { AuthModule } from 'src/auth/auth.module'
 		forwardRef(() => AuthModule)
 	],
 	controllers: [SectionController],
-	providers: [SectionService, UserService, JwtService],
+	providers: [SectionService, UserService, JwtService]
 })
-export class SectionModule { }
+export class SectionModule {}

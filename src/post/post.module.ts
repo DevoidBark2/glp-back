@@ -18,4 +18,4 @@ import { AuthModule } from 'src/auth/auth.module'
 	controllers: [PostController],
 	providers: [PostService, UserService, JwtService]
 })
-export class PostModule { }
+export class PostModule {}

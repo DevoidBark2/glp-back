@@ -21,6 +21,7 @@ import { AchievementUser } from 'src/achievements/entities/achievement-users.ent
 import { UserLevel } from 'src/users-levels/entity/user-level.entity'
 import { Purchase } from '../../customize/purchases/entity/purchases.entity'
 import { ActiveCustomization } from '../../customize/active_customizations/entity/active_customizations.entity'
+import { ExamUsers } from '../../exams/entity/exam-users.entity'
 
 @Entity('users')
 export class User {
@@ -103,4 +104,6 @@ export class User {
 
 	@OneToOne(() => ActiveCustomization, customization => customization.user)
 	activeCustomization: ActiveCustomization
+	@OneToMany(() => ExamUsers, exam => exam.user, { onDelete: 'CASCADE' })
+	exams: ExamUsers[]
 }

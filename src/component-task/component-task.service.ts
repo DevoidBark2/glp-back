@@ -375,7 +375,6 @@ export class ComponentTaskService {
 	}
 
 	async submitExamUser(examId: number, courseId: number, userId: string) {
-		console.log(examId)
 		const userAnswers = await this.examUsersAnswerEntityRepository.find({
 			where: {
 				user: { id: userId },
@@ -403,12 +402,9 @@ export class ComponentTaskService {
 			}
 		})
 
-		console.log(exam)
-
 		const userScore =
 			this.courseService.calculateTotalUserPoints(userAnswers)
 
-		console.log(exam.components.map(it => it.componentTask))
 		const totalExamScore = this.calculateTotalPointsFromTasks(
 			exam.components.map(it => it.componentTask)
 		)
@@ -426,6 +422,78 @@ export class ComponentTaskService {
 			progress: percentageScore,
 			isEndExam: true
 		})
+
+		const examData = await this.examEntityRepository.findOne({
+			where: { course: { id: courseId } },
+			relations: { components: { componentTask: true }, exam: true },
+			order: { components: { sort: 'ASC' } }
+		})
+
+		const userAnswersMap = new Map(
+			userAnswers
+				.filter(answer => answer?.task?.id)
+				.map(answer => [
+					answer?.task.id,
+					{ id: answer?.id, answer: answer?.answer }
+				])
+		)
+
+		const courseUser = await this.courseUserRepository.findOne({
+			where: {
+				course: { id: courseId },
+				user: { id: userId }
+			}
+		})
+		console.log(courseUser)
+		await this.courseUserRepository.update(courseUser.id, {
+			has_certificate: percentageScore > 75
+		})
+
+		examData.components.forEach(component => {
+			if (!component.componentTask) return
+
+			const taskId = component.componentTask.id
+			const userAnswerRecord = userAnswersMap.get(taskId)
+
+			component.componentTask = {
+				id: taskId,
+				userAnswer: userAnswerRecord
+					? {
+							...userAnswerRecord,
+							courseUser: undefined,
+							user: undefined,
+							task: undefined,
+							section: undefined,
+							created_at: undefined
+						}
+					: null,
+				title: undefined,
+				description: undefined,
+				type: undefined,
+				questions: undefined,
+				content_description: undefined,
+				created_at: undefined,
+				status: undefined,
+				sort: undefined
+			} as ComponentTask
+
+			delete component.componentTask.answer
+			component.componentTask.questions?.forEach(it => {
+				delete it.correctOption
+			})
+		})
+
+		return {
+			...examData,
+			title: exam.title,
+			...{
+				success: percentageScore > 75,
+				message:
+					percentageScore > 75
+						? '🎉 Поздравляем! Вы успешно завершили экзамен и получили сертификат. Вы можете скачать его в своём профиле.'
+						: '😞 К сожалению, ваш результат ниже 75%. Не расстраивайтесь! Удача обязательно улыбнётся вам в следующий раз.'
+			}
+		}
 	}
 
 	private calculateTotalPointsFromTasks(tasks: ComponentTask[]): number {

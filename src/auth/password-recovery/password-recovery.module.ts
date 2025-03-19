@@ -11,8 +11,11 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthModule } from '../auth.module'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Token, User, CourseUser]), forwardRef(() => AuthModule)],
+	imports: [
+		TypeOrmModule.forFeature([Token, User, CourseUser]),
+		forwardRef(() => AuthModule)
+	],
 	controllers: [PasswordRecoveryController],
 	providers: [PasswordRecoveryService, UserService, MailService, JwtService]
 })
-export class PasswordRecoveryModule { }
+export class PasswordRecoveryModule {}
