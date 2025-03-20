@@ -60,12 +60,13 @@ export class UserService {
 	}
 
 	async findById(id: string) {
+		console.log(id)
 		const user = await this.userRepository.findOne({
 			where: {
-				id: id,
-				courses: {
-					status: StatusCourseEnum.ACTIVE
-				}
+				id: id
+				// courses: {
+				// 	status: StatusCourseEnum.ACTIVE
+				// }
 			},
 			relations: {
 				courses: {
@@ -84,6 +85,7 @@ export class UserService {
 			}
 		})
 
+		console.log(user)
 		if (!user) {
 			throw new NotFoundException(`Пользователя с ID ${id} не найден!`)
 		}
@@ -222,6 +224,7 @@ export class UserService {
 	}
 
 	async getUserProfileInfo(userId: string) {
+		console.log(userId)
 		const user = await this.userRepository.findOne({
 			where: {
 				id: userId

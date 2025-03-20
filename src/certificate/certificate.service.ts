@@ -6,6 +6,7 @@ import { User } from '../user/entity/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CourseEntity } from '../course/entity/course.entity'
+import { ExamUsers } from '../exams/entity/exam-users.entity'
 const robotoFont = fs.readFileSync(
 	'./src/certificate/fonts/Roboto-Regular.ttf',
 	'base64'
@@ -20,7 +21,10 @@ export class CertificateService {
 
 	async generateCertificate(courseId: number, user: User): Promise<Buffer> {
 		const course = await this.courseEntityRepository.findOne({
-			where: { id: courseId }
+			where: { id: courseId },
+			relations: {
+				user: true
+			}
 		})
 		const doc = new jsPDF('l', 'mm', 'a4') // Landscape A4 format
 
@@ -75,16 +79,13 @@ export class CertificateService {
 			{ align: 'center' }
 		)
 
-		// Дата выдачи = дате завершения экзамена
-		doc.setFontSize(14)
-		doc.text(`Дата выдачи сертификата: ${Date.now()}`, 148.5, 130, {
-			align: 'center'
-		})
-
 		doc.setFontSize(12)
-		doc.text('Руководитель курса:   Иванов Иван Иванович', 60, 170)
+		doc.text(
+			`Руководитель курса:   ${course.user.second_name ?? ''} ${course.user.first_name ?? ''} ${course.user.last_name ?? ''}`,
+			60,
+			170
+		)
 
-		// Печать как буфер данных
 		return Buffer.from(doc.output('arraybuffer'))
 	}
 }

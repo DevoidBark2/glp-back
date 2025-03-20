@@ -304,7 +304,7 @@ export class CourseService {
 				publish_date: true,
 				has_certificate: true,
 				content_description: true,
-				secret_key: true,
+				secret_key: false,
 				category: {
 					id: true,
 					name: true

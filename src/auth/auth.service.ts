@@ -50,7 +50,7 @@ export class AuthService {
 		@InjectRepository(EventEntity)
 		private readonly eventEntityRepository: Repository<EventEntity>,
 		private readonly usersLevelsService: UsersLevelsService
-	) { }
+	) {}
 
 	// Метод для точного соответствия требованиям каждого уровня
 	private checkPasswordComplexity(
@@ -277,13 +277,6 @@ export class AuthService {
 				user.code
 			)
 		}
-
-		// Устанавливаем куки с флагами безопасности
-		res.cookie('userRole', userData.role, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 3600000
-		})
 
 		await this.eventEntityRepository.save({
 			user: userData,
