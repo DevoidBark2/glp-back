@@ -46,9 +46,10 @@ export class CourseController {
 		return await this.courseService.findAll()
 	}
 
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('/course/:id')
-	async getCourseById(@Param('id') id: number, @Req() req: Request) {
-		return await this.courseService.findOneById(id, req['user'])
+	async getCourseById(@Param('id') id: number) {
+		return await this.courseService.findOneById(id)
 	}
 
 	@UseGuards(SimpleAuthGuard)
@@ -143,6 +144,7 @@ export class CourseController {
 		return await this.courseService.getCourseDetails(id)
 	}
 
+	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
 	@Get('course-sections/:id')
 	async getCourseSections(@Param('id') id: number) {
 		return await this.courseService.getCourseSections(id)

@@ -218,14 +218,12 @@ export class CourseService {
 		})
 	}
 
-	async findOneById(courseId: number, user: User) {
+	async findOneById(courseId: number) {
 		const course = await this.courseEntityRepository.findOne({
 			where: { id: courseId },
 			relations: {
 				category: true,
-				user: true,
-				exam: true,
-				sections: true
+				exam: true
 			},
 			select: {
 				id: true,
@@ -255,32 +253,11 @@ export class CourseService {
 			}
 		})
 
-		// If the course is not found, return null
 		if (!course) {
 			throw new BadRequestException(`Курс с ID ${courseId} не найден!`)
 		}
 
-		// If no token is provided, return the course without `isUserEnrolled`
-		if (!user) {
-			return {
-				...course,
-				isUserEnrolled: false // Default value since no user to compare
-			}
-		}
-
-		// Check if the user is enrolled in the course using a direct query
-		const isUserEnrolled = await this.courseUserRepository.findOne({
-			where: {
-				user: { id: user.id },
-				course: { id: courseId }
-			}
-		})
-
-		// Return the course with the additional `isUserEnrolled` field
-		return {
-			...course,
-			isUserEnrolled: !!isUserEnrolled
-		}
+		return course
 	}
 
 	async getPlatformCourseById(courseId: number, user: User) {
@@ -288,9 +265,7 @@ export class CourseService {
 			where: { id: courseId },
 			relations: {
 				category: true,
-				user: true,
-				exam: true,
-				sections: true
+				user: true
 			},
 			select: {
 				id: true,
@@ -304,7 +279,6 @@ export class CourseService {
 				publish_date: true,
 				has_certificate: true,
 				content_description: true,
-				secret_key: false,
 				category: {
 					id: true,
 					name: true
@@ -420,6 +394,7 @@ export class CourseService {
 							first_name: true,
 							second_name: true,
 							last_name: true,
+							email: true,
 							phone: true,
 							role: true
 						}
@@ -428,29 +403,18 @@ export class CourseService {
 			: await this.courseEntityRepository.find({
 					where: { user: { id: user.id } },
 					relations: {
-						user: true,
 						category: true
 					},
 					order: {
-						user: {
-							role: 'DESC'
-						}
+						created_at: 'DESC'
 					},
 					select: {
 						id: true,
 						name: true,
 						created_at: true,
 						status: true,
-						duration: true,
 						level: true,
-						user: {
-							id: true,
-							first_name: true,
-							second_name: true,
-							last_name: true,
-							phone: true,
-							role: true
-						}
+						duration: true
 					}
 				})
 	}
@@ -540,14 +504,21 @@ export class CourseService {
 				course: { id: id }
 			},
 			relations: {
-				parentSection: true,
-				sectionComponents: {
-					componentTask: true
-				}
+				parentSection: true
 			},
 			order: {
 				sectionComponents: {
 					sort: 'ASC'
+				}
+			},
+			select: {
+				id: true,
+				name: true,
+				sort_number: true,
+				parentSection: {
+					id: true,
+					title: true,
+					sort: true
 				}
 			}
 		})

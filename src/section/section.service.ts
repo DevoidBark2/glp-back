@@ -33,11 +33,18 @@ export class SectionService {
 		return user.role === UserRole.SUPER_ADMIN
 			? this.sectionEntityRepository.find({
 					relations: {
-						course: true,
 						user: true,
-						sectionComponents: true
+						course: true
 					},
 					select: {
+						id: true,
+						name: true,
+						course: {
+							id: true,
+							name: true
+						},
+						created_at: true,
+						status: true,
 						user: {
 							id: true,
 							first_name: true,
@@ -50,8 +57,24 @@ export class SectionService {
 			: this.sectionEntityRepository.find({
 					where: { user: { id: user.id } },
 					relations: {
-						course: true,
-						sectionComponents: true
+						course: true
+					},
+					select: {
+						id: true,
+						name: true,
+						course: {
+							id: true,
+							name: true
+						},
+						created_at: true,
+						status: true,
+						user: {
+							id: true,
+							first_name: true,
+							second_name: true,
+							last_name: true,
+							role: true
+						}
 					}
 				})
 	}
@@ -225,7 +248,16 @@ export class SectionService {
 			description: section.description,
 			uploadFile: section.uploadFile,
 			status: section.status,
-			sectionComponents: section.sectionComponents,
+			sectionComponents: section.sectionComponents.map(component => {
+				return {
+					id: component.id,
+					componentTask: {
+						id: component.componentTask.id,
+						title: component.componentTask.title,
+						type: component.componentTask.type
+					}
+				}
+			}),
 			created_at: section.created_at,
 			externalLinks: section.externalLinks,
 			parentSection: section.parentSection.id

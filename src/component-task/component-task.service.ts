@@ -54,7 +54,13 @@ export class ComponentTaskService {
 		const newComponentUser = newComponent.user
 
 		return {
-			...newComponent,
+			...{
+				id: newComponent.id,
+				title: newComponent.title,
+				created_at: newComponent.created_at,
+				type: newComponent.type,
+				status: newComponent.status
+			},
 			user: {
 				id: newComponentUser.id,
 				first_name: newComponentUser.first_name,
@@ -133,7 +139,7 @@ export class ComponentTaskService {
 
 	async delete(componentId: string, user: User) {
 		const componentTask = await this.componentTaskRepository.findOne({
-			where: { id: componentId, user: user }
+			where: { id: componentId, user: { id: user.id } }
 		})
 
 		if (!componentTask) {
@@ -151,7 +157,12 @@ export class ComponentTaskService {
 					user: { id: user.id },
 					title: ILike(queryString)
 				}
-			]
+			],
+			select: {
+				id: true,
+				title: true,
+				type: true
+			}
 		})
 	}
 
