@@ -31,6 +31,7 @@ import { ChangeUserRoleDto } from './dto/change-user-role.dto'
 import { BlockUserDto } from './dto/block-user.dto'
 import { Authorized } from '../auth/decorators/authorized.decorator'
 import { Authorization } from '../auth/decorators/auth.decorator'
+
 // import { Request, Response } from 'express'
 
 @ApiTags('Пользователи')
@@ -54,6 +55,7 @@ export class UserController {
 		return await this.userService.delete(id)
 	}
 
+	@Authorization(UserRole.SUPER_ADMIN)
 	@Get('users/:id')
 	@ApiOperation({ summary: 'Get ' })
 	async getUserById(@Param('id') id: string) {
