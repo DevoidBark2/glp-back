@@ -161,7 +161,8 @@ export class ComponentTaskService {
 			select: {
 				id: true,
 				title: true,
-				type: true
+				type: true,
+				sort: true,	
 			}
 		})
 	}

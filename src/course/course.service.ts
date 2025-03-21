@@ -504,7 +504,10 @@ export class CourseService {
 				course: { id: id }
 			},
 			relations: {
-				parentSection: true
+				parentSection: true,
+				sectionComponents: {
+					componentTask: true
+				}
 			},
 			order: {
 				sectionComponents: {
@@ -519,6 +522,17 @@ export class CourseService {
 					id: true,
 					title: true,
 					sort: true
+				},
+				sectionComponents: {
+					id: true,
+					sort: true,
+					componentTask: {
+						id: true,
+						title: true,
+						type: true,
+						status: true,
+						created_at: true
+					}
 				}
 			}
 		})
