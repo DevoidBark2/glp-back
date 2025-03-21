@@ -18,13 +18,14 @@ import {
 	FilesInterceptor
 } from '@nestjs/platform-express'
 import { multerOptions } from 'src/config/multerConfig'
+import { ResponseMessage } from '../decorators/response-message.decorator'
 
 @ApiTags('Основые настройки')
 @Controller()
 export class GeneralSettingsController {
 	constructor(
 		private readonly generalSettingsService: GeneralSettingsService
-	) { }
+	) {}
 
 	@Get('/general-settings')
 	async getGeneralSettings() {
@@ -33,7 +34,7 @@ export class GeneralSettingsController {
 
 	@Get('footer')
 	async getFooterInfo() {
-		return this.generalSettingsService.getFooterInfo();
+		return this.generalSettingsService.getFooterInfo()
 	}
 
 	@Roles(UserRole.SUPER_ADMIN)
@@ -47,6 +48,7 @@ export class GeneralSettingsController {
 			multerOptions
 		)
 	)
+	@ResponseMessage('Настройки успешно обновлены!')
 	async changeGeneralSettings(
 		@Body() settings: ChangeGeneralSettingsDto,
 		@UploadedFiles()
@@ -58,20 +60,14 @@ export class GeneralSettingsController {
 		settings.logo_url = null
 		settings.default_avatar = null
 
-		// Check if files are uploaded
 		if (files.logo_url && files.logo_url.length > 0) {
 			settings.logo_url = `uploads/${files.logo_url[0].filename}`
 		}
 
-		// Check if default avatar is uploaded
 		if (files.default_avatar && files.default_avatar.length > 0) {
 			settings.default_avatar = `uploads/${files.default_avatar[0].filename}`
 		}
 
 		await this.generalSettingsService.change(settings)
-
-		return {
-			message: 'Настройки успешно обновлены!'
-		}
 	}
 }

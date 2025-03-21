@@ -125,7 +125,7 @@ export class UserController {
 			imagePath = 'uploads/' + image.filename
 		}
 
-		await this.userService.uploadAvatar(imagePath, req['user?'])
+		await this.userService.uploadAvatar(imagePath, req['user'])
 
 		return imagePath
 	}
