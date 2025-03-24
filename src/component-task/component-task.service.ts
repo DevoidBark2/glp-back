@@ -41,7 +41,9 @@ export class ComponentTaskService {
 		@InjectRepository(ExamUsers)
 		private examUsersRepository: Repository<ExamUsers>,
 		@InjectRepository(ExamEntity)
-		private examEntityRepository: Repository<ExamEntity>
+		private examEntityRepository: Repository<ExamEntity>,
+		@InjectRepository(SectionComponentTask)
+		private sectionComponentTaskRepository: Repository<SectionComponentTask>
 	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
@@ -162,7 +164,7 @@ export class ComponentTaskService {
 				id: true,
 				title: true,
 				type: true,
-				sort: true,	
+				sort: true
 			}
 		})
 	}
@@ -174,28 +176,19 @@ export class ComponentTaskService {
 	}
 
 	async changeComponentOrder(body: ChangeComponentOrderDto, user: User) {
-		const currentSection = await this.sectionRepository.findOne({
-			where: { id: body.sectionId },
-			relations: { sectionComponents: true }
+		body.components.map(async component => {
+			const componentTask =
+				await this.sectionComponentTaskRepository.findOne({
+					where: {
+						id: component.id,
+						section: { id: body.sectionId }
+					}
+				})
+
+			await this.sectionComponentTaskRepository.update(componentTask.id, {
+				sort: component.sort
+			})
 		})
-
-		if (!currentSection) {
-			throw new Error('Раздел не найден')
-		}
-
-		// Обновляем sort для каждого компонента
-		await Promise.all(
-			body.components.map(({ id, sort }) =>
-				this.sectionRepository
-					.createQueryBuilder()
-					.update(SectionComponentTask)
-					.set({ sort })
-					.where('id = :id', { id })
-					.execute()
-			)
-		)
-
-		return { message: 'Порядок компонентов обновлен' }
 	}
 
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {

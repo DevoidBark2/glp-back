@@ -289,9 +289,54 @@ export class SectionService {
 		courseId: number
 	}) {
 		for (const section of body.sections) {
-			await this.sectionEntityRepository.update(section.sectionId, {
+			const sectionItem = await this.sectionEntityRepository.findOne({
+				where: {
+					id: Number(section.sectionId)
+				},
+				relations: {
+					parentSection: true
+				}
+			})
+			await this.mainSectionRepository.update(
+				sectionItem.parentSection.id,
+				{
+					sort: section.sort
+				}
+			)
+		}
+	}
+
+	async updateOrderSection(body: {
+		courseId: number
+		parentId: number
+		sections: { id: number; sort: number }[]
+	}) {
+		console.log(body)
+		for (const section of body.sections) {
+			await this.sectionEntityRepository.update(section.id, {
 				sort_number: section.sort
 			})
 		}
+	}
+
+	async deleteParentSection(parentId: number, courseId: number) {
+		await this.sectionEntityRepository.delete({
+			course: { id: courseId },
+			parentSection: { id: parentId }
+		})
+	}
+
+	async deleteSectionInCourse(sectionId: number, courseId: number) {
+		await this.sectionEntityRepository.delete({
+			id: sectionId,
+			course: { id: courseId }
+		})
+	}
+
+	async deleteSectionComponent(componentId: string, sectionId: number) {
+		await this.sectionComponentTaskRepository.delete({
+			componentTask: { id: componentId },
+			section: { id: sectionId }
+		})
 	}
 }

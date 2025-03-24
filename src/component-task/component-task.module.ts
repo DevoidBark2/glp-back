@@ -22,6 +22,7 @@ import { AuthModule } from 'src/auth/auth.module'
 import { ExamUsers } from '../exams/entity/exam-users.entity'
 import { ExamUsersAnswerEntity } from '../exams/entity/exam-users-answer.entity'
 import { ExamEntity } from '../exams/entity/exam.entity'
+import { SectionComponentTask } from '../section/entity/section-component-task.entity'
 
 @Module({
 	imports: [
@@ -37,7 +38,8 @@ import { ExamEntity } from '../exams/entity/exam.entity'
 			CourseEntity,
 			ExamUsers,
 			ExamUsersAnswerEntity,
-			ExamEntity
+			ExamEntity,
+			SectionComponentTask
 		]),
 		forwardRef(() => AuthModule),
 		forwardRef(() => CourseModule)

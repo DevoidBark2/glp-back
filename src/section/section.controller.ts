@@ -6,6 +6,7 @@ import {
 	Param,
 	Post,
 	Put,
+	Query,
 	Req,
 	UseInterceptors
 } from '@nestjs/common'
@@ -125,5 +126,54 @@ export class SectionController {
 		}
 	) {
 		return await this.sectionService.updateOrderParentSection(body)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Post('update-order-section')
+	async updateOrderSection(
+		@Body()
+		body: {
+			courseId: number
+			parentId: number
+			sections: { id: number; sort: number }[]
+		}
+	) {
+		return await this.sectionService.updateOrderSection(body)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Delete('delete-parent-section/:parentId')
+	@ResponseMessage('Курс обновлен.')
+	async deleteParentSection(
+		@Param('parentId') parentId: number,
+		@Query('courseId') courseId: number
+	) {
+		return await this.sectionService.deleteParentSection(parentId, courseId)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Delete('delete-section/:sectionId')
+	@ResponseMessage('Курс обновлен.')
+	async deleteSection(
+		@Param('sectionId') sectionId: number,
+		@Query('courseId') courseId: number
+	) {
+		return await this.sectionService.deleteSectionInCourse(
+			sectionId,
+			courseId
+		)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Delete('delete-component-section/:componentId')
+	@ResponseMessage('Курс обновлен.')
+	async deleteSectionComponent(
+		@Param('componentId') componentId: string,
+		@Query('courseId') courseId: number
+	) {
+		return await this.sectionService.deleteSectionComponent(
+			componentId,
+			courseId
+		)
 	}
 }
