@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Post,
+	Put,
+	Req
+} from '@nestjs/common'
 import { ExamsService } from './exams.service'
 import { ApiTags } from '@nestjs/swagger'
 import { Authorization } from '../auth/decorators/auth.decorator'
@@ -6,11 +15,12 @@ import { UserRole } from '../constants/contants'
 import { CreateExamDto } from './dto/create-exam.dto'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { SetExamForCourseDto } from './dto/set-exam-for-course.dto'
+import { ChangeExamDto } from './dto/change-exam.dto'
 
 @ApiTags('Экзамен')
 @Controller('')
 export class ExamsController {
-	constructor(private readonly examsService: ExamsService) { }
+	constructor(private readonly examsService: ExamsService) {}
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Get('exams')
@@ -34,8 +44,21 @@ export class ExamsController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Put('set-exam-course')
-	@ResponseMessage("Экзамен успешно установлен")
+	@ResponseMessage('Экзамен успешно установлен')
 	async setExamForCourse(@Body() body: SetExamForCourseDto) {
-		await this.examsService.setExamForCourse(body);
+		await this.examsService.setExamForCourse(body)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Get('exams/:id')
+	async getExam(@Param('id') id: number) {
+		return await this.examsService.getExamById(id)
+	}
+
+	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
+	@Put('exams/:id')
+	@ResponseMessage('Экзамен успешно обновлен')
+	async changeExam(@Param('id') id: number, @Body() body: ChangeExamDto) {
+		return await this.examsService.changeExam(body, id)
 	}
 }

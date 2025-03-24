@@ -1038,8 +1038,6 @@ export class CourseService {
 			components: sectionComponents,
 			files: currentSection.uploadFile,
 			links: currentSection.externalLinks
-				? [currentSection.externalLinks]
-				: []
 		}
 	}
 

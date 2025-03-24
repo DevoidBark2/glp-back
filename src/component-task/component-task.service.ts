@@ -164,7 +164,8 @@ export class ComponentTaskService {
 				id: true,
 				title: true,
 				type: true,
-				sort: true
+				sort: true,
+				status: true
 			}
 		})
 	}

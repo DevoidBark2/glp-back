@@ -7,6 +7,7 @@ import { CreateExamDto } from './dto/create-exam.dto'
 import { ExamsComponent } from './entity/exams-components.entity'
 import { SetExamForCourseDto } from './dto/set-exam-for-course.dto'
 import { CourseEntity } from 'src/course/entity/course.entity'
+import { ChangeExamDto } from './dto/change-exam.dto'
 
 @Injectable()
 export class ExamsService {
@@ -64,6 +65,31 @@ export class ExamsService {
 		await this.examsComponentRepository.save(examComponents)
 	}
 
+	async changeExam(body: ChangeExamDto, examId: number) {
+		console.log(body)
+		console.log(examId)
+		await this.examsComponentRepository.delete({
+			exam: { id: examId }
+		})
+
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				id: examId
+			}
+		})
+
+		const examComponents = body.components.map(component => {
+			const examComponent = new ExamsComponent()
+			examComponent.exam = exam
+			examComponent.componentTask = component
+			examComponent.sort = component.sort
+
+			return examComponent
+		})
+
+		await this.examsComponentRepository.save(examComponents)
+	}
+
 	async deleteExam(id: number, user: User) {
 		const examUser = await this.examEntityRepository.findOne({
 			where: {
@@ -95,6 +121,49 @@ export class ExamsService {
 		await this.courseRepository.update(course.id, {
 			exam: exam
 		})
+	}
+
+	async getExamById(id: number) {
+		const exam = await this.examEntityRepository.findOne({
+			where: {
+				id: id
+			},
+			relations: {
+				components: {
+					componentTask: true
+				}
+			},
+			select: {
+				id: true,
+				title: true,
+				components: {
+					id: true,
+					sort: true,
+					componentTask: {
+						id: true,
+						title: true,
+						sort: true,
+						type: true,
+						created_at: true
+					}
+				}
+			}
+		})
+
+		return {
+			id: exam.id,
+			title: exam.title,
+			components: exam.components.map(component => {
+				return {
+					id: component.componentTask.id,
+					title: component.componentTask.title,
+					type: component.componentTask.type,
+					sort: component.sort,
+					status: component.componentTask.status,
+					created_at: component.componentTask.created_at
+				}
+			})
+		}
 	}
 
 	// async startExam(userId: string, examId: string) {
