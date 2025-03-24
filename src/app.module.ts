@@ -4,7 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserModule } from './user/user.module'
 import { PostModule } from './post/post.module'
-import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { CourseModule } from './course/course.module'
 import { SectionModule } from './section/section.module'
@@ -38,8 +37,9 @@ import { EffectsModule } from './customize/effects/effects.module'
 import { CustomizeModule } from './customize/customize.module'
 import { PurchasesModule } from './customize/purchases/purchases.module'
 import { BullModule } from '@nestjs/bull'
-import { CertificateService } from './certificate/certificate.service';
-import { CertificateModule } from './certificate/certificate.module';
+import { CertificateService } from './certificate/certificate.service'
+import { CertificateModule } from './certificate/certificate.module'
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 @Module({
 	imports: [

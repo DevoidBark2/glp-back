@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
 import { ConfigService } from '@nestjs/config'
-import { render } from '@react-email/components'
+import { render } from '@react-email/render'
 import { ConfirmationTemplate } from './templates/confirmation.template'
 import { ResetPasswordTemplate } from './templates/reset-password.template'
 import { TwoFactorAuthTemplate } from './templates/two-factor-auth.template'

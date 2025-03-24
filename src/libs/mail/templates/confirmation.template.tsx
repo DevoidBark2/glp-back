@@ -1,5 +1,8 @@
 import { Html } from '@react-email/html'
-import { Heading, Link, Body, Text } from '@react-email/components'
+import { Text } from '@react-email/text'
+import { Body } from '@react-email/body'
+import { Link } from '@react-email/link'
+import { Heading } from '@react-email/heading'
 import * as React from 'react'
 interface ConfirmationTemplateProps {
 	domain: string

@@ -1,5 +1,7 @@
 import { Html } from '@react-email/html'
-import { Heading, Body, Text } from '@react-email/components'
+import { Text } from '@react-email/text'
+import { Body } from '@react-email/body'
+import { Heading } from '@react-email/heading'
 import * as React from 'react'
 interface TwoFactorAuthTemplateProps {
 	token: string
