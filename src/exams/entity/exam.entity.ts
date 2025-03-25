@@ -27,7 +27,9 @@ export class ExamEntity {
 	components: ExamsComponent[]
 	@OneToOne(() => ExamUsers, examUser => examUser.exam)
 	exam: ExamUsers
-	@OneToMany(() => CourseEntity, course => course.exam, { onDelete: "SET NULL" })
+	@OneToMany(() => CourseEntity, course => course.exam, {
+		onDelete: 'SET NULL'
+	})
 	course: CourseEntity[]
 	@CreateDateColumn()
 	created_at: Date

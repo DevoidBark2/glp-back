@@ -61,7 +61,7 @@ import { SectionModule } from 'src/section/section.module'
 			useFactory: getProvidersConfig,
 			inject: [ConfigService]
 		}),
-		forwardRef(() => MailConfirmationModule,),
+		forwardRef(() => MailConfirmationModule),
 		forwardRef(() => SectionModule)
 	],
 	controllers: [AuthController],
@@ -74,4 +74,4 @@ import { SectionModule } from 'src/section/section.module'
 	],
 	exports: [AuthService, TwoFactorAuthService]
 })
-export class AuthModule { }
+export class AuthModule {}

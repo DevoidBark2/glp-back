@@ -15,6 +15,6 @@ export class IsPasswordsMatchingConstraint
 	}
 
 	public defaultMessage(validationArguments?: ValidationArguments) {
-		return 'Пароли не совпадают'
+		return `Пароли не совпадают ${validationArguments.targetName}`
 	}
 }

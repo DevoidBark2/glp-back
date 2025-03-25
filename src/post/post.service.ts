@@ -19,7 +19,7 @@ export class PostService {
 		@InjectRepository(User)
 		private readonly userRepository: Repository<User>,
 		private readonly jwtService: JwtService
-	) { }
+	) {}
 
 	async getAllPosts() {
 		return this.postEntityRepository.find({
@@ -118,6 +118,7 @@ export class PostService {
 	}
 
 	async getPostForModerators(user: User) {
+		return user
 		// const moderatorPosts = await this.moderatorPostRepository.find({
 		// 	where: {
 		// 		user: { id: user.id },
@@ -241,6 +242,7 @@ export class PostService {
 	}
 
 	private async randomAssignPost(postId: number) {
+		return postId
 		// const moderators = await this.userRepository.find({
 		// 	where: {
 		// 		role: UserRole.MODERATOR

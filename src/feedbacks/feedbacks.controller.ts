@@ -5,7 +5,6 @@ import {
 	Post,
 	Req,
 	UploadedFiles,
-	UseFilters,
 	UseInterceptors
 } from '@nestjs/common'
 import { FeedbacksService } from './feedbacks.service'
@@ -15,7 +14,6 @@ import { Roles } from 'src/decorators/roles.decorator'
 import { UserRole } from 'src/constants/contants'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { feedbacksMulterConfig } from './multerConfig/feedBackMulterConfig'
-import { FileLimitExceptionFilter } from './filters/fileLimitFilter.filter'
 
 @ApiTags('Feedbacks')
 @Controller('')

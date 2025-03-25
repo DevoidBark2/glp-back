@@ -38,19 +38,12 @@ export class ComponentTaskController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('/components')
+	@ResponseMessage('Компонент успешно создан!')
 	async createComponentTask(
 		@Body() body: CreateComponentTaskDto,
 		@Req() req: Request
 	) {
-		const component = await this.componentTaskService.create(
-			body,
-			req['user']
-		)
-
-		return {
-			message: 'Компонент успешно создан!',
-			component: component
-		}
+		await this.componentTaskService.create(body, req['user'])
 	}
 
 	@Authorization(UserRole.TEACHER, UserRole.SUPER_ADMIN)
@@ -107,13 +100,7 @@ export class ComponentTaskController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('change-order-component')
-	async changeComponentOrder(
-		@Body() body: ChangeComponentOrderDto,
-		@Req() req: Request
-	) {
-		return await this.componentTaskService.changeComponentOrder(
-			body,
-			req['user']
-		)
+	async changeComponentOrder(@Body() body: ChangeComponentOrderDto) {
+		return await this.componentTaskService.changeComponentOrder(body)
 	}
 }

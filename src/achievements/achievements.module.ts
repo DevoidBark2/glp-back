@@ -9,8 +9,11 @@ import { UserModule } from 'src/user/user.module'
 import { AchievementsListener } from './achievements.listener'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Achievement, User, AchievementUser]), UserModule],
+	imports: [
+		TypeOrmModule.forFeature([Achievement, User, AchievementUser]),
+		UserModule
+	],
 	controllers: [AchievementsController],
 	providers: [AchievementsService, AchievementsListener]
 })
-export class AchievementsModule { }
+export class AchievementsModule {}

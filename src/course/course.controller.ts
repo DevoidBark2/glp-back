@@ -71,6 +71,7 @@ export class CourseController {
 	@ApiConsumes('multipart/form-data')
 	@ApiOperation({ summary: 'Create new course' })
 	@ApiBody({ type: CreateCourseDto })
+	@ResponseMessage('Курс успешно создан!')
 	// @LogAction(ActionEvent.CREATE_COURSE, 'A new course was created')
 	@ApiHeader({
 		name: 'authorization',
@@ -86,15 +87,7 @@ export class CourseController {
 		if (image) {
 			course.image = 'uploads/' + image?.filename
 		}
-		const newCourse = await this.courseService.createCourse(
-			course,
-			req['user']
-		)
-
-		return {
-			course: newCourse,
-			message: 'Курс успешно создан!'
-		}
+		await this.courseService.createCourse(course, req['user'])
 	}
 
 	@Get('get-courses')
@@ -133,11 +126,8 @@ export class CourseController {
 	@ResponseMessage(
 		'Курс отправлен на проверку, ожидайте ответа от модератора'
 	)
-	async publishCourse(
-		@Body() body: { courseId: number },
-		@Req() req: Request
-	) {
-		return await this.courseService.publishCourse(body.courseId, req)
+	async publishCourse(@Body() body: { courseId: number }) {
+		return await this.courseService.publishCourse(body.courseId)
 	}
 
 	@Get('course-details/:id')

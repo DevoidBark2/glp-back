@@ -6,7 +6,6 @@ import { User } from '../user/entity/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CourseEntity } from '../course/entity/course.entity'
-import { ExamUsers } from '../exams/entity/exam-users.entity'
 const robotoFont = fs.readFileSync(
 	'./src/certificate/fonts/Roboto-Regular.ttf',
 	'base64'

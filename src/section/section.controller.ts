@@ -7,19 +7,15 @@ import {
 	Post,
 	Put,
 	Query,
-	Req,
-	UploadedFiles,
-	UseInterceptors
+	Req
 } from '@nestjs/common'
 import { SectionService } from './section.service'
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { CreateSectionCourseDto } from './dto/create_section_course.dto'
 import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 import { MainSectionDto } from './dto/create-main-section.dto'
-import { FilesInterceptor } from '@nestjs/platform-express'
-import { fileOptions } from '../config/fileOption'
 import { Authorization } from '../auth/decorators/auth.decorator'
 import { ChangeSectionCourseDto } from './dto/change_section_course.dto'
 
@@ -79,8 +75,7 @@ export class SectionController {
 	@ApiBody({ type: CreateSectionCourseDto })
 	@ResponseMessage('Раздел успешно обновлен!')
 	async changeSectionCourse(
-		@Body() sectionCourse: ChangeSectionCourseDto,
-		@Req() req: Request
+		@Body() sectionCourse: ChangeSectionCourseDto
 		//s@UploadedFiles() images: Express.Multer.File[]
 	) {
 		// if (!newSectionCourse.uploadFile) {
@@ -92,7 +87,7 @@ export class SectionController {
 		// 		fileName: file.originalname // Оригинальное имя файла от пользователя
 		// 	})
 		// })
-		await this.sectionService.changeSection(sectionCourse, req['user'])
+		await this.sectionService.changeSection(sectionCourse)
 	}
 
 	@Roles(UserRole.SUPER_ADMIN, UserRole.TEACHER)

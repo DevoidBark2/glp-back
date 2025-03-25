@@ -361,7 +361,7 @@ export class CourseService {
 				})
 			: null
 
-		return await this.courseEntityRepository.save({
+		await this.courseEntityRepository.save({
 			...createCourse,
 			user: currentUser,
 			category: category,
@@ -395,7 +395,6 @@ export class CourseService {
 							second_name: true,
 							last_name: true,
 							email: true,
-							phone: true,
 							role: true
 						}
 					}
@@ -420,12 +419,6 @@ export class CourseService {
 	}
 
 	async delete(courseId: number) {
-		const course = await this.courseEntityRepository.findOne({
-			where: {
-				id: courseId
-			}
-		})
-
 		// if (course.status === StatusCourseEnum.IN_PROCESSING) {
 		// 	throw new BadRequestException(
 		// 		'В данный момент курс в обработке, ожидайте ответа от модератора'
@@ -441,7 +434,7 @@ export class CourseService {
 		await this.courseEntityRepository.delete(courseId)
 	}
 
-	async publishCourse(courseId: number, req: Request) {
+	async publishCourse(courseId: number) {
 		// const course = await this.courseEntityRepository.findOne({
 		// 	where: { id: courseId },
 		// 	relations: {
@@ -1059,7 +1052,7 @@ export class CourseService {
 			endExamAt: endExamAt
 		})
 
-		const now = new Date()
+		// const now = new Date()
 		// const delayInMs = endExamAt.getTime() - now.getTime()
 		//
 		// await this.examQueue.add(

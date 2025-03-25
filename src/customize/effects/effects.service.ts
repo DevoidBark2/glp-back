@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Effect } from './entity/effects.entity'
 import { Repository } from 'typeorm'
 import { User } from '../../user/entity/user.entity'
-import { Frame } from '../frames/entity/frames.entity'
 import { Purchase } from '../purchases/entity/purchases.entity'
 import { ActiveCustomization } from '../active_customizations/entity/active_customizations.entity'
 

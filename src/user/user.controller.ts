@@ -10,7 +10,6 @@ import {
 	Put,
 	Query,
 	Req,
-	Res,
 	UploadedFile,
 	UseInterceptors
 } from '@nestjs/common'
@@ -169,16 +168,16 @@ export class UserController {
 		return this.userService.findById(id)
 	}
 
-	@Authorization()
-	@HttpCode(HttpStatus.OK)
-	@Delete('/delete-account')
-	async deleteAccount(
-		@Req() req: Request,
-		@Res({ passthrough: true }) res: Response,
-		@Authorized('id') id: string
-	) {
-		//return await this.userService.deleteAccount(id, req, res)
-	}
+	// @Authorization()
+	// @HttpCode(HttpStatus.OK)
+	// @Delete('/delete-account')
+	// async deleteAccount(
+	// 	@Req() req: Request,
+	// 	@Res({ passthrough: true }) res: Response,
+	// 	@Authorized('id') id: string
+	// ) {
+	// 	//return await this.userService.deleteAccount(id, req, res)
+	// }
 
 	@HttpCode(HttpStatus.OK)
 	@Get('/get-teachers')

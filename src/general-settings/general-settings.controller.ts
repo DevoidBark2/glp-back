@@ -3,7 +3,6 @@ import {
 	Controller,
 	Get,
 	Post,
-	UploadedFile,
 	UploadedFiles,
 	UseInterceptors
 } from '@nestjs/common'
@@ -12,15 +11,11 @@ import { Roles } from '../decorators/roles.decorator'
 import { UserRole } from '../constants/contants'
 import { ApiTags } from '@nestjs/swagger'
 import { ChangeGeneralSettingsDto } from './dto/change-general-settings.dto'
-import {
-	FileFieldsInterceptor,
-	FileInterceptor,
-	FilesInterceptor
-} from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import { multerOptions } from 'src/config/multerConfig'
 import { ResponseMessage } from '../decorators/response-message.decorator'
 
-@ApiTags('Основые настройки')
+@ApiTags('Основные настройки')
 @Controller()
 export class GeneralSettingsController {
 	constructor(

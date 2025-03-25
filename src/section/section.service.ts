@@ -139,7 +139,7 @@ export class SectionService {
 		)
 	}
 
-	async changeSection(section: ChangeSectionCourseDto, user: User) {
+	async changeSection(section: ChangeSectionCourseDto) {
 		console.log(section)
 		// Находим существующий раздел
 		const sectionItem = await this.sectionEntityRepository.findOne({

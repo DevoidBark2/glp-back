@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger'
 
 export class SetExamForCourseDto {
-    @ApiProperty()
-    examId: number
-    @ApiProperty()
-    courseId: number
+	@ApiProperty()
+	examId: number
+	@ApiProperty()
+	courseId: number
 }

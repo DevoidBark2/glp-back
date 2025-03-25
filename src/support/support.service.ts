@@ -21,5 +21,6 @@ export class SupportService {
 
 	sendMsgFromSupport(updateSupportDto: UpdateSupportDto) {
 		//return `This action returns all support`;
+		return updateSupportDto
 	}
 }

@@ -25,7 +25,6 @@ import { TwoFactorAuthModule } from './auth/two-factor-auth/two-factor-auth.modu
 import { CommentsModule } from './comments/comments.module'
 import { ExamsModule } from './exams/exams.module'
 import { ReviewModule } from './review/review.module'
-import { PdfModule } from './pdf/pdf.module'
 import { ThreeModelModule } from './three-model/three-model.module'
 import { UsersLevelsModule } from './users-levels/users-levels.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
@@ -95,7 +94,6 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 		CommentsModule,
 		ExamsModule,
 		ReviewModule,
-		PdfModule,
 		ThreeModelModule,
 		UsersLevelsModule,
 		CoinsModule,

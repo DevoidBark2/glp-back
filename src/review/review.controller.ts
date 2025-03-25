@@ -15,7 +15,7 @@ import { ResponseMessage } from 'src/decorators/response-message.decorator'
 
 @Controller('')
 export class ReviewController {
-	constructor(private readonly reviewService: ReviewService) { }
+	constructor(private readonly reviewService: ReviewService) {}
 
 	@Authorization()
 	@Post('/course-review')

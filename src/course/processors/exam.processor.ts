@@ -20,7 +20,7 @@ export class ExamProcessor {
 		)
 
 		console.log(
-			`Экзамен: ${examId} Результат: X правильных, X неправильных`
+			`Экзамен: ${result.id} Результат: X правильных, X неправильных`
 		)
 	}
 }

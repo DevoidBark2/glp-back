@@ -64,6 +64,6 @@ export class CourseEntity {
 	exam: ExamEntity
 	@CreateDateColumn()
 	created_at: Date
-	@OneToMany(() => ReviewCourse, (review) => review.course, { cascade: true })
-	reviews: ReviewCourse[];
+	@OneToMany(() => ReviewCourse, review => review.course, { cascade: true })
+	reviews: ReviewCourse[]
 }

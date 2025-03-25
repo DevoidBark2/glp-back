@@ -19,7 +19,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('FAQ')
 @Controller()
 export class FaqController {
-	constructor(private readonly faqService: FaqService) { }
+	constructor(private readonly faqService: FaqService) {}
 
 	@Roles(UserRole.SUPER_ADMIN)
 	@Post('faq')
@@ -35,7 +35,7 @@ export class FaqController {
 
 	@Get('faq/:id')
 	async getFaqById(@Param('id') id: number) {
-		return this.faqService.getById(id);
+		return this.faqService.getById(id)
 	}
 
 	@Roles(UserRole.SUPER_ADMIN)

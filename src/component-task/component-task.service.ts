@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { ChangeComponentOrderDto } from './dto/change-component-order.dto'
 import { SectionComponentTask } from '../section/entity/section-component-task.entity'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { AddCoinsForUser, AddXpForUser } from './events/component-task.events'
 import { CourseService } from 'src/course/course.service'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { CourseUser } from '../course/entity/course-user.entity'
@@ -47,32 +46,11 @@ export class ComponentTaskService {
 	) {}
 
 	async create(componentTask: CreateComponentTaskDto, user: User) {
-		const newComponent = await this.componentTaskRepository.save({
+		await this.componentTaskRepository.save({
 			id: uuidv4(),
 			user,
 			...componentTask
 		})
-
-		const newComponentUser = newComponent.user
-
-		return {
-			...{
-				id: newComponent.id,
-				title: newComponent.title,
-				created_at: newComponent.created_at,
-				type: newComponent.type,
-				status: newComponent.status
-			},
-			user: {
-				id: newComponentUser.id,
-				first_name: newComponentUser.first_name,
-				second_name: newComponentUser.second_name,
-				last_name: newComponentUser.last_name,
-				role: newComponentUser.role,
-				email: newComponentUser.email,
-				phone: newComponentUser.phone
-			}
-		}
 	}
 
 	async getAll(user: User) {
@@ -176,7 +154,7 @@ export class ComponentTaskService {
 		})
 	}
 
-	async changeComponentOrder(body: ChangeComponentOrderDto, user: User) {
+	async changeComponentOrder(body: ChangeComponentOrderDto) {
 		body.components.map(async component => {
 			const componentTask =
 				await this.sectionComponentTaskRepository.findOne({

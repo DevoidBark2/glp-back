@@ -17,7 +17,7 @@ export class CommentsService {
 		@InjectRepository(SectionEntity)
 		private readonly sectionEntityRepository: Repository<SectionEntity>,
 		private eventEmitter: EventEmitter2
-	) { }
+	) {}
 
 	async getSectionComments(sectionId: number) {
 		return await this.commentsRepository.find({
@@ -54,7 +54,7 @@ export class CommentsService {
 			user: user
 		})
 
-		this.eventEmitter.emit('comment.added', new CommentAddedEvent(user.id));
+		this.eventEmitter.emit('comment.added', new CommentAddedEvent(user.id))
 
 		return {
 			id: newComment.id,
