@@ -7,9 +7,15 @@ import { UserModule } from '../user/user.module'
 import { ExamsComponent } from './entity/exams-components.entity'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { WebsocketGateway } from '../websockets/websocket.gateway'
+import { CourseUser } from '../course/entity/course-user.entity'
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([ExamEntity, ExamsComponent, CourseEntity]),
+		TypeOrmModule.forFeature([
+			ExamEntity,
+			ExamsComponent,
+			CourseEntity,
+			CourseUser
+		]),
 		UserModule
 	],
 	controllers: [ExamsController],

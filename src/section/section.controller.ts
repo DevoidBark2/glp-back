@@ -42,40 +42,40 @@ export class SectionController {
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Post('/sections')
-	@UseInterceptors(FilesInterceptor('uploadFile', 10, fileOptions))
-	@ApiConsumes('multipart/form-data')
+	// @UseInterceptors(FilesInterceptor('uploadFile', 10, fileOptions))
+	// @ApiConsumes('multipart/form-data')
 	@ApiBody({ type: CreateSectionCourseDto })
 	@ResponseMessage('Раздел успешно создан!')
 	async createSectionCourse(
 		@Body() newSectionCourse: CreateSectionCourseDto,
-		@Req() req: Request,
-		@UploadedFiles() images: Express.Multer.File[]
+		@Req() req: Request
+		// @UploadedFiles() images: Express.Multer.File[]
 	) {
-		console.log(images)
-		if (typeof newSectionCourse.course === 'string') {
-			newSectionCourse.course = JSON.parse(newSectionCourse.course)
-		}
-		if (typeof newSectionCourse.externalLinks === 'string') {
-			newSectionCourse.externalLinks = JSON.parse(
-				newSectionCourse.externalLinks
-			)
-		}
-		if (!newSectionCourse.uploadFile) {
-			newSectionCourse.uploadFile = []
-		}
-		images.forEach((file: Express.Multer.File) => {
-			newSectionCourse.uploadFile.push({
-				filePath: 'uploads/' + file.filename,
-				fileName: file.originalname
-			})
-		})
+		// console.log(images)
+		// if (typeof newSectionCourse.course === 'string') {
+		// 	newSectionCourse.course = JSON.parse(newSectionCourse.course)
+		// }
+		// if (typeof newSectionCourse.externalLinks === 'string') {
+		// 	newSectionCourse.externalLinks = JSON.parse(
+		// 		newSectionCourse.externalLinks
+		// 	)
+		// }
+		// if (!newSectionCourse.uploadFile) {
+		// 	newSectionCourse.uploadFile = []
+		// }
+		// images.forEach((file: Express.Multer.File) => {
+		// 	newSectionCourse.uploadFile.push({
+		// 		filePath: 'uploads/' + file.filename,
+		// 		fileName: file.originalname
+		// 	})
+		// })
 		await this.sectionService.createSection(newSectionCourse, req['user'])
 	}
 
 	@Authorization(UserRole.SUPER_ADMIN, UserRole.TEACHER)
 	@Put('/sections')
-	@UseInterceptors(FilesInterceptor('uploadFile', 10, fileOptions))
-	@ApiConsumes('multipart/form-data')
+	// @UseInterceptors(FilesInterceptor('uploadFile', 10, fileOptions))
+	// @ApiConsumes('multipart/form-data')
 	@ApiBody({ type: CreateSectionCourseDto })
 	@ResponseMessage('Раздел успешно обновлен!')
 	async changeSectionCourse(

@@ -69,7 +69,7 @@ export class CourseController {
 	@Post('/course')
 	@UseInterceptors(FileInterceptor('image', multerOptions))
 	@ApiConsumes('multipart/form-data')
-	@ApiOperation({ summary: 'Create new post' })
+	@ApiOperation({ summary: 'Create new course' })
 	@ApiBody({ type: CreateCourseDto })
 	// @LogAction(ActionEvent.CREATE_COURSE, 'A new course was created')
 	@ApiHeader({
@@ -82,6 +82,7 @@ export class CourseController {
 		@Req() req: Request,
 		@UploadedFile() image: Express.Multer.File
 	) {
+		console.log(image)
 		if (image) {
 			course.image = 'uploads/' + image?.filename
 		}

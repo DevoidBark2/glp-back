@@ -8,6 +8,7 @@ import { ExamsComponent } from './entity/exams-components.entity'
 import { SetExamForCourseDto } from './dto/set-exam-for-course.dto'
 import { CourseEntity } from 'src/course/entity/course.entity'
 import { ChangeExamDto } from './dto/change-exam.dto'
+import { CourseUser } from '../course/entity/course-user.entity'
 
 @Injectable()
 export class ExamsService {
@@ -17,7 +18,9 @@ export class ExamsService {
 		@InjectRepository(ExamsComponent)
 		private readonly examsComponentRepository: Repository<ExamsComponent>,
 		@InjectRepository(CourseEntity)
-		private readonly courseRepository: Repository<CourseEntity>
+		private readonly courseRepository: Repository<CourseEntity>,
+		@InjectRepository(CourseUser)
+		private readonly courseUserRepository: Repository<CourseUser>
 	) {}
 
 	async findAll(user: User) {
@@ -106,6 +109,19 @@ export class ExamsService {
 	}
 
 	async setExamForCourse(body: SetExamForCourseDto) {
+		const courseMembers = await this.courseUserRepository.find({
+			where: {
+				course: {
+					id: body.courseId
+				}
+			}
+		})
+
+		if (courseMembers.length > 0) {
+			throw new BadRequestException(
+				'Невозможно изменить экзамен, так как у курса уже есть участники.'
+			)
+		}
 		const exam = await this.examEntityRepository.findOne({
 			where: {
 				id: body.examId
