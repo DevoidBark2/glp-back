@@ -83,7 +83,6 @@ export class CourseController {
 		@Req() req: Request,
 		@UploadedFile() image: Express.Multer.File
 	) {
-		console.log(image)
 		if (image) {
 			course.image = 'uploads/' + image?.filename
 		}

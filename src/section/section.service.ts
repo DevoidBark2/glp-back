@@ -97,8 +97,6 @@ export class SectionService {
 				order: { sort_number: 'DESC' }
 			})
 
-			console.log(lastSection)
-
 			sortNumber =
 				lastSection.length > 0
 					? Number(lastSection[0].sort_number) + 1
@@ -140,7 +138,6 @@ export class SectionService {
 	}
 
 	async changeSection(section: ChangeSectionCourseDto) {
-		console.log(section)
 		// Находим существующий раздел
 		const sectionItem = await this.sectionEntityRepository.findOne({
 			where: { id: Number(section.id) },
@@ -312,7 +309,6 @@ export class SectionService {
 		parentId: number
 		sections: { id: number; sort: number }[]
 	}) {
-		console.log(body)
 		for (const section of body.sections) {
 			await this.sectionEntityRepository.update(section.id, {
 				sort_number: section.sort

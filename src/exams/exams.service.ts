@@ -69,8 +69,6 @@ export class ExamsService {
 	}
 
 	async changeExam(body: ChangeExamDto, examId: number) {
-		console.log(body)
-		console.log(examId)
 		await this.examsComponentRepository.delete({
 			exam: { id: examId }
 		})

@@ -171,8 +171,6 @@ export class ComponentTaskService {
 	}
 
 	async addAnswerForTask(body: SaveTaskUserDto, user: User) {
-		console.log(body)
-
 		const course = await this.courseEntityRepository.findOne({
 			where: {
 				id: body.courseId
@@ -343,7 +341,6 @@ export class ComponentTaskService {
 		})
 
 		if (progress === 100) {
-			console.log('YOOO')
 		}
 
 		return {
@@ -428,7 +425,6 @@ export class ComponentTaskService {
 				user: { id: userId }
 			}
 		})
-		console.log(courseUser)
 		await this.courseUserRepository.update(courseUser.id, {
 			has_certificate: percentageScore > 75
 		})

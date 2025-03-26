@@ -11,7 +11,6 @@ export class ExamProcessor {
 		job: Job<{ userId: string; examId: number; courseId: number }>
 	) {
 		const { userId, examId, courseId } = job.data
-		console.log(`Проверяем экзамен пользователя ${userId}`)
 
 		const result = await this.componentTaskService.submitExamUser(
 			examId,
@@ -19,8 +18,8 @@ export class ExamProcessor {
 			userId
 		)
 
-		console.log(
-			`Экзамен: ${result.id} Результат: X правильных, X неправильных`
-		)
+		// console.log(
+		// 	`Экзамен: ${result.id} Результат: X правильных, X неправильных`
+		// )
 	}
 }

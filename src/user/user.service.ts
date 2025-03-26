@@ -236,7 +236,6 @@ export class UserService {
 	}
 
 	async getUserProfileInfo(userId: string) {
-		console.log(userId)
 		const user = await this.userRepository.findOne({
 			where: {
 				id: userId
@@ -256,8 +255,6 @@ export class UserService {
 				course: true
 			}
 		})
-
-		console.log(userCourses)
 
 		return {
 			id: userId,

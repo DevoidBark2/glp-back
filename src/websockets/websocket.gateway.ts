@@ -57,7 +57,6 @@ export class WebsocketGateway
 		@MessageBody()
 		{ quiz, answer }: { quiz: ComponentTask; answer: number[] | string }
 	) {
-		console.log(quiz, answer)
 		// await this.examService.saveProgress(userId, questionIndex)
 		// client.emit('progressSaved', { questionIndex })
 	}
@@ -75,9 +74,9 @@ export class WebsocketGateway
 		userId: string
 		achievementTitle: string
 	}) {
-		console.log(
-			`Пользователь ${event.userId} получил достижение: ${event.achievementTitle}`
-		)
+		// console.log(
+		// 	`Пользователь ${event.userId} получил достижение: ${event.achievementTitle}`
+		// )
 
 		// Отправляем уведомление через сокет
 		this.server.emit('achievementNotification', {
